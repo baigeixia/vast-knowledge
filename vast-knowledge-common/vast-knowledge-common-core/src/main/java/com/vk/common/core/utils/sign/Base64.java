@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * Base64工具类
  * 
- * @author ruoyi
+ * @author vk
  */
 public final class Base64
 {

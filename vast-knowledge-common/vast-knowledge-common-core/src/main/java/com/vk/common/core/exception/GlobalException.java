@@ -13,7 +13,7 @@ import java.io.Serial;
 /**
  * 全局异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public class GlobalException extends RuntimeException
 {

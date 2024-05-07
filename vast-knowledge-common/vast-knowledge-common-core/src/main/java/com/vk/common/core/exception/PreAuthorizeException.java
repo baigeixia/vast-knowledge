@@ -5,7 +5,7 @@ import java.io.Serial;
 /**
  * 权限异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public class PreAuthorizeException extends RuntimeException
 {

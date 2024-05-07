@@ -3,7 +3,7 @@ package com.vk.common.log.enums;
 /**
  * 操作状态
  * 
- * @author ruoyi
+ * @author vk
  *
  */
 public enum BusinessStatus

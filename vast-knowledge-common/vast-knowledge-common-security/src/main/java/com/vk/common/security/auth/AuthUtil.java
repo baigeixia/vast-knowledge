@@ -8,7 +8,7 @@ import com.vk.system.api.model.LoginUser;
 /**
  * Token 权限验证工具类
  * 
- * @author ruoyi
+ * @author vk
  */
 public class AuthUtil
 {

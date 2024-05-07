@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 字典工具类
  * 
- * @author ruoyi
+ * @author vk
  */
 public class DictUtils
 {

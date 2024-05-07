@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * 全局异常处理器
  *
- * @author ruoyi
+ * @author vk
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler

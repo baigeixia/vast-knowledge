@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * 字符串工具类
  * 
- * @author ruoyi
+ * @author vk
  */
 public class StringUtils extends org.apache.commons.lang3.StringUtils
 {
@@ -56,6 +56,17 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
     public static boolean isNotEmpty(Collection<?> coll)
     {
         return !isEmpty(coll);
+    }
+
+    /**
+     * 是否为http(s)://开头
+     *
+     * @param link 链接
+     * @return 结果
+     */
+    public static boolean ishttp(String link)
+    {
+        return StringUtils.startsWithAny(link, Constants.HTTP, Constants.HTTPS);
     }
 
     /**

@@ -8,7 +8,7 @@ import com.vk.common.core.utils.StringUtils;
 /**
  * sql操作工具类
  * 
- * @author ruoyi
+ * @author vk
  */
 public class SqlUtil
 {

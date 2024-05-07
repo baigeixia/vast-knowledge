@@ -3,7 +3,7 @@ package com.vk.common.log.enums;
 /**
  * 操作人类别
  * 
- * @author ruoyi
+ * @author vk
  */
 public enum OperatorType
 {

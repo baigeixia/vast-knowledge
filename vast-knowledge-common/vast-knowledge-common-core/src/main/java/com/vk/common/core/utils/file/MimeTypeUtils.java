@@ -3,7 +3,7 @@ package com.vk.common.core.utils.file;
 /**
  * 媒体类型工具类
  * 
- * @author ruoyi
+ * @author vk
  */
 public class MimeTypeUtils
 {

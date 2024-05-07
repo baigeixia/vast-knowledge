@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 /**
  * 自定义xss校验注解
  * 
- * @author ruoyi
+ * @author vk
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.METHOD, ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.PARAMETER })

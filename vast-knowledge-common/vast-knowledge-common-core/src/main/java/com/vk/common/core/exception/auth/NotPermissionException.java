@@ -8,7 +8,7 @@ import java.io.Serial;
 /**
  * 未能通过的权限认证异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public class NotPermissionException extends RuntimeException
 {

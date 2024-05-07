@@ -137,6 +137,17 @@ public class TokenUtils {
     }
 
     /**
+     * 根据身份信息获取用户名
+     *
+     * @param token token
+     * @return 用户名
+     */
+    public static String getUserName(String token)
+    {
+        Claims claims = parseToken(token);
+        return getValue(claims, SecurityConstants.DETAILS_USERNAME);
+    }
+    /**
      * 根据令牌获取用户标识
      *
      * @param token 令牌

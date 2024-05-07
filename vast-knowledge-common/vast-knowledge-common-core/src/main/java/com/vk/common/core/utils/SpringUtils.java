@@ -11,7 +11,7 @@ import reactor.util.annotation.NonNull;
 /**
  * spring工具类 方便在非spring管理环境中获取bean
  * 
- * @author ruoyi
+ * @author vk
  */
 @Component
 public final class SpringUtils implements BeanFactoryPostProcessor

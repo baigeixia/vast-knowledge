@@ -7,13 +7,13 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 /**
  * 网关启动程序
  * 
- * @author ruoyi
+ * @author vk
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
-public class RuoYiGatewayApplication
+public class VkGatewayApplication
 {
     public static void main(String[] args)
     {
-        SpringApplication.run(RuoYiGatewayApplication.class, args);
+        SpringApplication.run(VkGatewayApplication.class, args);
     }
 }

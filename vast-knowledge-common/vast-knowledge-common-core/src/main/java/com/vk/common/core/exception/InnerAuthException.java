@@ -5,7 +5,7 @@ import java.io.Serial;
 /**
  * 内部认证异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public class InnerAuthException extends RuntimeException
 {

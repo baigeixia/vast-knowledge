@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * 网关鉴权
  * 
- * @author ruoyi
+ * @author vk
  */
 @Component
 public class AuthFilter implements GlobalFilter, Ordered

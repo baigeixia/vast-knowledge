@@ -5,7 +5,7 @@ import java.io.Serial;
 /**
  * 检查异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public class CheckedException extends RuntimeException
 {

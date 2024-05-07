@@ -19,7 +19,7 @@ com.alibaba.nacos.api.exception.NacosException: dataId invalid
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:333)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
-	at com.vk.gateway.RuoYiGatewayApplication.main(RuoYiGatewayApplication.java:17)
+	at com.vk.gateway.VkGatewayApplication.main(RuoYiGatewayApplication.java:17)
 17:39:54.675 [main] ERROR c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,111] - get data from Nacos error,dataId:gateway-application-${spring.profiles.active}.yml 
 com.alibaba.nacos.api.exception.NacosException: dataId invalid
 	at com.alibaba.nacos.client.config.utils.ParamUtils.checkKeyParam(ParamUtils.java:102)
@@ -41,7 +41,7 @@ com.alibaba.nacos.api.exception.NacosException: dataId invalid
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:333)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354)
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
-	at com.vk.gateway.RuoYiGatewayApplication.main(RuoYiGatewayApplication.java:17)
+	at com.vk.gateway.VkGatewayApplication.main(RuoYiGatewayApplication.java:17)
 18:02:12.189 [reactor-http-nio-2] ERROR o.s.b.a.w.r.e.AbstractErrorWebExceptionHandler - [error,102] - [49b76edd-10]  500 Server Error for HTTP GET "/code"
 java.lang.NullPointerException: Cannot invoke "java.lang.Boolean.booleanValue()" because the return value of "com.vk.gateway.config.properties.CaptchaProperties.getEnabled()" is null
 	at com.vk.gateway.service.impl.ValidateCodeServiceImpl.createCaptcha(ValidateCodeServiceImpl.java:53)
@@ -191,7 +191,7 @@ Original Stack Trace:
 		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 		at java.base/java.lang.Thread.run(Thread.java:1583)
 18:03:42.345 [reactor-http-nio-2] ERROR o.s.b.a.w.r.e.AbstractErrorWebExceptionHandler - [error,102] - [ad713a2b-1]  500 Server Error for HTTP GET "/code"
-com.google.code.kaptcha.util.ConfigException: Invalid value 'com.ruoyi.gateway.config.KaptchaTextCreator' for config parameter 'kaptcha.textproducer.impl'.
+com.google.code.kaptcha.util.ConfigException: Invalid value 'com.vk.gateway.config.KaptchaTextCreator' for config parameter 'kaptcha.textproducer.impl'.
 	at com.google.code.kaptcha.util.ConfigHelper.getClassInstance(ConfigHelper.java:119)
 	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
 Error has been observed at the following site(s):
@@ -267,7 +267,7 @@ Original Stack Trace:
 		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
 		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 		at java.base/java.lang.Thread.run(Thread.java:1583)
-Caused by: java.lang.ClassNotFoundException: com.ruoyi.gateway.config.KaptchaTextCreator
+Caused by: java.lang.ClassNotFoundException: com.vk.gateway.config.KaptchaTextCreator
 	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
 	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
 	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:526)

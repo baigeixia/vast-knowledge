@@ -5,7 +5,7 @@ import java.io.Serial;
 /**
  * 未能通过的登录认证异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public class NotLoginException extends RuntimeException
 {

@@ -6,7 +6,7 @@ import com.vk.common.core.utils.StringUtils;
 /**
  * 转义和反转义工具类
  * 
- * @author ruoyi
+ * @author vk
  */
 public class EscapeUtil
 {

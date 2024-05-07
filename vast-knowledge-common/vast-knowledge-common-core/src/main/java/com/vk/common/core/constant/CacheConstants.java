@@ -3,7 +3,7 @@ package com.vk.common.core.constant;
 /**
  * 缓存常量信息
  * 
- * @author ruoyi
+ * @author vk
  */
 public class CacheConstants
 {

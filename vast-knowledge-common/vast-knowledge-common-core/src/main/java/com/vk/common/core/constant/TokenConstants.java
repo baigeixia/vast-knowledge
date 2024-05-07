@@ -3,7 +3,7 @@ package com.vk.common.core.constant;
 /**
  * Token的Key常量
  * 
- * @author ruoyi
+ * @author vk
  */
 public class TokenConstants
 {

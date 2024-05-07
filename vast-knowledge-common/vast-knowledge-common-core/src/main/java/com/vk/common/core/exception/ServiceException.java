@@ -5,7 +5,7 @@ import java.io.Serial;
 /**
  * 业务异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public final class ServiceException extends RuntimeException
 {

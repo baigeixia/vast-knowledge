@@ -3,7 +3,7 @@ package com.vk.common.core.constant;
 /**
  * 返回状态码
  * 
- * @author ruoyi
+ * @author vk
  */
 public class HttpStatus
 {

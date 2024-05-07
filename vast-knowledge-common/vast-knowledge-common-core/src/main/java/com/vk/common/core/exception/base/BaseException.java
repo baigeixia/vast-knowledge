@@ -5,7 +5,7 @@ import java.io.Serial;
 /**
  * 基础异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public class BaseException extends RuntimeException
 {

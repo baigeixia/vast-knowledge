@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 /**
  * 主库数据源
  * 
- * @author ruoyi
+ * @author vk
  */
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

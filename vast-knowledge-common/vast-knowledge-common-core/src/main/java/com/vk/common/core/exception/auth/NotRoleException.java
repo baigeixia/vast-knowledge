@@ -7,7 +7,7 @@ import java.io.Serial;
 /**
  * 未能通过的角色认证异常
  * 
- * @author ruoyi
+ * @author vk
  */
 public class NotRoleException extends RuntimeException
 {

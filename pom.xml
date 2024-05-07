@@ -14,6 +14,7 @@
         <module>vast-knowledge-getway</module>
         <module>vast-knowledge-common</module>
         <module>vast-knowledge-api</module>
+        <module>vast-knowledge-service</module>
     </modules>
 
     <properties>
@@ -25,10 +26,11 @@
         <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
         <spring-boot.version>3.2.5</spring-boot.version>
         <spring-framework.version>6.1.6</spring-framework.version>
-        <swagger.core.version>2.0.0-rc2</swagger.core.version>
         <tobato.version>1.27.2</tobato.version>
         <kaptcha.version>2.3.3</kaptcha.version>
-        <swagger.fox.version>3.0.0</swagger.fox.version>
+        <swagger.core.version>2.5.0</swagger.core.version>
+        <lombok.version>1.18.32</lombok.version>
+<!--        <swagger.fox.version>3.0.0</swagger.fox.version>-->
         <pagehelper.boot.version>2.1.0</pagehelper.boot.version>
         <commons.io.version>2.16.1</commons.io.version>
         <fastjson.version>2.0.49</fastjson.version>
@@ -96,16 +98,30 @@
                 <version>${tobato.version}</version>
             </dependency>
 
-            <!-- Swagger 依赖配置 -->
+<!--            &lt;!&ndash; Swagger 依赖配置 &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>io.swagger</groupId>-->
+<!--                <artifactId>swagger-models</artifactId>-->
+<!--                <version>${swagger.core.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>io.swagger</groupId>-->
+<!--                <artifactId>swagger-annotations</artifactId>-->
+<!--                <version>${swagger.core.version}</version>-->
+<!--            </dependency>-->
+
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-models</artifactId>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${swagger.core.version}</version>
             </dependency>
+
+            <!-- lombok -->
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger.core.version}</version>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- 验证码 -->
@@ -205,6 +221,27 @@
             <dependency>
                 <groupId>com.vk</groupId>
                 <artifactId>vast-knowledge-common-swagger</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- vk Common DataSource -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-datasource</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- vk Common DataScope -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-datascope</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- vk Common Log -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-log</artifactId>
                 <version>${vk.version}</version>
             </dependency>
 

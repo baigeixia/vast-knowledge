@@ -7,7 +7,7 @@ import java.io.Serial;
 /**
  * 文件上传异常类
  * 
- * @author ruoyi
+ * @author vk
  */
 public class FileUploadException extends Exception
 {

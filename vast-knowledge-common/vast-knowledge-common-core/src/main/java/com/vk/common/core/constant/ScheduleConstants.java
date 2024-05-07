@@ -3,7 +3,7 @@ package com.vk.common.core.constant;
 /**
  * 任务调度通用常量
  * 
- * @author ruoyi
+ * @author vk
  */
 public class ScheduleConstants
 {
