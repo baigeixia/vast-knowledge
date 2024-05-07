@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.om</groupId>
+    <groupId>com.vk</groupId>
     <artifactId>vast-knowledge</artifactId>
     <version>0.0.1</version>
     <packaging>pom</packaging>
@@ -13,9 +13,11 @@
     <modules>
         <module>vast-knowledge-getway</module>
         <module>vast-knowledge-common</module>
+        <module>vast-knowledge-api</module>
     </modules>
 
     <properties>
+        <vk.version>0.0.1</vk.version>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -26,13 +28,17 @@
         <swagger.core.version>2.0.0-rc2</swagger.core.version>
         <tobato.version>1.27.2</tobato.version>
         <kaptcha.version>2.3.3</kaptcha.version>
+        <swagger.fox.version>3.0.0</swagger.fox.version>
         <pagehelper.boot.version>2.1.0</pagehelper.boot.version>
         <commons.io.version>2.16.1</commons.io.version>
         <fastjson.version>2.0.49</fastjson.version>
         <jjwt.version>0.12.5</jjwt.version>
         <easy.version>3.3.4</easy.version>
+        <druid.version>1.2.22</druid.version>
+        <dynamic-ds.version>4.3.0</dynamic-ds.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <jakarta.servlet.version>6.1.0-M2</jakarta.servlet.version>
+        <mybatis-flex.version>1.8.8</mybatis-flex.version>
     </properties>
 
     <dependencies>
@@ -151,12 +157,55 @@
                 <version>${transmittable-thread-local.version}</version>
             </dependency>
 
-            <!-- servlet-->
+            <!-- mybatis-flex -->
             <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>${jakarta.servlet.version}</version>
-                <scope>provided</scope>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
+                <version>${mybatis-flex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-processor</artifactId>
+                <version>${mybatis-flex.version}</version>
+            </dependency>
+
+            <!-- 核心模块 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-core</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- 系统接口 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-system</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- 缓存服务 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-redis</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-security</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-gateway</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-swagger</artifactId>
+                <version>${vk.version}</version>
             </dependency>
 
         </dependencies>
