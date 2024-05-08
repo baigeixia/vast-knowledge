@@ -7,6 +7,7 @@ import com.vk.common.core.domain.R;
 
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
+import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;

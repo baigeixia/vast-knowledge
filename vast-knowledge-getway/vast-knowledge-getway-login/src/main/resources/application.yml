@@ -3,27 +3,26 @@ server:
 spring:
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]': # 匹配所有请求
-            allowedOrigins: '*' #跨域处理 允许所有的域
-            allowedHeaders: '*'
-            allowedMethods: # 支持的方法
-              - GET
-              - POST
-              - PUT
-              - DELETE
+#      globalcors:
+#        corsConfigurations:
+#          '[/**]': # 匹配所有请求
+#            allowedOriginPatterns: '*' #跨域处理 允许所有的域
+#            allowed-headers: '*'
+#            allowed-methods: '*'
+#            allow-credentials: true
+#            exposedHeaders: "Content-Disposition,Content-Type,Cache-Control"
       routes:
         # 用户微服
-        - id: service-admin
-          uri: lb://service-admin
+        - id: vk-service-system
+          uri: lb://vk-service-system
           predicates:
             - Path=/dev-api/admin/**
           filters:
             - StripPrefix=2
-        - id: service-admin
-          uri: lb://service-admin
+        # 权限微服
+        - id: vk-service-auth
+          uri: lb://vk-service-auth
           predicates:
-            - Path=/dev-api/admin/**
+            - Path=/dev-api/auth/**
           filters:
             - StripPrefix=2

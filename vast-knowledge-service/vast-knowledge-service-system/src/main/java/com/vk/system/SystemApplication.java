@@ -17,10 +17,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableRyFeignClients
 @SpringBootApplication
 @MapperScan("com.vk.system.mapper")
-public class VkSystemApplication
+public class SystemApplication
 {
     public static void main(String[] args)
     {
-        SpringApplication.run(VkSystemApplication.class, args);
+        SpringApplication.run(SystemApplication.class, args);
     }
 }

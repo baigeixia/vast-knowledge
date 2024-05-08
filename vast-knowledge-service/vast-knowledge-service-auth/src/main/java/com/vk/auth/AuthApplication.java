@@ -12,10 +12,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  */
 @EnableRyFeignClients
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
-public class VkAuthApplication
+public class AuthApplication
 {
     public static void main(String[] args)
     {
-        SpringApplication.run(VkAuthApplication.class, args);
+        SpringApplication.run(AuthApplication.class, args);
     }
 }

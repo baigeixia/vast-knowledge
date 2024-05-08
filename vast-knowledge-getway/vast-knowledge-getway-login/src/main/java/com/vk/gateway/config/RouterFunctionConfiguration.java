@@ -25,7 +25,7 @@ public class RouterFunctionConfiguration
     public RouterFunction routerFunction()
     {
         return RouterFunctions.route(
-                RequestPredicates.GET("/code").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)),
-                validateCodeHandler);
+                RequestPredicates.GET("/dev-api/code").and(RequestPredicates.accept(MediaType.TEXT_PLAIN))
+                ,validateCodeHandler);
     }
 }

@@ -39,7 +39,7 @@ public class SysLogininfor extends BaseEntity
     /** 访问时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Excel(name = "访问时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
-    private Date accessTime;
+    private Date loginTime;
 
     public Long getInfoId()
     {
@@ -91,13 +91,13 @@ public class SysLogininfor extends BaseEntity
         this.msg = msg;
     }
 
-    public Date getAccessTime()
+    public Date getLoginTime()
     {
-        return accessTime;
+        return loginTime;
     }
 
-    public void setAccessTime(Date accessTime)
+    public void setLoginTime(Date loginTime)
     {
-        this.accessTime = accessTime;
+        this.loginTime = loginTime;
     }
 }

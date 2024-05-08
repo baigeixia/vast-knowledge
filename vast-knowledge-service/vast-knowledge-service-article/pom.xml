@@ -5,28 +5,51 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.vk</groupId>
-        <artifactId>vast-knowledge-getway</artifactId>
+        <artifactId>vast-knowledge-service</artifactId>
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>vast-knowledge-getway-login</artifactId>
+    <groupId>com.vk.article</groupId>
+    <artifactId>vast-knowledge-service-article</artifactId>
 
+    <description>
+        文章模块
+    </description>
 
     <dependencies>
-        <!--验证码 -->
+
+        <!-- SpringCloud Alibaba Nacos -->
         <dependency>
-            <groupId>pro.fessional</groupId>
-            <artifactId>kaptcha</artifactId>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- SpringCloud Alibaba Nacos Config -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- vk Common DataSource -->
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-datasource</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- vk Common Swagger -->
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-swagger</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.vk</groupId>
-            <artifactId>vast-knowledge-common-gateway</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vk</groupId>
-            <artifactId>vast-knowledge-common-redis</artifactId>
+            <artifactId>vast-knowledge-common-core</artifactId>
         </dependency>
 
     </dependencies>
@@ -47,5 +70,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

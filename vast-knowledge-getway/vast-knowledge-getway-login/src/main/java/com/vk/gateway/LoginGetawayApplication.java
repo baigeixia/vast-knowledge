@@ -10,10 +10,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * @author vk
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
-public class VkGatewayApplication
+public class LoginGetawayApplication
 {
     public static void main(String[] args)
     {
-        SpringApplication.run(VkGatewayApplication.class, args);
+        SpringApplication.run(LoginGetawayApplication.class, args);
     }
 }

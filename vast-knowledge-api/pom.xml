@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>vast-knowledge-api-system</module>
+        <module>vast-knowledge-api-article</module>
     </modules>
 
     <properties>

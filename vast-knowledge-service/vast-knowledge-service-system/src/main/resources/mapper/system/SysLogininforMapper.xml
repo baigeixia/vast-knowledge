@@ -10,16 +10,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="status"        column="status"            />
 		<result property="ipaddr"        column="ipaddr"            />
 		<result property="msg"           column="msg"               />
-		<result property="accessTime"    column="access_time"       />
+		<result property="loginTime"    column="login_time"       />
 	</resultMap>
 
 	<insert id="insertLogininfor" parameterType="SysLogininfor">
-		insert into sys_logininfor (user_name, status, ipaddr, msg, access_time)
+		insert into sys_logininfor (user_name, status, ipaddr, msg, login_time)
 		values (#{userName}, #{status}, #{ipaddr}, #{msg}, sysdate())
 	</insert>
 	
 	<select id="selectLogininforList" parameterType="SysLogininfor" resultMap="SysLogininforResult">
-		select info_id, user_name, ipaddr, status, msg, access_time from sys_logininfor
+		select info_id, user_name, ipaddr, status, msg, login_time from sys_logininfor
 		<where>
 			<if test="ipaddr != null and ipaddr != ''">
 				AND ipaddr like concat('%', #{ipaddr}, '%')
@@ -31,10 +31,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				AND user_name like concat('%', #{userName}, '%')
 			</if>
 			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-				AND access_time &gt;= #{params.beginTime}
+				AND login_time &gt;= #{params.beginTime}
 			</if>
 			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-				AND access_time &lt;= #{params.endTime}
+				AND login_time &lt;= #{params.endTime}
 			</if>
 		</where>
 		order by info_id desc
