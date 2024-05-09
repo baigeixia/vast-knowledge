@@ -53,9 +53,6 @@ public class SysUserController extends BaseController
     @Autowired
     private ISysPermissionService permissionService;
 
-    @Autowired
-    private ISysConfigService configService;
-
     /**
      * 获取用户列表
      */
@@ -104,7 +101,7 @@ public class SysUserController extends BaseController
      */
     @InnerAuth
     @GetMapping("/info/{username}")
-    public R<LoginUser> info(@PathVariable("username") String username)
+    public R<LoginUser> info(@PathVariable(name = "username") String username)
     {
         SysUser sysUser = userService.selectUserByUserName(username);
         if (StringUtils.isNull(sysUser))
@@ -122,24 +119,24 @@ public class SysUserController extends BaseController
         return R.ok(sysUserVo);
     }
 
-    /**
-     * 注册用户信息
-     */
-    @InnerAuth
-    @PostMapping("/register")
-    public R<Boolean> register(@RequestBody SysUser sysUser)
-    {
-        String username = sysUser.getUserName();
-        if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser"))))
-        {
-            return R.fail("当前系统没有开启注册功能！");
-        }
-        if (!userService.checkUserNameUnique(sysUser))
-        {
-            return R.fail("保存用户'" + username + "'失败，注册账号已存在");
-        }
-        return R.ok(userService.registerUser(sysUser));
-    }
+    // /**
+    //  * 注册用户信息
+    //  */
+    // @InnerAuth
+    // @PostMapping("/register")
+    // public R<Boolean> register(@RequestBody SysUser sysUser)
+    // {
+    //     String username = sysUser.getUserName();
+    //     if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser"))))
+    //     {
+    //         return R.fail("当前系统没有开启注册功能！");
+    //     }
+    //     if (!userService.checkUserNameUnique(sysUser))
+    //     {
+    //         return R.fail("保存用户'" + username + "'失败，注册账号已存在");
+    //     }
+    //     return R.ok(userService.registerUser(sysUser));
+    // }
 
     /**
      * 获取用户信息
@@ -240,7 +237,7 @@ public class SysUserController extends BaseController
     @RequiresPermissions("system:user:remove")
     @Log(title = "用户管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{userIds}")
-    public AjaxResult remove(@PathVariable Long[] userIds)
+    public AjaxResult remove(@PathVariable(name = "userIds") Long[] userIds)
     {
         if (ArrayUtils.contains(userIds, SecurityUtils.getUserId()))
         {
@@ -283,7 +280,7 @@ public class SysUserController extends BaseController
      */
     @RequiresPermissions("system:user:query")
     @GetMapping("/authRole/{userId}")
-    public AjaxResult authRole(@PathVariable("userId") Long userId)
+    public AjaxResult authRole(@PathVariable(name = "userId") Long userId)
     {
         AjaxResult ajax = AjaxResult.success();
         SysUser user = userService.selectUserById(userId);

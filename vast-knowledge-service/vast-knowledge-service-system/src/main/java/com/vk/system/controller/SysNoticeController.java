@@ -44,7 +44,7 @@ public class SysNoticeController extends BaseController
      */
     @RequiresPermissions("system:notice:query")
     @GetMapping(value = "/{noticeId}")
-    public AjaxResult getInfo(@PathVariable Long noticeId)
+    public AjaxResult getInfo(@PathVariable(name = "noticeId") Long noticeId)
     {
         return success(noticeService.selectNoticeById(noticeId));
     }
@@ -79,7 +79,7 @@ public class SysNoticeController extends BaseController
     @RequiresPermissions("system:notice:remove")
     @Log(title = "通知公告", businessType = BusinessType.DELETE)
     @DeleteMapping("/{noticeIds}")
-    public AjaxResult remove(@PathVariable Long[] noticeIds)
+    public AjaxResult remove(@PathVariable(name = "noticeIds") Long[] noticeIds)
     {
         return toAjax(noticeService.deleteNoticeByIds(noticeIds));
     }

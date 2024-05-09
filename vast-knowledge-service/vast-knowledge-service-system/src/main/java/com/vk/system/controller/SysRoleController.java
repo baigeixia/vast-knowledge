@@ -67,7 +67,7 @@ public class SysRoleController extends BaseController
      */
     @RequiresPermissions("system:role:query")
     @GetMapping(value = "/{roleId}")
-    public AjaxResult getInfo(@PathVariable Long roleId)
+    public AjaxResult getInfo(@PathVariable(name = "roleId") Long roleId)
     {
         roleService.checkRoleDataScope(roleId);
         return success(roleService.selectRoleById(roleId));
@@ -149,7 +149,7 @@ public class SysRoleController extends BaseController
     @RequiresPermissions("system:role:remove")
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
-    public AjaxResult remove(@PathVariable Long[] roleIds)
+    public AjaxResult remove(@PathVariable(name = "roleIds") Long[] roleIds)
     {
         return toAjax(roleService.deleteRoleByIds(roleIds));
     }
@@ -204,7 +204,7 @@ public class SysRoleController extends BaseController
     @RequiresPermissions("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/cancelAll")
-    public AjaxResult cancelAuthUserAll(Long roleId, Long[] userIds)
+    public AjaxResult cancelAuthUserAll(@RequestParam(name = "roleId") Long roleId, @RequestParam(name = "userIds") Long[] userIds)
     {
         return toAjax(roleService.deleteAuthUsers(roleId, userIds));
     }
@@ -215,7 +215,7 @@ public class SysRoleController extends BaseController
     @RequiresPermissions("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
     @PutMapping("/authUser/selectAll")
-    public AjaxResult selectAuthUserAll(Long roleId, Long[] userIds)
+    public AjaxResult selectAuthUserAll(@RequestParam(name = "roleId") Long roleId, @RequestParam(name = "userIds") Long[] userIds)
     {
         roleService.checkRoleDataScope(roleId);
         return toAjax(roleService.insertAuthUsers(roleId, userIds));
@@ -226,7 +226,7 @@ public class SysRoleController extends BaseController
      */
     @RequiresPermissions("system:role:query")
     @GetMapping(value = "/deptTree/{roleId}")
-    public AjaxResult deptTree(@PathVariable("roleId") Long roleId)
+    public AjaxResult deptTree(@PathVariable(name = "roleId") Long roleId)
     {
         AjaxResult ajax = AjaxResult.success();
         ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));

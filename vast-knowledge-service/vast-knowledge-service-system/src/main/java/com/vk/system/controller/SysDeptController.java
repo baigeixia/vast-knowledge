@@ -57,7 +57,7 @@ public class SysDeptController extends BaseController
      */
     @RequiresPermissions("system:dept:query")
     @GetMapping(value = "/{deptId}")
-    public AjaxResult getInfo(@PathVariable Long deptId)
+    public AjaxResult getInfo(@PathVariable(name = "deptId") Long deptId)
     {
         deptService.checkDeptDataScope(deptId);
         return success(deptService.selectDeptById(deptId));
@@ -111,7 +111,7 @@ public class SysDeptController extends BaseController
     @RequiresPermissions("system:dept:remove")
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
-    public AjaxResult remove(@PathVariable Long deptId)
+    public AjaxResult remove(@PathVariable(name = "deptId") Long deptId)
     {
         if (deptService.hasChildByDeptId(deptId))
         {
@@ -134,5 +134,19 @@ public class SysDeptController extends BaseController
     {
         List<SysDept> depts = deptService.selectDeptList(dept);
         return AjaxResult.success(deptService.buildDeptTreeSelect(depts));
+    }
+
+    /**
+     * 加载对应角色部门列表树
+     */
+    //@ApiOperation("获取对应角色部门列表树")
+    @GetMapping(value = "/roleDeptTreeselect/{roleId}")
+    public AjaxResult roleDeptTreeselect(@PathVariable(name = "roleId") Long roleId)
+    {
+        List<SysDept> depts = deptService.selectDeptList(new SysDept());
+        AjaxResult ajax = AjaxResult.success();
+        ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
+        ajax.put("depts", deptService.buildDeptTreeSelect(depts));
+        return ajax;
     }
 }

@@ -54,7 +54,7 @@ public class SysDictTypeController extends BaseController
      */
     @RequiresPermissions("system:dict:query")
     @GetMapping(value = "/{dictId}")
-    public AjaxResult getInfo(@PathVariable Long dictId)
+    public AjaxResult getInfo(@PathVariable(name = "dictId") Long dictId)
     {
         return success(dictTypeService.selectDictTypeById(dictId));
     }
@@ -97,7 +97,7 @@ public class SysDictTypeController extends BaseController
     @RequiresPermissions("system:dict:remove")
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictIds}")
-    public AjaxResult remove(@PathVariable Long[] dictIds)
+    public AjaxResult remove(@PathVariable(name = "dictIds") Long[] dictIds)
     {
         dictTypeService.deleteDictTypeByIds(dictIds);
         return success();

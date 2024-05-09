@@ -26,7 +26,7 @@ public interface RemoteUserService
      * @return 结果
      */
     @GetMapping("/user/info/{username}")
-    public R<LoginUser> getUserInfo(@PathVariable("username") String username, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+    public R<LoginUser> getUserInfo(@PathVariable(name = "username") String username, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 
     /**
      * 注册用户信息

@@ -58,7 +58,7 @@ public class SysPostController extends BaseController
      */
     @RequiresPermissions("system:post:query")
     @GetMapping(value = "/{postId}")
-    public AjaxResult getInfo(@PathVariable Long postId)
+    public AjaxResult getInfo(@PathVariable(name = "postId") Long postId)
     {
         return success(postService.selectPostById(postId));
     }
@@ -109,7 +109,7 @@ public class SysPostController extends BaseController
     @RequiresPermissions("system:post:remove")
     @Log(title = "岗位管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{postIds}")
-    public AjaxResult remove(@PathVariable Long[] postIds)
+    public AjaxResult remove(@PathVariable(name = "postIds") Long[] postIds)
     {
         return toAjax(postService.deletePostByIds(postIds));
     }

@@ -12,6 +12,7 @@ import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.api.model.LoginUser;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +50,10 @@ public class TokenController
         String token = SecurityUtils.getToken(request);
         if (StringUtils.isNotEmpty(token))
         {
+            Claims claims = TokenUtils.parseToken(token);
+            if (null==claims){
+                return R.ok();
+            }
             String username = TokenUtils.getUserName(token);
             // 删除用户缓存记录
             AuthUtil.logoutByToken(token);

@@ -45,7 +45,7 @@ public class SysMenuController extends BaseController
      */
     @RequiresPermissions("system:menu:query")
     @GetMapping(value = "/{menuId}")
-    public AjaxResult getInfo(@PathVariable Long menuId)
+    public AjaxResult getInfo(@PathVariable(name = "menuId") Long menuId)
     {
         return success(menuService.selectMenuById(menuId));
     }
@@ -65,7 +65,7 @@ public class SysMenuController extends BaseController
      * 加载对应角色菜单列表树
      */
     @GetMapping(value = "/roleMenuTreeselect/{roleId}")
-    public AjaxResult roleMenuTreeselect(@PathVariable("roleId") Long roleId)
+    public AjaxResult roleMenuTreeselect(@PathVariable(name = "roleId") Long roleId)
     {
         Long userId = SecurityUtils.getUserId();
         List<SysMenu> menus = menuService.selectMenuList(userId);
@@ -125,7 +125,7 @@ public class SysMenuController extends BaseController
     @RequiresPermissions("system:menu:remove")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
-    public AjaxResult remove(@PathVariable("menuId") Long menuId)
+    public AjaxResult remove(@PathVariable(name = "menuId") Long menuId)
     {
         if (menuService.hasChildByMenuId(menuId))
         {

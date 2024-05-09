@@ -14,7 +14,6 @@ import com.vk.system.domain.SysPost;
 import com.vk.system.domain.SysUserPost;
 import com.vk.system.domain.SysUserRole;
 import com.vk.system.mapper.*;
-import com.vk.system.service.ISysConfigService;
 import com.vk.system.service.ISysUserService;
 import jakarta.validation.Validator;
 import org.slf4j.Logger;
@@ -54,8 +53,8 @@ public class SysUserServiceImpl implements ISysUserService
     @Autowired
     private SysUserPostMapper userPostMapper;
 
-    @Autowired
-    private ISysConfigService configService;
+    // @Autowired
+    // private ISysConfigService configService;
 
     @Autowired
     protected Validator validator;
@@ -488,7 +487,7 @@ public class SysUserServiceImpl implements ISysUserService
         int failureNum = 0;
         StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
-        String password = configService.selectConfigByKey("sys.user.initPassword");
+        // String password = configService.selectConfigByKey("sys.user.initPassword");
         for (SysUser user : userList)
         {
             try
@@ -498,7 +497,7 @@ public class SysUserServiceImpl implements ISysUserService
                 if (StringUtils.isNull(u))
                 {
                     BeanValidators.validateWithException(validator, user);
-                    user.setPassword(SecurityUtils.encryptPassword(password));
+                    // user.setPassword(SecurityUtils.encryptPassword(password));
                     user.setCreateBy(operName);
                     userMapper.insertUser(user);
                     successNum++;
