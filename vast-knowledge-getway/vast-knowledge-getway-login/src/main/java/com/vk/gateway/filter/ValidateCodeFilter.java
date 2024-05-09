@@ -8,12 +8,20 @@ import com.vk.gateway.config.properties.CaptchaProperties;
 import com.vk.gateway.service.ValidateCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
@@ -25,9 +33,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author vk
  */
 @Component
-public class ValidateCodeFilter extends AbstractGatewayFilterFactory<Object>
-{
-    private final static String[] VALIDATE_URL = new String[] { "/auth/login", "/auth/register" };
+public class ValidateCodeFilter implements GlobalFilter, Ordered {
+    private final static String[] VALIDATE_URL = new String[]{"/dev-api/auth/login", "/dev-api/auth/register"};
 
     @Autowired
     private ValidateCodeService validateCodeService;
@@ -39,34 +46,33 @@ public class ValidateCodeFilter extends AbstractGatewayFilterFactory<Object>
 
     private static final String UUID = "uuid";
 
+
     @Override
-    public GatewayFilter apply(Object config)
-    {
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
 
-            // 非登录/注册请求或验证码关闭，不处理
-            if (!StringUtils.equalsAnyIgnoreCase(request.getURI().getPath(), VALIDATE_URL) || !captchaProperties.getEnabled())
-            {
-                return chain.filter(exchange);
-            }
-
-            try
-            {
-                String rspStr = resolveBodyFromRequest(request);
-                JSONObject obj = JSON.parseObject(rspStr);
-                validateCodeService.checkCaptcha(obj.getString(CODE), obj.getString(UUID));
-            }
-            catch (Exception e)
-            {
-                return ServletUtils.webFluxResponseWriter(exchange.getResponse(), e.getMessage());
-            }
+        // 非登录/注册请求或验证码关闭，不处理
+        if (!StringUtils.equalsAnyIgnoreCase(request.getURI().getPath(), VALIDATE_URL) || !captchaProperties.getEnabled()) {
             return chain.filter(exchange);
-        };
+        }
+        try {
+            String rspStr = resolveBodyFromRequest(request);
+            JSONObject obj = JSON.parseObject(rspStr);
+            validateCodeService.checkCaptcha(obj.getString(CODE), obj.getString(UUID));
+        } catch (Exception e) {
+            return ServletUtils.webFluxResponseWriter(exchange.getResponse(), e.getMessage());
+        }
+
+        return chain.filter(exchange);
     }
 
-    private String resolveBodyFromRequest(ServerHttpRequest serverHttpRequest)
-    {
+    @Override
+    public int getOrder() {
+        return -201;
+    }
+
+
+    private String resolveBodyFromRequest(ServerHttpRequest serverHttpRequest) {
         // 获取请求体
         Flux<DataBuffer> body = serverHttpRequest.getBody();
         AtomicReference<String> bodyRef = new AtomicReference<>();
@@ -77,4 +83,5 @@ public class ValidateCodeFilter extends AbstractGatewayFilterFactory<Object>
         });
         return bodyRef.get();
     }
+
 }

@@ -4,12 +4,31 @@ spring:
   cloud:
     gateway:
 #      globalcors:
+#        add-to-simple-url-handler-mapping: true
+#        cors-configurations:
+#          '[/**]':
+#            allowedOrigins:  #允许哪些网站访问跨域请求
+#              - "http://localhost:80"
+##              - "http://localhost:8081"
+#            allowedMethods: #允许的跨域ajax请求方式
+#              - "GET"
+#              - "POST"
+#              - "DELETE"
+#              - "PUT"
+#            allowedHeaders: "*" #允许请求携带的头信息
+#            allowCredentials: true #是否允许携带token
+#            maxAge: 36000 #这次跨域检测的有效期
+#      discovery:
+#        locator:
+#          enabled: false
+#      globalcors:
 #        corsConfigurations:
 #          '[/**]': # 匹配所有请求
-#            allowedOriginPatterns: '*' #跨域处理 允许所有的域
-#            allowed-headers: '*'
-#            allowed-methods: '*'
-#            allow-credentials: true
+#            allowedOrigins: "*" #跨域处理 允许所有的域
+#            allowedHeaders: '*'
+#            allowedMethods: '*'
+#            allowCredentials: true
+#            maxAge: 18000
 #            exposedHeaders: "Content-Disposition,Content-Type,Cache-Control"
       routes:
         # 用户微服
