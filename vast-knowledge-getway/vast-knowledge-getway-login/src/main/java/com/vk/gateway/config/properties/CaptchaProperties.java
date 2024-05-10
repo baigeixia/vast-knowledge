@@ -4,6 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
  * 验证码配置
  * 
@@ -23,6 +25,8 @@ public class CaptchaProperties
      * 验证码类型（math 数组计算 char 字符）
      */
     private String type;
+
+    // private List<String> checkPath;
 
     public Boolean getEnabled()
     {

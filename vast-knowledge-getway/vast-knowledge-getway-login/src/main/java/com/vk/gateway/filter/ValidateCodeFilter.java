@@ -68,7 +68,7 @@ public class ValidateCodeFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -201;
+        return -3;
     }
 
 

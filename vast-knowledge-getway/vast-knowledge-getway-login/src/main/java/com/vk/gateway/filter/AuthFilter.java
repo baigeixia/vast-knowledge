@@ -137,6 +137,6 @@ public class AuthFilter implements GlobalFilter, Ordered
     @Override
     public int getOrder()
     {
-        return -200;
+        return -2;
     }
 }
