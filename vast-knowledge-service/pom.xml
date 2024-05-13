@@ -15,6 +15,12 @@
         <module>vast-knowledge-service-auth</module>
         <module>vast-knowledge-service-system</module>
         <module>vast-knowledge-service-article</module>
+        <module>vast-knowledge-service-admin</module>
+        <module>vast-knowledge-service-analyze</module>
+        <module>vast-knowledge-service-behaviour</module>
+        <module>vast-knowledge-service-comment</module>
+        <module>vast-knowledge-service-search</module>
+        <module>vast-knowledge-service-wemedia</module>
     </modules>
 
     <properties>

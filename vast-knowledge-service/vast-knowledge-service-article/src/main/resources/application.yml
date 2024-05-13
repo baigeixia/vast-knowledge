@@ -1,6 +1,6 @@
 # Tomcat
 server:
-  port: 19003
+  port: 19004
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource

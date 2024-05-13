@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.vk</groupId>
+        <artifactId>vast-knowledge-api</artifactId>
+        <version>0.0.1</version>
+    </parent>
+
+    <groupId>com.vk.behaviour</groupId>
+    <artifactId>vast-knowledge-api-behaviour</artifactId>
+
+    <description>
+        用户行为
+    </description>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-core</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>

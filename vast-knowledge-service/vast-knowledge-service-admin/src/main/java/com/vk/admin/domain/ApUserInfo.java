@@ -1,0 +1,102 @@
+package com.vk.admin.domain;
+
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+
+/**
+ * APP用户详情信息 实体类。
+ *
+ * @author 张三
+ * @since 2024-05-13
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(value = "ap_user_info")
+public class ApUserInfo implements Serializable {
+
+    /**
+     * 主键
+     */
+    @Id
+    private BigInteger id;
+
+    private BigInteger userId;
+
+    /**
+     * 真是姓名
+     */
+    private String name;
+
+    /**
+     * 身份证号,aes加密
+     */
+    private String idno;
+
+    /**
+     * 公司
+     */
+    private String company;
+
+    /**
+     * 职业
+     */
+    private String occupation;
+
+    /**
+     * 年龄
+     */
+    private Integer age;
+
+    private LocalDateTime birthday;
+
+    /**
+     * 个人格言
+     */
+    private String introduction;
+
+    /**
+     * 归属地
+     */
+    private String location;
+
+    /**
+     * 粉丝数量
+     */
+    private Long fans;
+
+    /**
+     * 关注数量
+     */
+    private Long follows;
+
+    /**
+     * 是否允许推荐我给好友
+     */
+    private Integer isRecommendMe;
+
+    /**
+     * 是否允许给我推荐好友
+     */
+    private Integer isRecommendFriend;
+
+    /**
+     * 是否分享页面显示头像
+     */
+    private Integer isDisplayImage;
+
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updatedTime;
+
+}

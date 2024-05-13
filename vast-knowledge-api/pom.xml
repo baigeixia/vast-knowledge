@@ -14,6 +14,12 @@
     <modules>
         <module>vast-knowledge-api-system</module>
         <module>vast-knowledge-api-article</module>
+        <module>vast-knowledge-api-admin</module>
+        <module>vast-knowledge-api-analyze</module>
+        <module>vast-knowledge-api-behaviour</module>
+        <module>vast-knowledge-api-comment</module>
+        <module>vast-knowledge-api-search</module>
+        <module>vast-knowledge-api-wemedia</module>
     </modules>
 
     <properties>

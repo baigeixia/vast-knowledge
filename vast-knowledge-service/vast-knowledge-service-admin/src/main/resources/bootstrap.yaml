@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: vk-service-admin
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos_root_dentity_@^^security
+      discovery:
+        # 服务注册地址
+        server-addr: 123.207.35.9:8848
+      config:
+        server-addr: 123.207.35.9:8848
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}

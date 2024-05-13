@@ -1,0 +1,50 @@
+package com.vk.behaviour.domain;
+
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+
+/**
+ * APP分享行为 实体类。
+ *
+ * @author 张三
+ * @since 2024-05-13
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(value = "ap_share_behavior")
+public class ApShareBehavior implements Serializable {
+
+    @Id
+    private BigInteger id;
+
+    /**
+     * 实体ID
+     */
+    private BigInteger entryId;
+
+    /**
+     * 文章ID
+     */
+    private BigInteger articleId;
+
+    /**
+     * 0:微信 1:微信朋友圈 2:QQ 3:QQ空间 4:微博 
+     */
+    private Integer type;
+
+    /**
+     * 登录时间
+     */
+    private LocalDateTime createdTime;
+
+}

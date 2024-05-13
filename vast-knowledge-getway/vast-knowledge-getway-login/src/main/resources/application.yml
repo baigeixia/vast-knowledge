@@ -23,7 +23,7 @@ spring:
         - id: vk-service-system
           uri: lb://vk-service-system
           predicates:
-            - Path=/dev-api/admin/**
+            - Path=/dev-api/system/**
           filters:
             - StripPrefix=2
 #            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
@@ -32,6 +32,13 @@ spring:
           uri: lb://vk-service-auth
           predicates:
             - Path=/dev-api/auth/**
+          filters:
+            - StripPrefix=2
+        # 后台微服
+        - id: vk-service-admin
+          uri: lb://vk-service-admin
+          predicates:
+            - Path=/dev-api/admin/**
           filters:
             - StripPrefix=2
 
