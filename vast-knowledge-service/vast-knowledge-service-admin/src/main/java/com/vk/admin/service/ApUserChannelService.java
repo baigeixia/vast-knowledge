@@ -11,4 +11,5 @@ import com.vk.admin.domain.ApUserChannel;
  */
 public interface ApUserChannelService extends IService<ApUserChannel> {
 
+
 }

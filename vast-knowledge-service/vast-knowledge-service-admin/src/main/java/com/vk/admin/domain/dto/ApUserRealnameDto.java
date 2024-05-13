@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * @version 1.0
  * @description 说明
- * @package com.itheima.user.dto
+ * @package com.vk.user.dto
  */
 @Data
 public class ApUserRealnameDto  {

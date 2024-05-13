@@ -3,6 +3,9 @@ package com.vk.analyze.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.vk.analyze.domain.AdSensitive;
 import com.vk.analyze.service.AdSensitiveService;
+import com.vk.common.core.web.controller.BaseController;
+import com.vk.common.core.web.domain.AjaxResult;
+import com.vk.common.core.web.page.TableDataInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +20,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/adSensitive")
-public class AdSensitiveController {
+public class AdSensitiveController   {
 
     @Autowired
     private AdSensitiveService adSensitiveService;
@@ -60,9 +63,10 @@ public class AdSensitiveController {
      *
      * @return 所有数据
      */
-    @GetMapping("list")
-    public List<AdSensitive> list() {
-        return adSensitiveService.list();
+    @PostMapping("list")
+    public AjaxResult getlist(@RequestBody AdSensitive adSensitive) {
+        List<AdSensitive> list= adSensitiveService.getlist(adSensitive);
+        return AjaxResult.success(list);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.vk.analyze.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.vk.analyze.domain.AdStrategyGroup;
 import com.vk.analyze.service.AdStrategyGroupService;
+import com.vk.common.core.web.controller.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +63,7 @@ public class AdStrategyGroupController {
      */
     @GetMapping("list")
     public List<AdStrategyGroup> list() {
+
         return adStrategyGroupService.list();
     }
 

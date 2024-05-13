@@ -4,4 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.analyze.mapper.AdSensitiveMapper">
 
+
+    <select id="getlist" >
+        select * from ad_sensitive
+    </select>
 </mapper>

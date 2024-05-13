@@ -3,6 +3,8 @@ package com.vk.analyze.service;
 import com.mybatisflex.core.service.IService;
 import com.vk.analyze.domain.AdChannel;
 
+import java.util.List;
+
 /**
  * 频道信息 服务层。
  *
@@ -11,4 +13,5 @@ import com.vk.analyze.domain.AdChannel;
  */
 public interface AdChannelService extends IService<AdChannel> {
 
+    List<AdChannel> getlist(AdChannel adChannel);
 }

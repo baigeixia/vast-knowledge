@@ -2,6 +2,9 @@ package com.vk.analyze.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.analyze.domain.AdSensitive;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * 敏感词信息 映射层。
@@ -11,4 +14,6 @@ import com.vk.analyze.domain.AdSensitive;
  */
 public interface AdSensitiveMapper extends BaseMapper<AdSensitive> {
 
+
+    List<AdSensitive> getlist(AdSensitive adSensitive);
 }

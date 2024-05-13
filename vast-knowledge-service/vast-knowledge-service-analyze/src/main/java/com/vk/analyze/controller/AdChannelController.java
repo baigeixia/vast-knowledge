@@ -3,6 +3,10 @@ package com.vk.analyze.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.service.AdChannelService;
+import com.vk.common.core.web.controller.BaseController;
+import com.vk.common.core.web.page.PageDomain;
+import com.vk.common.core.web.page.TableDataInfo;
+import com.vk.common.core.web.page.TableSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/adChannel")
-public class AdChannelController {
+public class AdChannelController  extends BaseController {
 
     @Autowired
     private AdChannelService adChannelService;
@@ -60,9 +64,11 @@ public class AdChannelController {
      *
      * @return 所有数据
      */
-    @GetMapping("list")
-    public List<AdChannel> list() {
-        return adChannelService.list();
+    @PostMapping("list")
+    public TableDataInfo list(@RequestBody AdChannel adChannel) {
+//        startPage();
+        List<AdChannel> list =  adChannelService.getlist(adChannel);
+        return getDataTable(list);
     }
 
     /**

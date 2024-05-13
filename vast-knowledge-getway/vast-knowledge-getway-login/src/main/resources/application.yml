@@ -41,4 +41,11 @@ spring:
             - Path=/dev-api/admin/**
           filters:
             - StripPrefix=2
+        # 频道与行为微服
+        - id: vk-service-analyze
+          uri: lb://vk-service-analyze
+          predicates:
+            - Path=/dev-api/analyze/**
+          filters:
+            - StripPrefix=2
 

@@ -3,6 +3,8 @@ package com.vk.analyze.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.vk.analyze.domain.AdLabel;
 import com.vk.analyze.service.AdLabelService;
+import com.vk.common.core.web.controller.BaseController;
+import com.vk.common.core.web.page.TableDataInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/adLabel")
-public class AdLabelController {
+public class AdLabelController  extends BaseController {
 
     @Autowired
     private AdLabelService adLabelService;
@@ -61,8 +63,9 @@ public class AdLabelController {
      * @return 所有数据
      */
     @GetMapping("list")
-    public List<AdLabel> list() {
-        return adLabelService.list();
+    public TableDataInfo list() {
+        List<AdLabel> list = adLabelService.getlist();
+        return getDataTable(list);
     }
 
     /**

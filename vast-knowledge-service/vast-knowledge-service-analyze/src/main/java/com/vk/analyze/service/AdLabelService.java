@@ -3,6 +3,8 @@ package com.vk.analyze.service;
 import com.mybatisflex.core.service.IService;
 import com.vk.analyze.domain.AdLabel;
 
+import java.util.List;
+
 /**
  * 标签信息 服务层。
  *
@@ -11,4 +13,5 @@ import com.vk.analyze.domain.AdLabel;
  */
 public interface AdLabelService extends IService<AdLabel> {
 
+    List<AdLabel> getlist();
 }

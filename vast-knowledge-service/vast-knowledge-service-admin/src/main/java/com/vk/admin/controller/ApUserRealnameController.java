@@ -18,7 +18,7 @@ import java.util.List;
  * @description <p>APP实名认证信息</p>
  *
  * @version 1.0
- * @package com.itheima.user.controller
+ * @package com.vk.user.controller
  */
 @RestController
 @RequestMapping("/auth")

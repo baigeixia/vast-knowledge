@@ -6,6 +6,8 @@ import com.vk.analyze.mapper.AdSensitiveMapper;
 import com.vk.analyze.service.AdSensitiveService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 敏感词信息 服务层实现。
  *
@@ -15,4 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdSensitiveServiceImpl extends ServiceImpl<AdSensitiveMapper, AdSensitive> implements AdSensitiveService {
 
+    @Override
+    public List<AdSensitive> getlist(AdSensitive adSensitive) {
+        return this.mapper.getlist(adSensitive);
+    }
 }

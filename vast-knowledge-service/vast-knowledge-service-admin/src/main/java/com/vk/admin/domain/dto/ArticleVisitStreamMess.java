@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * @version 1.0
  * @description 说明
- * @package com.itheima.article.dto
+ * @package com.vk.article.dto
  */
 @Data
 public class ArticleVisitStreamMess {

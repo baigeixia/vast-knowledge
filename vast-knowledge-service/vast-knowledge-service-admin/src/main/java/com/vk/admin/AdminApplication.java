@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @MapperScan(basePackages = "com.vk.admin.mapper")
-@EnableFeignClients(basePackages = "com.vk.*.feign")
+//@EnableFeignClients(basePackages = "com.vk.*.feign")
 public class AdminApplication {
     public static void main(String[] args) {
         SpringApplication.run(AdminApplication.class,args);
