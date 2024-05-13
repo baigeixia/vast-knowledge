@@ -9,6 +9,8 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.domain.table.AdChannelTableDef;
 import com.vk.analyze.mapper.AdChannelMapper;
 import com.vk.analyze.service.AdChannelService;
+import com.vk.common.core.utils.ServletUtils;
+import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.page.PageDomain;
 import com.vk.common.core.web.page.TableSupport;
 import org.springframework.stereotype.Service;
@@ -28,11 +30,20 @@ import static com.vk.analyze.domain.table.AdChannelTableDef.AD_CHANNEL;
 public class AdChannelServiceImpl extends ServiceImpl<AdChannelMapper, AdChannel> implements AdChannelService {
 
     @Override
-    public List<AdChannel> getlist(AdChannel adChannel) {
+    public  Page<AdChannel>  getlist(AdChannel adChannel) {
+        Integer status = adChannel.getStatus();
+        String name = adChannel.getName();
 
-//        QueryCondition eq = AD_CHANNEL.STATUS.eq(adChannel.getStatus(), null!=adChannel.getStatus());
-        QueryWrapper eq = query().where(AD_CHANNEL.STATUS.eq(adChannel.getStatus()));
-        Page<AdChannel> paginate = this.mapper.paginate(1, 10, eq);
-        return paginate.getRecords();
+        Integer pageNum = ServletUtils.getPageNum();
+        Integer pageSize = ServletUtils.getPageSize();
+
+        //        QueryCondition eq = AD_CHANNEL.STATUS.eq(adChannel.getStatus(), null!=adChannel.getStatus());
+
+        Page<AdChannel> paginate = this.mapper.paginate(pageNum, pageSize, query()
+                .where(AD_CHANNEL.STATUS.eq(status,null!=status ))
+                .and(AD_CHANNEL.NAME.eq(name, StringUtils.isNotEmpty(name))));
+
+        return paginate;
+
     }
 }

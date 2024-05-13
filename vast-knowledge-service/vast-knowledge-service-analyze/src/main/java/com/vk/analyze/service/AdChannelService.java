@@ -1,5 +1,6 @@
 package com.vk.analyze.service;
 
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import com.vk.analyze.domain.AdChannel;
 
@@ -13,5 +14,5 @@ import java.util.List;
  */
 public interface AdChannelService extends IService<AdChannel> {
 
-    List<AdChannel> getlist(AdChannel adChannel);
+    Page<AdChannel>  getlist(AdChannel adChannel);
 }

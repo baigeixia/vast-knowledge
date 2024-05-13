@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.service.AdChannelService;
 import com.vk.common.core.web.controller.BaseController;
+import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.core.web.page.PageDomain;
 import com.vk.common.core.web.page.TableDataInfo;
 import com.vk.common.core.web.page.TableSupport;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/adChannel")
-public class AdChannelController  extends BaseController {
+public class AdChannelController  {
 
     @Autowired
     private AdChannelService adChannelService;
@@ -65,10 +66,9 @@ public class AdChannelController  extends BaseController {
      * @return 所有数据
      */
     @PostMapping("list")
-    public TableDataInfo list(@RequestBody AdChannel adChannel) {
-//        startPage();
-        List<AdChannel> list =  adChannelService.getlist(adChannel);
-        return getDataTable(list);
+    public AjaxResult list(@RequestBody AdChannel adChannel) {
+        Page<AdChannel>   list =  adChannelService.getlist(adChannel);
+        return AjaxResult.success(list);
     }
 
     /**

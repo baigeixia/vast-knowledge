@@ -28,6 +28,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static com.vk.common.core.web.page.TableSupport.PAGE_NUM;
+import static com.vk.common.core.web.page.TableSupport.PAGE_SIZE;
+
 /**
  * 客户端工具类
  * 
@@ -35,6 +38,23 @@ import java.util.*;
  */
 public class ServletUtils
 {
+
+
+    /**
+     * PageNum
+     */
+    public static Integer getPageNum()
+    {
+        return  Convert.toInt(getParameter(PAGE_NUM),1);
+    }
+
+    /**
+     * PageSize
+     */
+    public static Integer getPageSize()
+    {
+        return  Convert.toInt(getParameter(PAGE_SIZE),10);
+    }
     /**
      * 获取String参数
      */
