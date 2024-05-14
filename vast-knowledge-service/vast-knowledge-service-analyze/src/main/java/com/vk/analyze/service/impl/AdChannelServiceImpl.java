@@ -41,7 +41,7 @@ public class AdChannelServiceImpl extends ServiceImpl<AdChannelMapper, AdChannel
 
         Page<AdChannel> paginate = this.mapper.paginate(pageNum, pageSize, query()
                 .where(AD_CHANNEL.STATUS.eq(status,null!=status ))
-                .and(AD_CHANNEL.NAME.eq(name, StringUtils.isNotEmpty(name))));
+                .and(AD_CHANNEL.NAME.like(name, StringUtils.isNotEmpty(name))));
 
         return paginate;
 
