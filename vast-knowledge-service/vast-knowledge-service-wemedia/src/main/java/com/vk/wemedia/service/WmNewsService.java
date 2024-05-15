@@ -1,5 +1,6 @@
 package com.vk.wemedia.service;
 
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import com.vk.wemedia.domain.WmNews;
 
@@ -11,4 +12,5 @@ import com.vk.wemedia.domain.WmNews;
  */
 public interface WmNewsService extends IService<WmNews> {
 
+    Page<WmNews> getlist(WmNews news);
 }

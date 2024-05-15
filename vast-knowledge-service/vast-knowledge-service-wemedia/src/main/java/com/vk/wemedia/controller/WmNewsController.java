@@ -1,6 +1,7 @@
 package com.vk.wemedia.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.wemedia.domain.WmNews;
 import com.vk.wemedia.service.WmNewsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +61,10 @@ public class WmNewsController {
      *
      * @return 所有数据
      */
-    @GetMapping("list")
-    public List<WmNews> list() {
-        return wmNewsService.list();
+    @PostMapping("list")
+    public AjaxResult getlist(@RequestBody WmNews news) {
+        Page<WmNews> list=wmNewsService.getlist(news);
+        return AjaxResult.success(list);
     }
 
     /**

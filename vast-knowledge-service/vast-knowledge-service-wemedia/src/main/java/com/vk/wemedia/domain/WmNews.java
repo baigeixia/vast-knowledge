@@ -94,5 +94,6 @@ public class WmNews implements Serializable {
     private String images;
 
     private Integer enable;
+    private String authorName;
 
 }

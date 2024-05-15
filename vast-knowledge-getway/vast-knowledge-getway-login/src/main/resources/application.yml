@@ -48,4 +48,10 @@ spring:
             - Path=/dev-api/analyze/**
           filters:
             - StripPrefix=2
+        - id: vk-service-wemedia
+          uri: lb://vk-service-wemedia
+          predicates:
+            - Path=/dev-api/media/**
+          filters:
+            - StripPrefix=2
 
