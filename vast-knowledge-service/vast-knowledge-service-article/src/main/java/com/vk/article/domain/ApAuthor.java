@@ -1,6 +1,7 @@
 package com.vk.article.domain;
 
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +10,10 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
 /**
- * APP已发布文章配置 实体类。
+ * APP文章作者信息 实体类。
  *
  * @author 张三
  * @since 2024-07-11
@@ -20,38 +22,38 @@ import java.math.BigInteger;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "ap_article_config")
-public class ApArticleConfig implements Serializable {
+@Table(value = "ap_author")
+public class ApAuthor implements Serializable {
 
     /**
      * 主键
      */
-    @Id
+    @Id(keyType = KeyType.Auto)
     private BigInteger id;
 
     /**
-     * 文章ID
+     * 作者名称
      */
-    private BigInteger articleId;
+    private String name;
 
     /**
-     * 是否可评论
+     * 0:爬取数据 1:签约合作商 2:平台自媒体人
      */
-    private Integer isComment;
+    private Integer type;
 
     /**
-     * 是否转发
+     * 社交账号ID
      */
-    private Integer isForward;
+    private BigInteger userId;
 
     /**
-     * 是否下架
+     * 创建时间
      */
-    private Integer isDown;
+    private LocalDateTime createdTime;
 
     /**
-     * 是否已删除
+     * 自媒体账号
      */
-    private Integer isDelete;
+    private BigInteger wmUserId;
 
 }

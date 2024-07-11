@@ -1,0 +1,50 @@
+server:
+  port: 16001
+spring:
+  cloud:
+    gateway:
+      # 网关全局跨域配置
+#      globalcors:
+#        add-to-simple-url-handler-mapping: true
+#        cors-configurations:
+#          '[/**]': # 匹配所有请求
+#            allowedOrigins: "*" #跨域处理 允许所有的域
+#            allowedHeaders: "*"
+#            allowedMethods: # 支持的方法
+#              - GET
+#              - POST
+#              - PUT
+#              - DELETE
+#              - OPTIONS
+#            maxAge: 18000
+#            allowCredentials: true
+      routes:
+        # 权限微服
+        - id: vk-service-auth
+          uri: lb://vk-service-auth
+          predicates:
+            - Path=/dev-api/auth/**
+          filters:
+            - StripPrefix=2
+        # 后台管理微服
+        - id: vk-service-system
+          uri: lb://vk-service-system
+          predicates:
+            - Path=/dev-api/system/**
+          filters:
+            - StripPrefix=2
+        # 用户信息
+        - id: vk-service-admin
+          uri: lb://vk-service-admin
+          predicates:
+            - Path=/dev-api/admin/**
+          filters:
+            - StripPrefix=2
+        # 媒体信息
+        - id: vk-service-wemedia
+          uri: lb://vk-service-wemedia
+          predicates:
+            - Path=/dev-api/media/**
+          filters:
+            - StripPrefix=2
+

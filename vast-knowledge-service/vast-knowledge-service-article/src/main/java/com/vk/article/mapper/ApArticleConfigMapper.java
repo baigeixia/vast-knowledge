@@ -1,14 +1,13 @@
 package com.vk.article.mapper;
 
-
 import com.mybatisflex.core.BaseMapper;
 import com.vk.article.domain.ApArticleConfig;
 
 /**
- * @description <p>APP已发布文章配置 Mapper 接口</p>
+ * APP已发布文章配置 映射层。
  *
- * @version 1.0
- * @package
+ * @author 张三
+ * @since 2024-07-11
  */
 public interface ApArticleConfigMapper extends BaseMapper<ApArticleConfig> {
 

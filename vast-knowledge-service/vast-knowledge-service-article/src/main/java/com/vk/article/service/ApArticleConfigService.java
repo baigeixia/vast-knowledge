@@ -1,14 +1,13 @@
 package com.vk.article.service;
 
-
 import com.mybatisflex.core.service.IService;
 import com.vk.article.domain.ApArticleConfig;
 
 /**
- * @description <p>APP已发布文章配置 业务接口</p>
+ * APP已发布文章配置 服务层。
  *
- * @version 1.0
- * @package com.vk.article.service
+ * @author 张三
+ * @since 2024-07-11
  */
 public interface ApArticleConfigService extends IService<ApArticleConfig> {
 

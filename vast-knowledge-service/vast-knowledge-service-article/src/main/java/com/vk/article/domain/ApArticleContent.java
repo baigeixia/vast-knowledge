@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
- * APP已发布文章配置 实体类。
+ * APP已发布文章内容 实体类。
  *
  * @author 张三
  * @since 2024-07-11
@@ -20,8 +20,8 @@ import java.math.BigInteger;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "ap_article_config")
-public class ApArticleConfig implements Serializable {
+@Table(value = "ap_article_content")
+public class ApArticleContent implements Serializable {
 
     /**
      * 主键
@@ -35,23 +35,8 @@ public class ApArticleConfig implements Serializable {
     private BigInteger articleId;
 
     /**
-     * 是否可评论
+     * 文章内容
      */
-    private Integer isComment;
-
-    /**
-     * 是否转发
-     */
-    private Integer isForward;
-
-    /**
-     * 是否下架
-     */
-    private Integer isDown;
-
-    /**
-     * 是否已删除
-     */
-    private Integer isDelete;
+    private String content;
 
 }

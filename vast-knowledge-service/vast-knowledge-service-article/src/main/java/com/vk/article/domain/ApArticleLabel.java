@@ -1,6 +1,7 @@
 package com.vk.article.domain;
 
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
- * APP已发布文章配置 实体类。
+ * 文章标签信息 实体类。
  *
  * @author 张三
  * @since 2024-07-11
@@ -20,38 +21,25 @@ import java.math.BigInteger;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "ap_article_config")
-public class ApArticleConfig implements Serializable {
+@Table(value = "ap_article_label")
+public class ApArticleLabel implements Serializable {
 
     /**
      * 主键
      */
-    @Id
+    @Id(keyType = KeyType.Auto)
     private BigInteger id;
 
-    /**
-     * 文章ID
-     */
     private BigInteger articleId;
 
     /**
-     * 是否可评论
+     * 标签ID
      */
-    private Integer isComment;
+    private Long labelId;
 
     /**
-     * 是否转发
+     * 排序
      */
-    private Integer isForward;
-
-    /**
-     * 是否下架
-     */
-    private Integer isDown;
-
-    /**
-     * 是否已删除
-     */
-    private Integer isDelete;
+    private Long count;
 
 }

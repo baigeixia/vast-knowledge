@@ -1,0 +1,28 @@
+server:
+  port: 16002
+spring:
+  cloud:
+    gateway:
+      # 网关全局跨域配置
+      routes:
+        # 评论
+        - id: vk-service-comment
+          uri: lb://vk-service-comment
+          predicates:
+            - Path=/dev-api/comment/**
+          filters:
+            - StripPrefix=2
+        # 搜索
+        - id: vk-service-search
+          uri: lb://vk-service-search
+          predicates:
+            - Path=/dev-api/search/**
+          filters:
+            - StripPrefix=2
+        # 文章
+        - id: vk-service-article
+          uri: lb://vk-service-article
+          predicates:
+            - Path=/dev-api/article/**
+          filters:
+            - StripPrefix=2
