@@ -13,7 +13,7 @@
     <artifactId>vast-knowledge-common-security</artifactId>
 
     <description>
-        vast-knowledge-common-security安全模块
+        安全模块
     </description>
 
     <dependencies>
@@ -30,6 +30,7 @@
             <artifactId>vast-knowledge-api-system</artifactId>
         </dependency>
 
+        <!--redis -->
         <dependency>
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-redis</artifactId>

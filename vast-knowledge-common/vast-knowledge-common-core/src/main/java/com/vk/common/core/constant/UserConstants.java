@@ -12,6 +12,11 @@ public class UserConstants
      */
     public static final String SYS_USER = "SYS_USER";
 
+    /**
+     * 用户平台用户的唯一标志
+     */
+    public static final String Vk_USER = "Vk_USER";
+
     /** 正常状态 */
     public static final String NORMAL = "0";
 
@@ -77,4 +82,14 @@ public class UserConstants
     public static final int PASSWORD_MIN_LENGTH = 5;
 
     public static final int PASSWORD_MAX_LENGTH = 20;
+
+
+    /**
+     * 验证码登录
+     */
+    public static final int VERIFICATION_CODE_LOGIN = 1;
+    /**
+     * 密码登录
+     */
+    public static final int PASSWORD_LOGIN = 2;
 }

@@ -36,11 +36,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Mysql Connector -->
-<!--        <dependency>-->
-<!--            <groupId>com.mysql</groupId>-->
-<!--            <artifactId>mysql-connector-j</artifactId>-->
-<!--        </dependency>-->
 
         <!-- vk Common DataSource -->
         <dependency>

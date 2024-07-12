@@ -11,7 +11,7 @@
     <name>vast-knowledge</name>
     <description>博问</description>
     <modules>
-        <module>vast-knowledge-getway</module>
+        <module>vast-knowledge-gateway</module>
         <module>vast-knowledge-common</module>
         <module>vast-knowledge-api</module>
         <module>vast-knowledge-service</module>

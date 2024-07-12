@@ -15,7 +15,7 @@
         <module>vast-knowledge-service-auth</module>
         <module>vast-knowledge-service-system</module>
         <module>vast-knowledge-service-article</module>
-        <module>vast-knowledge-service-admin</module>
+        <module>vast-knowledge-service-user</module>
         <module>vast-knowledge-service-analyze</module>
         <module>vast-knowledge-service-behaviour</module>
         <module>vast-knowledge-service-comment</module>
