@@ -33,6 +33,11 @@ public class CacheConstants
     public final static String LOGIN_TOKEN_KEY = "login_tokens:";
 
     /**
+     * 权限缓存客户端前缀
+     */
+    public final static String LOGIN_CLIENT_TOKEN_KEY = "login_client_tokens:";
+
+    /**
      * 验证码 redis key
      */
     public static final String CAPTCHA_CODE_KEY = "captcha_codes:";

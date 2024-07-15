@@ -107,6 +107,20 @@ public class SecurityUtils
     }
 
     /**
+     * 生成BCryptPasswordEncoder密码  客户端使用
+     *
+     * @param password 密码
+     * @return 加密字符串
+     */
+    public static String encryptPassword(String password,String salt)
+    {
+        String passwordWithSalt = password + salt;
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(passwordWithSalt);
+    }
+
+    /**
      * 判断密码是否相同
      *
      * @param rawPassword 真实密码

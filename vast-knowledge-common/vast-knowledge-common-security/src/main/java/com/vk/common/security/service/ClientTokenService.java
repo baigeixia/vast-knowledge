@@ -1,6 +1,5 @@
 package com.vk.common.security.service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.utils.ServletUtils;
@@ -11,11 +10,16 @@ import com.vk.common.core.utils.uuid.IdUtils;
 import com.vk.common.redis.service.RedisService;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.api.model.LoginUser;
+import com.vk.user.feign.domain.ClientApUser;
+import com.vk.user.feign.model.LoginApUser;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -26,9 +30,9 @@ import java.util.concurrent.TimeUnit;
  * @author vk
  */
 @Component
-public class TokenService
+public class ClientTokenService
 {
-    private static final Logger log = LoggerFactory.getLogger(TokenService.class);
+    private static final Logger log = LoggerFactory.getLogger(ClientTokenService.class);
 
     @Autowired
     private RedisService redisService;
@@ -39,18 +43,18 @@ public class TokenService
 
     private final static long expireTime = CacheConstants.EXPIRATION;
 
-    private final static String ACCESS_TOKEN = CacheConstants.LOGIN_TOKEN_KEY;
+    private final static String ACCESS_TOKEN = CacheConstants.LOGIN_CLIENT_TOKEN_KEY;
 
     private final static Long MILLIS_MINUTE_TEN = CacheConstants.REFRESH_TIME * MILLIS_MINUTE;
 
     /**
      * 创建LoginUser令牌
      */
-    public Map<String, Object> createToken(LoginUser loginUser)
+    public Map<String, Object> createToken(LoginApUser loginUser)
     {
         String token = IdUtils.fastUUID();
-        Long userId = loginUser.getSysUser().getUserId();
-        String userName = loginUser.getSysUser().getUserName();
+        Long userId = loginUser.getApUser().getId();
+        String userName = loginUser.getApUser().getName();
         loginUser.setToken(token);
         loginUser.setUserid(userId);
         loginUser.setUsername(userName);
@@ -76,9 +80,9 @@ public class TokenService
      *
      * @return 用户信息
      */
-    public LoginUser getLoginUser()
+    public LoginApUser getLoginApUser()
     {
-        return getLoginUser(ServletUtils.getRequest());
+        return getLoginApUser(ServletUtils.getRequest());
     }
 
     /**
@@ -86,11 +90,11 @@ public class TokenService
      *
      * @return 用户信息
      */
-    public LoginUser getLoginUser(HttpServletRequest request)
+    public LoginApUser getLoginApUser(HttpServletRequest request)
     {
         // 获取请求携带的令牌
         String token = SecurityUtils.getToken(request);
-        return getLoginUser(token);
+        return getLoginApUser(token);
     }
 
     /**
@@ -98,9 +102,9 @@ public class TokenService
      *
      * @return 用户信息
      */
-    public LoginUser getLoginUser(String token)
+    public LoginApUser getLoginApUser(String token)
     {
-        LoginUser user = null;
+        LoginApUser user = null;
         try
         {
             if (StringUtils.isNotEmpty(token))
@@ -120,7 +124,7 @@ public class TokenService
     /**
      * 设置用户身份信息
      */
-    public void setLoginUser(LoginUser loginUser)
+    public void setLoginApUser(LoginApUser loginUser)
     {
         if (StringUtils.isNotNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken()))
         {
@@ -131,7 +135,7 @@ public class TokenService
     /**
      * 删除用户缓存信息
      */
-    public void delLoginUser(String token)
+    public void delLoginApUser(String token)
     {
         if (StringUtils.isNotEmpty(token))
         {
@@ -145,7 +149,7 @@ public class TokenService
      *
      * @param loginUser
      */
-    public void verifyToken(LoginUser loginUser)
+    public void verifyToken(LoginApUser loginUser)
     {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
@@ -160,7 +164,7 @@ public class TokenService
      *
      * @param loginUser 登录信息
      */
-    public void refreshToken(LoginUser loginUser)
+    public void refreshToken(LoginApUser loginUser)
     {
         loginUser.setLoginTime(System.currentTimeMillis());
         loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);

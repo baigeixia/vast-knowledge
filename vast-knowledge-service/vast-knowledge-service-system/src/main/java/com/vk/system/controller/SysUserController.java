@@ -147,6 +147,7 @@ public class SysUserController extends BaseController
     public AjaxResult getInfo()
     {
         SysUser user = userService.selectUserById(SecurityUtils.getUserId());
+        user.setPassword(null);
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合

@@ -29,7 +29,7 @@ public class ApUser implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 密码、通信等加密盐

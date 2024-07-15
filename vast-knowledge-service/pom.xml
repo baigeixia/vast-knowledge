@@ -11,6 +11,7 @@
 
     <artifactId>vast-knowledge-service</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>vast-knowledge-service-auth</module>
         <module>vast-knowledge-service-system</module>

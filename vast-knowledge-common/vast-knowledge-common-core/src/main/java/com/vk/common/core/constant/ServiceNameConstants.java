@@ -21,4 +21,10 @@ public class ServiceNameConstants
      * 文件服务的serviceid
      */
     public static final String FILE_SERVICE = "vk-service-file";
+
+
+    /**
+     * 客户端用户模块
+     */
+    public static final String CLIENT_USER_SERVICE = "vk-service-user";
 }

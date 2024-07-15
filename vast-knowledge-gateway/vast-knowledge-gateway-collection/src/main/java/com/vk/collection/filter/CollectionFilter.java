@@ -1,16 +1,16 @@
-package com.vk.core.filter;
+package com.vk.collection.filter;
+
 
 import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.constant.HttpStatus;
 import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.constant.TokenConstants;
 import com.vk.common.core.utils.ServletUtils;
-import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
-import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.filter.IgnoreWhiteProperties;
 import com.vk.common.redis.service.RedisService;
 import io.jsonwebtoken.Claims;
+import com.vk.common.core.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,6 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -26,9 +25,9 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 @Component
-public class CoreFilter implements GlobalFilter, Ordered  {
+public class CollectionFilter implements GlobalFilter, Ordered  {
 
-    private static final Logger log = LoggerFactory.getLogger(CoreFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(CollectionFilter.class);
 
     @Autowired
     private IgnoreWhiteProperties ignoreWhite;
@@ -103,8 +102,6 @@ public class CoreFilter implements GlobalFilter, Ordered  {
     {
         mutate.headers(httpHeaders -> httpHeaders.remove(name)).build();
     }
-
-
 
     /**
      * 获取缓存key

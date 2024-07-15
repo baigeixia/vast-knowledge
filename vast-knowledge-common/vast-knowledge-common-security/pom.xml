@@ -16,6 +16,7 @@
         安全模块
     </description>
 
+
     <dependencies>
 
         <!-- Spring Web -->
@@ -30,12 +31,18 @@
             <artifactId>vast-knowledge-api-system</artifactId>
         </dependency>
 
+        <!-- 客户端用户接口 -->
+        <dependency>
+            <groupId>com.vk.admin</groupId>
+            <artifactId>vast-knowledge-api-user</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
         <!--redis -->
         <dependency>
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-redis</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>

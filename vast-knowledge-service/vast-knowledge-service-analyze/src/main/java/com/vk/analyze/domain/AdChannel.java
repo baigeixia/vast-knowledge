@@ -36,7 +36,7 @@ public class AdChannel implements Serializable {
     /**
      * 频道描述
      */
-    private String description;
+    private String icon;
 
     /**
      * 是否默认频道
