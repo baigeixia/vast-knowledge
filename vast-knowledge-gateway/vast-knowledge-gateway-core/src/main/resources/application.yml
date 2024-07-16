@@ -3,7 +3,6 @@ server:
 spring:
   cloud:
     gateway:
-      # 网关全局跨域配置
       routes:
         # 评论
         - id: vk-service-comment

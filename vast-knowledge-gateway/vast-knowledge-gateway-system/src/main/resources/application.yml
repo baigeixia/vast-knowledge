@@ -34,10 +34,10 @@ spring:
           filters:
             - StripPrefix=2
         # 用户信息
-        - id: vk-service-admin
-          uri: lb://vk-service-admin
+        - id: vk-service-user
+          uri: lb://vk-service-user
           predicates:
-            - Path=/dev-api/admin/**
+            - Path=/dev-api/user/**
           filters:
             - StripPrefix=2
         # 媒体信息
