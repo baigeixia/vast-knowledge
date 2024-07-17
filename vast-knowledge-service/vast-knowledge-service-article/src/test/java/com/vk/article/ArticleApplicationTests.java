@@ -1,6 +1,6 @@
 package com.vk.article;
 
-import com.vk.db.utils.MongoDBHelper;
+import com.vk.db.service.article.ArticleMgService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class ArticleApplicationTests  {
 
     @Autowired
-    private MongoDBHelper mongoDBHelper;
+    private ArticleMgService articleMgService;
 
     @Test
     void  contextLoads(){

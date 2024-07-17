@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -29,17 +29,17 @@ public class AdArticleStatistics implements Serializable {
      * 主键
      */
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 主账号ID
      */
-    private BigInteger articleWeMedia;
+    private Long articleWeMedia;
 
     /**
      * 子账号ID
      */
-    private BigInteger articleCrawlers;
+    private Long articleCrawlers;
 
     /**
      * 频道ID

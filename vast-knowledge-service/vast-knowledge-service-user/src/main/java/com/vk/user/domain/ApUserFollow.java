@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -29,17 +29,17 @@ public class ApUserFollow implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 关注作者ID
      */
-    private BigInteger followId;
+    private Long followId;
 
     /**
      * 粉丝昵称

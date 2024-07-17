@@ -3,7 +3,7 @@ package com.vk.user.feign.domain;
 
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**

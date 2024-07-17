@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 
 /**
  * APP已发布文章配置 实体类。
@@ -27,12 +27,12 @@ public class ApArticleConfig implements Serializable {
      * 主键
      */
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 文章ID
      */
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * 是否可评论

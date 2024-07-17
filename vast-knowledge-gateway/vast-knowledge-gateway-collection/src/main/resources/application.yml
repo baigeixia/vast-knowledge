@@ -8,13 +8,13 @@ spring:
         - id: vk-service-behaviour
           uri: lb://vk-service-behaviour
           predicates:
-            - Path=/dev-api/behaviour/**
+            - Path=/dev-collection/behaviour/**
           filters:
             - StripPrefix=2
         #统计信息
         - id: vk-service-analyze
           uri: lb://vk-service-analyze
           predicates:
-            - Path=/dev-api/analyze/**
+            - Path=/dev-collection/analyze/**
           filters:
             - StripPrefix=2

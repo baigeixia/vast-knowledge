@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -29,12 +29,12 @@ public class WmMaterial implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 自媒体用户ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 图片地址

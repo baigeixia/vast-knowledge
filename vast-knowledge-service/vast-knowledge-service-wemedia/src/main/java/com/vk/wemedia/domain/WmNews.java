@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -29,12 +29,12 @@ public class WmNews implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 自媒体用户ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 标题
@@ -86,7 +86,7 @@ public class WmNews implements Serializable {
     /**
      * 发布库文章ID
      */
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * //图片用逗号分隔

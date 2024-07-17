@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -25,12 +25,12 @@ import java.time.LocalDateTime;
 public class WmUserEquipment implements Serializable {
 
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 0PC 1ANDROID 2IOS 3PAD 9 其他

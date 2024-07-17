@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -28,12 +28,12 @@ public class WmFansPortrait implements Serializable {
      * 主键
      */
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 账号ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 画像项目

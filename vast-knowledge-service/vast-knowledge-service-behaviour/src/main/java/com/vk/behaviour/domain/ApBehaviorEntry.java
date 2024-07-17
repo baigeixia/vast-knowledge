@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -29,7 +29,7 @@ public class ApBehaviorEntry implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 实体类型 0:终端设备 1:用户
@@ -39,7 +39,7 @@ public class ApBehaviorEntry implements Serializable {
     /**
      * 实体ID
      */
-    private BigInteger entryId;
+    private Long entryId;
 
     /**
      * 创建时间

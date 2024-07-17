@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -26,17 +26,17 @@ import java.time.LocalDateTime;
 public class WmUserLogin implements Serializable {
 
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 登录设备ID
      */
-    private BigInteger equipmentId;
+    private Long equipmentId;
 
     /**
      * 登录IP

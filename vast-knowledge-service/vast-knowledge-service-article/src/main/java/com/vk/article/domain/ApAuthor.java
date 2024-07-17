@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -29,7 +29,7 @@ public class ApAuthor implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 作者名称
@@ -44,7 +44,7 @@ public class ApAuthor implements Serializable {
     /**
      * 社交账号ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 创建时间
@@ -54,6 +54,6 @@ public class ApAuthor implements Serializable {
     /**
      * 自媒体账号
      */
-    private BigInteger wmUserId;
+    private Long wmUserId;
 
 }

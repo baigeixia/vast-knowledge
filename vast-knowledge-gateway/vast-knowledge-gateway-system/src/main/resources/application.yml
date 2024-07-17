@@ -23,28 +23,28 @@ spring:
         - id: vk-service-auth
           uri: lb://vk-service-auth
           predicates:
-            - Path=/dev-api/auth/**
+            - Path=/dev-system/auth/**
           filters:
             - StripPrefix=2
         # 后台管理微服
         - id: vk-service-system
           uri: lb://vk-service-system
           predicates:
-            - Path=/dev-api/system/**
+            - Path=/dev-system/system/**
           filters:
             - StripPrefix=2
         # 用户信息
         - id: vk-service-user
           uri: lb://vk-service-user
           predicates:
-            - Path=/dev-api/user/**
+            - Path=/dev-system/user/**
           filters:
             - StripPrefix=2
         # 媒体信息
         - id: vk-service-wemedia
           uri: lb://vk-service-wemedia
           predicates:
-            - Path=/dev-api/media/**
+            - Path=/dev-system/media/**
           filters:
             - StripPrefix=2
 

@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 public class ApEquipment implements Serializable {
 
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 0:PC 1:Android 2:IOS 3:PAD 9:其他

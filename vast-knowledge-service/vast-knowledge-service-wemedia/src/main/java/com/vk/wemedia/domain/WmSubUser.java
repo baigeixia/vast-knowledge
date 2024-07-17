@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 
 /**
  * 自媒体子账号信息 实体类。
@@ -27,16 +27,16 @@ public class WmSubUser implements Serializable {
      * 主键
      */
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 主账号ID
      */
-    private BigInteger parentId;
+    private Long parentId;
 
     /**
      * 子账号ID
      */
-    private BigInteger childrenId;
+    private Long childrenId;
 
 }

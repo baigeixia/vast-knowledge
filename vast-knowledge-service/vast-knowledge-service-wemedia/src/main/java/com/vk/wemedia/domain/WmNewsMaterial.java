@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 
 /**
  * 自媒体图文引用素材信息 实体类。
@@ -28,17 +28,17 @@ public class WmNewsMaterial implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 素材ID
      */
-    private BigInteger materialId;
+    private Long materialId;
 
     /**
      * 图文ID
      */
-    private BigInteger newsId;
+    private Long newsId;
 
     /**
      * 引用类型 0:内容引用 1:主图引用

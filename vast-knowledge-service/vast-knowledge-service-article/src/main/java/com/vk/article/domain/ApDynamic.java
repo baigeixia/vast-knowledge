@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -25,12 +25,12 @@ import java.time.LocalDateTime;
 public class ApDynamic implements Serializable {
 
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 文章作者的ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 作者昵称
@@ -50,7 +50,7 @@ public class ApDynamic implements Serializable {
     /**
      * 转发文章ID
      */
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * 转发文章标题

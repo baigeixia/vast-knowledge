@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -26,9 +26,9 @@ import java.time.LocalDateTime;
 public class ApHotArticles implements Serializable {
 
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
-    private BigInteger entryId;
+    private Long entryId;
 
     /**
      * 频道ID
@@ -48,7 +48,7 @@ public class ApHotArticles implements Serializable {
     /**
      * 文章ID
      */
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * 省市

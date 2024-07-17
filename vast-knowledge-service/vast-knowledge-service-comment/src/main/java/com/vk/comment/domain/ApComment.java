@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -30,19 +30,19 @@ public class ApComment implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
      */
-    private BigInteger authorId;
+    private Long authorId;
 
     /**
      * 用户昵称
      */
     private String authorName;
 
-    private BigInteger entryId;
+    private Long entryId;
 
     /**
      * 频道ID

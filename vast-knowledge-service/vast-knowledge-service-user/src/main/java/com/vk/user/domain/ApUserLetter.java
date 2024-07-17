@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -26,17 +26,17 @@ public class ApUserLetter implements Serializable {
     /**
      * 主键
      */
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 发送人ID
      */
-    private BigInteger senderId;
+    private Long senderId;
 
     /**
      * 发送人昵称

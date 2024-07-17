@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 
 /**
  * APP用户动态列 实体类。
@@ -27,16 +27,16 @@ public class ApUserDynamicList implements Serializable {
      * 主键
      */
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 动态ID
      */
-    private BigInteger dynamicId;
+    private Long dynamicId;
 
 }

@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 
 /**
  * APP设备码信息 实体类。
@@ -24,12 +24,12 @@ import java.math.BigInteger;
 public class ApEquipmentCode implements Serializable {
 
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
      */
-    private BigInteger equipmentId;
+    private Long equipmentId;
 
     /**
      * 设备码

@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 public class ApUserChannel implements Serializable {
 
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
@@ -35,7 +35,7 @@ public class ApUserChannel implements Serializable {
     /**
      * 文章ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     private String name;
 

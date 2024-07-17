@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -25,22 +25,22 @@ import java.time.LocalDateTime;
 public class ApFollowBehavior implements Serializable {
 
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 实体ID
      */
-    private BigInteger entryId;
+    private Long entryId;
 
     /**
      * 文章ID
      */
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * 关注用户ID
      */
-    private BigInteger followId;
+    private Long followId;
 
     /**
      * 登录时间

@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 
 /**
  * 文章标签信息 实体类。
@@ -28,9 +28,9 @@ public class ApArticleLabel implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * 标签ID

@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.sql.Date;
 
 /**
@@ -29,17 +29,17 @@ public class WmFansStatistics implements Serializable {
      * 主键
      */
     @Id(keyType = KeyType.Auto)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 主账号ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 子账号ID
      */
-    private BigInteger article;
+    private Long article;
 
     private Long readCount;
 

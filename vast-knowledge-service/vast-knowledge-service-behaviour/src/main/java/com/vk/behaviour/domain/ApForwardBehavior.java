@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -25,22 +25,22 @@ import java.time.LocalDateTime;
 public class ApForwardBehavior implements Serializable {
 
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 实体ID
      */
-    private BigInteger entryId;
+    private Long entryId;
 
     /**
      * 文章ID
      */
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * 动态ID
      */
-    private BigInteger dynamicId;
+    private Long dynamicId;
 
     /**
      * 登录时间

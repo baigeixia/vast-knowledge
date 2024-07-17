@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+
 import java.time.LocalDateTime;
 
 /**
@@ -28,12 +28,12 @@ public class ApUserArticleList implements Serializable {
      * 主键
      */
     @Id
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户ID
      */
-    private BigInteger userId;
+    private Long userId;
 
     /**
      * 频道ID
@@ -43,7 +43,7 @@ public class ApUserArticleList implements Serializable {
     /**
      * 动态ID
      */
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * 是否展示
