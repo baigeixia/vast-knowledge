@@ -8,8 +8,16 @@ spring:
     url: jdbc:mysql://123.207.35.9:36060/learned_asked_article?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai
     username: root
     password: mysql_root_123@112..
+  data:
+    mongodb:
+      uri: mongodb://adminRoot:mymongoroot_1234%40@123.207.35.9:26117/test
+
 # MyBatis配置
 mybatis-flex:
   type-aliases-package: com.vk.**.domain
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapper-locations: classpath*:mapper/**/*Mapper.xml
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG

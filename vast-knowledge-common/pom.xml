@@ -23,6 +23,7 @@
         <module>vast-knowledge-common-swagger</module>
         <module>vast-knowledge-common-datasource</module>
         <module>vast-knowledge-common-gateway</module>
+        <module>vast-knowledge-common-mongondb</module>
     </modules>
 
 </project>

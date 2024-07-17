@@ -49,12 +49,17 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
-
     </dependencies>
 
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-mongodb</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
@@ -213,6 +218,13 @@
                 <version>${vk.version}</version>
             </dependency>
 
+            <!-- MongoDB -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-mongondb</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.vk</groupId>
                 <artifactId>vast-knowledge-common-security</artifactId>
@@ -230,6 +242,8 @@
                 <artifactId>vast-knowledge-common-swagger</artifactId>
                 <version>${vk.version}</version>
             </dependency>
+
+
 
             <!-- vk Common DataSource -->
             <dependency>

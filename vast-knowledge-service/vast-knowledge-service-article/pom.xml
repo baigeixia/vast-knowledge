@@ -17,6 +17,10 @@
     </description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
 
         <!-- SpringCloud Alibaba Nacos -->
         <dependency>
@@ -36,6 +40,7 @@
             <artifactId>vast-knowledge-common-datasource</artifactId>
         </dependency>
 
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -50,6 +55,11 @@
         <dependency>
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-mongondb</artifactId>
         </dependency>
 
     </dependencies>
