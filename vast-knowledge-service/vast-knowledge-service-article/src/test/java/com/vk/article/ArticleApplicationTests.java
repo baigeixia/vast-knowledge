@@ -1,7 +1,9 @@
 package com.vk.article;
 
 import com.mongodb.client.MongoDatabase;
+import com.vk.article.domain.ApArticleContent;
 import com.vk.article.service.ApArticleContentService;
+import com.vk.common.core.utils.uuid.UUID;
 import com.vk.db.repository.article.ArticleMgRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,11 @@ public class ArticleApplicationTests  {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-
     @Autowired
     private ArticleMgRepository articleMgRepository;
 
+    @Autowired
+    private ApArticleContentService apArticleContentService;
     @Test
     void  contextLoads(){
         System.out.println(articleMgRepository.findAll());
@@ -123,5 +126,19 @@ public class ArticleApplicationTests  {
         // List<ArticleMg> all = mongoTemplate.findAll(ArticleMg.class);
         // all.forEach(System.out::println);
 
+    }
+    @Test
+    void  testContextSave(){
+        ApArticleContent content = new ApArticleContent();
+        content.setContent("88888888888888888888888888");
+        content.setId(9L);
+        apArticleContentService.contentSave(content);
+    }
+
+
+    @Test
+    void  testUUID(){
+        UUID uuid = UUID.randomUUID();
+        System.out.println(uuid);
     }
 }
