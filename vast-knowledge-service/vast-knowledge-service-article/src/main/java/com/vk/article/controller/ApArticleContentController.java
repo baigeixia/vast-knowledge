@@ -3,6 +3,7 @@ package com.vk.article.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.vk.article.domain.ApArticleContent;
 import com.vk.article.service.ApArticleContentService;
+import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * @since 2024-07-11
  */
 @RestController
-@RequestMapping("/apArticleContent")
+@RequestMapping("/content")
 public class ApArticleContentController {
 
     @Autowired
@@ -29,8 +30,9 @@ public class ApArticleContentController {
      * @return {@code true} 添加成功，{@code false} 添加失败
      */
     @PostMapping("save")
-    public boolean save(@RequestBody ApArticleContent apArticleContent) {
-        return apArticleContentService.save(apArticleContent);
+    public AjaxResult contentSave(@RequestBody ApArticleContent apArticleContent) {
+        apArticleContentService.contentSave(apArticleContent);
+        return AjaxResult.success("保存完成");
     }
 
     /**

@@ -1,9 +1,12 @@
 package com.vk.article;
 
+import com.vk.db.repository.article.ArticleMgRepository;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
  * @version 1.0
@@ -12,6 +15,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @SpringBootApplication
 @MapperScan(basePackages = "com.vk.article.mapper")
+@EnableMongoRepositories(basePackageClasses = ArticleMgRepository.class)
 // @EnableFeignClients(basePackages = "com.vk.*.feign")
 public class ArticleApplication {
     public static void main(String[] args) {
