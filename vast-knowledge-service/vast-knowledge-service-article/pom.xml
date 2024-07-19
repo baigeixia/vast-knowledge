@@ -62,6 +62,12 @@
             <artifactId>vast-knowledge-common-mongondb</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-api-analyze</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>

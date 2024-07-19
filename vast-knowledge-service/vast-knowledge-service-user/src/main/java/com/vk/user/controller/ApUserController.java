@@ -31,7 +31,7 @@ import static com.vk.user.domain.table.ApUserTableDef.AP_USER;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/apUser")
+@RequestMapping("/User")
 public class ApUserController {
 
     @Autowired

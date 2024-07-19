@@ -15,4 +15,5 @@ import java.util.List;
 public interface AdChannelService extends IService<AdChannel> {
 
     Page<AdChannel>  getlist(AdChannel adChannel);
+
 }

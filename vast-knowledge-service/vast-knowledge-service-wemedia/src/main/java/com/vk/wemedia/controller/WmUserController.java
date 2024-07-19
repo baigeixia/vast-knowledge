@@ -16,7 +16,7 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/wmUser")
+@RequestMapping("/User")
 public class WmUserController {
 
     @Autowired

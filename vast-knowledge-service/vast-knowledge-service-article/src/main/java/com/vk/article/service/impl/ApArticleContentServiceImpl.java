@@ -7,6 +7,7 @@ import com.vk.article.domain.ApArticleContent;
 import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.service.ApArticleContentService;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.db.domain.article.ArticleMg;
 import com.vk.db.repository.article.ArticleMgRepository;
@@ -35,9 +36,8 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
     private ArticleMgRepository articleMgRepository;
 
     @Override
-    public void contentSave(ApArticleContent apArticleContent) {
+    public Long contentSave(ApArticleContent apArticleContent) {
         Long id = apArticleContent.getId();
-        Long articleId = apArticleContent.getArticleId();
         String content = apArticleContent.getContent();
 
         if (ObjectUtils.isEmpty(content)) {
@@ -46,7 +46,7 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
 
         if (ObjectUtils.isEmpty(id)) {
             contentInset(apArticleContent);
-            return;
+            return id;
         }
 
         ArticleMg articleMg = articleMgRepository.findById(id).orElse(null);
@@ -65,6 +65,24 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
             }
         }
 
+        return  id;
+    }
+
+    @Override
+    public ApArticleContent getInfoContent(Long id) {
+
+        if (StringUtils.isLongEmpty(id)){
+            throw new LeadNewsException("id不能为空");
+        }
+
+        ArticleMg articleMg = articleMgRepository.findById(id).orElse(null);
+        if (null!= articleMg){
+            ApArticleContent articleContent = new ApArticleContent();
+            BeanUtils.copyProperties(articleMg,articleContent);
+            return articleContent;
+        }
+
+        return mapper.selectOneById(id);
     }
 
     private  void  contentInset(ApArticleContent  insetContent  ){

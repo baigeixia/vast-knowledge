@@ -18,7 +18,7 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/adLabel")
+@RequestMapping("/Label")
 public class AdLabelController  extends BaseController {
 
     @Autowired

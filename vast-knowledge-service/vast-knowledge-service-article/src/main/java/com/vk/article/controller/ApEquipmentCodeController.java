@@ -16,7 +16,7 @@ import java.util.List;
  * @since 2024-07-11
  */
 @RestController
-@RequestMapping("/apEquipmentCode")
+@RequestMapping("/EquipmentCode")
 public class ApEquipmentCodeController {
 
     @Autowired

@@ -11,5 +11,7 @@ import com.vk.article.domain.ApArticleContent;
  */
 public interface ApArticleContentService extends IService<ApArticleContent> {
 
-    void contentSave(ApArticleContent apArticleContent);
+    Long contentSave(ApArticleContent apArticleContent);
+
+    ApArticleContent getInfoContent(Long id);
 }

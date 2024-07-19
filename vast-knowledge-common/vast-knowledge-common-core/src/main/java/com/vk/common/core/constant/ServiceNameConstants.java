@@ -26,5 +26,10 @@ public class ServiceNameConstants
     /**
      * 客户端用户模块
      */
-    public static final String CLIENT_USER_SERVICE = "vk-service-user";
+    public static final String USER_SERVICE = "vk-service-user";
+
+    /**
+     * 客户端用户模块
+     */
+    public static final String ANALYZE_SERVICE = "vk-service-analyze";
 }

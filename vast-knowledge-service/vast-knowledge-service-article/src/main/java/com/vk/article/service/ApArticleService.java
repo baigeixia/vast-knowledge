@@ -2,6 +2,7 @@ package com.vk.article.service;
 
 import com.mybatisflex.core.service.IService;
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.vo.ArticleInfoVo;
 
 /**
  * 已发布的文章信息 服务层。
@@ -11,4 +12,7 @@ import com.vk.article.domain.ApArticle;
  */
 public interface ApArticleService extends IService<ApArticle> {
 
+    Long saveArticle(ApArticle apArticle);
+
+    ArticleInfoVo infoArticle(Long articleId);
 }

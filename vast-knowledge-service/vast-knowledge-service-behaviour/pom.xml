@@ -52,11 +52,7 @@
             <artifactId>vast-knowledge-common-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.vk.admin</groupId>
-            <artifactId>vast-knowledge-api-user</artifactId>
-            <version>0.0.1</version>
-        </dependency>
+
     </dependencies>
 
     <build>

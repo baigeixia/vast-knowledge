@@ -1,8 +1,10 @@
 package com.vk.article;
 
 import com.mongodb.client.MongoDatabase;
+import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleContent;
 import com.vk.article.service.ApArticleContentService;
+import com.vk.article.service.ApArticleService;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.db.repository.article.ArticleMgRepository;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,17 @@ public class ArticleApplicationTests  {
 
     @Autowired
     private ApArticleContentService apArticleContentService;
+
+    @Autowired
+    private ApArticleService apArticleService;
+
+    @Test
+    void  testArticleChannles(){
+        ApArticle article = new ApArticle();
+        article.setTitle("11111");
+        Long l = apArticleService.saveArticle(article);
+        System.out.println(l);
+    }
     @Test
     void  contextLoads(){
         System.out.println(articleMgRepository.findAll());

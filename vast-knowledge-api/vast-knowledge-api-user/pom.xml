@@ -9,7 +9,6 @@
         <version>0.0.1</version>
     </parent>
 
-    <groupId>com.vk.admin</groupId>
     <artifactId>vast-knowledge-api-user</artifactId>
 
     <description>

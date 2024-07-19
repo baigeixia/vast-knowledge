@@ -1,6 +1,7 @@
 package com.vk.article.domain;
 
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 @Table(value = "ap_article")
 public class ApArticle implements Serializable {
 
-    @Id
+    @Id(keyType = KeyType.Auto)
     private Long id;
 
     /**

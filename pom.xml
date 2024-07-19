@@ -204,6 +204,51 @@
                 <version>${vk.version}</version>
             </dependency>
 
+
+
+            <!-- 数据分析接口 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-analyze</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- 用户行为接口 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-behaviour</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- 评论接口 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-comment</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- 搜索接口 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-search</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- 媒体接口 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-wemedia</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+
+            <!-- 客户端用户接口 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-user</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
             <!-- 系统接口 -->
             <dependency>
                 <groupId>com.vk</groupId>
@@ -242,7 +287,6 @@
                 <artifactId>vast-knowledge-common-swagger</artifactId>
                 <version>${vk.version}</version>
             </dependency>
-
 
 
             <!-- vk Common DataSource -->

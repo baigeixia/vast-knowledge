@@ -3,6 +3,7 @@ package com.vk.analyze.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.service.AdChannelService;
+import com.vk.common.core.domain.R;
 import com.vk.common.core.web.controller.BaseController;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.core.web.page.PageDomain;
@@ -21,11 +22,18 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/adChannel")
+@RequestMapping("/channel")
 public class AdChannelController  {
 
     @Autowired
     private AdChannelService adChannelService;
+
+
+    @PostMapping("getOneInfo/{channelId}")
+    public R<AdChannel> getOneInfo(@PathVariable Long channelId) {
+        AdChannel resultInfo = adChannelService.getById(channelId);
+        return  R.ok(resultInfo);
+    }
 
     /**
      * 添加频道信息。

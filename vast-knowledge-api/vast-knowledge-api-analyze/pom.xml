@@ -9,7 +9,6 @@
         <version>0.0.1</version>
     </parent>
 
-    <groupId>com.vk.analyze</groupId>
     <artifactId>vast-knowledge-api-analyze</artifactId>
 
     <description>

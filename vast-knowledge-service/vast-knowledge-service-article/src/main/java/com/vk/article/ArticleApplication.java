@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication
 @MapperScan(basePackages = "com.vk.article.mapper")
 @EnableMongoRepositories(basePackageClasses = ArticleMgRepository.class)
-// @EnableFeignClients(basePackages = "com.vk.*.feign")
+@EnableFeignClients(basePackages = "com.vk.*.feign")
 public class ArticleApplication {
     public static void main(String[] args) {
         SpringApplication.run(ArticleApplication.class,args);

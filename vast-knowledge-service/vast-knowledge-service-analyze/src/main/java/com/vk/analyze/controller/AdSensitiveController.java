@@ -19,7 +19,7 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/adSensitive")
+@RequestMapping("/Sensitive")
 public class AdSensitiveController   {
 
     @Autowired

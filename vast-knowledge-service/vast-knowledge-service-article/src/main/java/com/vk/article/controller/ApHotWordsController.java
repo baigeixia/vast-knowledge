@@ -16,7 +16,7 @@ import java.util.List;
  * @since 2024-07-11
  */
 @RestController
-@RequestMapping("/apHotWords")
+@RequestMapping("/HotWords")
 public class ApHotWordsController {
 
     @Autowired

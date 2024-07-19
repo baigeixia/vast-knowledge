@@ -16,7 +16,7 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/apBehaviorEntry")
+@RequestMapping("/BehaviorEntry")
 public class ApBehaviorEntryController {
 
     @Autowired

@@ -33,9 +33,8 @@
 
         <!-- 客户端用户接口 -->
         <dependency>
-            <groupId>com.vk.admin</groupId>
+            <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-api-user</artifactId>
-            <version>0.0.1</version>
         </dependency>
 
         <!--redis -->
