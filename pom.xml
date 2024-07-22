@@ -15,6 +15,7 @@
         <module>vast-knowledge-common</module>
         <module>vast-knowledge-api</module>
         <module>vast-knowledge-service</module>
+        <module>vast-knowledge-common/vast-knowledge-common-websocket</module>
     </modules>
 
     <properties>
