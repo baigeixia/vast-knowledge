@@ -3,6 +3,7 @@ package com.vk.article;
 import com.mongodb.client.MongoDatabase;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleContent;
+import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.service.ApArticleContentService;
 import com.vk.article.service.ApArticleService;
 import com.vk.common.core.utils.uuid.UUID;
@@ -33,6 +34,12 @@ public class ArticleApplicationTests  {
         article.setTitle("11111");
         Long l = apArticleService.saveArticle(article);
         System.out.println(l);
+    }
+
+    @Test
+    void  testGetArticle(){
+        ApArticleContent infoContent = apArticleContentService.getInfoContent(22L);
+        System.out.println(infoContent);
     }
     @Test
     void  contextLoads(){

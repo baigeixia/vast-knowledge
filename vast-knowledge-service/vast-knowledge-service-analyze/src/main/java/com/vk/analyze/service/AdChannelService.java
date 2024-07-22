@@ -16,4 +16,7 @@ public interface AdChannelService extends IService<AdChannel> {
 
     Page<AdChannel>  getlist(AdChannel adChannel);
 
+
+    void loadingChannel();
+
 }

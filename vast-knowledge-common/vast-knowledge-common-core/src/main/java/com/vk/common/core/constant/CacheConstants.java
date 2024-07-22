@@ -61,4 +61,15 @@ public class CacheConstants
      * 登录IP黑名单 cache key
      */
     public static final String SYS_LOGIN_BLACKIPLIST = SYS_CONFIG_KEY + "sys.login.blackIPList";
+
+    /**
+     * 字典管理 cache key
+     */
+    public static final String AD_CHANNEL_KEY = "ad_channel:";
+
+    /**
+     * 字典管理 cache key
+     */
+    public static final String AD_CHANNEL_LABEL_KEY = "ad_channel_label:";
+
 }

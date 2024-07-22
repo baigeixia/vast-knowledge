@@ -18,6 +18,11 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
         <!-- SpringCloud Alibaba Nacos -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -50,6 +55,11 @@
         <dependency>
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-redis</artifactId>
         </dependency>
 
     </dependencies>

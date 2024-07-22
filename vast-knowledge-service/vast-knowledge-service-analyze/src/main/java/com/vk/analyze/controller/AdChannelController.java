@@ -9,11 +9,16 @@ import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.core.web.page.PageDomain;
 import com.vk.common.core.web.page.TableDataInfo;
 import com.vk.common.core.web.page.TableSupport;
+import com.vk.common.redis.constants.BusinessConstants;
+import com.vk.common.redis.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.List;
+
+import static com.vk.common.core.constant.CacheConstants.AD_CHANNEL_KEY;
 
 /**
  * 频道信息 控制层。
@@ -28,11 +33,17 @@ public class AdChannelController  {
     @Autowired
     private AdChannelService adChannelService;
 
+    @Autowired
+    private RedisService redisService;
 
-    @PostMapping("getOneInfo/{channelId}")
-    public R<AdChannel> getOneInfo(@PathVariable Long channelId) {
-        AdChannel resultInfo = adChannelService.getById(channelId);
-        return  R.ok(resultInfo);
+    @GetMapping("getOneInfo/{channelId}")
+    public R<AdChannel> getOneInfo(@PathVariable(name = "channelId") Long channelId) {
+        AdChannel adChannel = redisService.getCacheObject(BusinessConstants.loadingChannel(channelId));
+        if (ObjectUtils.isEmpty(adChannel)){
+            AdChannel channel = adChannelService.getById(channelId);
+            return  R.ok(channel);
+        }
+        return  R.ok(adChannel);
     }
 
     /**
@@ -77,17 +88,6 @@ public class AdChannelController  {
     public AjaxResult list(@RequestBody AdChannel adChannel) {
         Page<AdChannel>   list =  adChannelService.getlist(adChannel);
         return AjaxResult.success(list);
-    }
-
-    /**
-     * 根据频道信息主键获取详细信息。
-     *
-     * @param id 频道信息主键
-     * @return 频道信息详情
-     */
-    @GetMapping("getInfo/{id}")
-    public AdChannel getInfo(@PathVariable Serializable id) {
-        return adChannelService.getById(id);
     }
 
     /**

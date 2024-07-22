@@ -13,5 +13,6 @@ import java.util.List;
  */
 public interface AdLabelService extends IService<AdLabel> {
 
+    void loadingChannelLabel();
     List<AdLabel> getlist();
 }

@@ -67,6 +67,11 @@
             <artifactId>vast-knowledge-api-analyze</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-redis</artifactId>
+        </dependency>
+
 
     </dependencies>
 

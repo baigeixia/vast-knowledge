@@ -1,24 +1,21 @@
 package com.vk.analyze.service.impl;
 
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryColumn;
-import com.mybatisflex.core.query.QueryCondition;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.analyze.domain.AdChannel;
-import com.vk.analyze.domain.table.AdChannelTableDef;
 import com.vk.analyze.mapper.AdChannelMapper;
 import com.vk.analyze.service.AdChannelService;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.web.page.PageDomain;
-import com.vk.common.core.web.page.TableSupport;
+import com.vk.common.redis.constants.BusinessConstants;
+import com.vk.common.redis.service.RedisService;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-
 import static com.vk.analyze.domain.table.AdChannelTableDef.AD_CHANNEL;
+import static com.vk.common.core.constant.DatabaseConstants.DB_ROW_STATUS_YES;
 
 /**
  * 频道信息 服务层实现。
@@ -28,6 +25,29 @@ import static com.vk.analyze.domain.table.AdChannelTableDef.AD_CHANNEL;
  */
 @Service
 public class AdChannelServiceImpl extends ServiceImpl<AdChannelMapper, AdChannel> implements AdChannelService {
+
+    @Autowired
+    private RedisService redisService;
+
+
+    /**
+     * 项目启动时，初始化字典到缓存
+     */
+    @PostConstruct
+    public void init()
+    {
+        loadingChannel();
+    }
+
+    @Override
+    public void loadingChannel() {
+        mapper.selectListByQuery(QueryWrapper.create().where(AD_CHANNEL.STATUS.eq(DB_ROW_STATUS_YES)))
+                .forEach(i->
+                        redisService.setCacheObject(BusinessConstants.loadingChannel(i.getId()), i)
+                );
+    }
+
+
 
     @Override
     public  Page<AdChannel>  getlist(AdChannel adChannel) {

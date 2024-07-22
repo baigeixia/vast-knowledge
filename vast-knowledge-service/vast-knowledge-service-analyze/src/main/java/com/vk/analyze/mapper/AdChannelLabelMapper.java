@@ -11,4 +11,6 @@ import com.vk.analyze.domain.AdChannelLabel;
  */
 public interface AdChannelLabelMapper extends BaseMapper<AdChannelLabel> {
 
+
+
 }
