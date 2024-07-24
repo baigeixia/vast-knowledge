@@ -6,7 +6,9 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.domain.ApArticleContent;
 import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.service.ApArticleContentService;
+import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.db.domain.article.ArticleMg;
@@ -44,9 +46,10 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
             throw new LeadNewsException("错误的参数");
         }
 
+
         if (ObjectUtils.isEmpty(id)) {
             contentInset(apArticleContent);
-            return id;
+            return apArticleContent.getId();
         }
 
         ArticleMg articleMg = articleMgRepository.findById(id).orElse(null);
@@ -65,7 +68,7 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
             }
         }
 
-        return  id;
+        return  apArticleContent.getId();
     }
 
     @Override
@@ -86,6 +89,8 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
     }
 
     private  void  contentInset(ApArticleContent  insetContent  ){
+        Long userId = SecurityContextHolder.getUserId();
+        insetContent.setAuthorId(userId);
         int inserted = mapper.insertSelective(insetContent);
         if (inserted == 1) {
             ArticleMg sevenMg = new ArticleMg();

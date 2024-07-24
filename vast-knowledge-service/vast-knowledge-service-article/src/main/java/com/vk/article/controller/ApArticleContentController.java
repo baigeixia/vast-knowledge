@@ -31,7 +31,7 @@ public class ApArticleContentController {
     }
 
     @GetMapping("getInfo")
-    public AjaxResult getInfoContent(@RequestParam Long id) {
+    public AjaxResult getInfoContent(@RequestParam(name = "id") Long id) {
         ApArticleContent vo=  apArticleContentService.getInfoContent(id);
         return AjaxResult.success(vo);
     }

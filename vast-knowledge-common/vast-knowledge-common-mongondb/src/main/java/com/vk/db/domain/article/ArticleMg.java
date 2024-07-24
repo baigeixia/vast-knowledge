@@ -2,6 +2,7 @@ package com.vk.db.domain.article;
 
 
 
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  * @author 张三
  * @since 2024-07-11
  */
+@Data
 @Document
 public class ArticleMg implements Serializable {
 
@@ -33,41 +35,15 @@ public class ArticleMg implements Serializable {
     private Long articleId;
 
     /**
+     * 作者ID
+     */
+    @Indexed
+    private Long authorId;
+
+    /**
      * 文章内容
      */
     private String content;
 
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getArticleId() {
-        return articleId;
-    }
-
-    public void setArticleId(Long articleId) {
-        this.articleId = articleId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return "ArticleMg{" +
-                "id=" + id +
-                ", articleId=" + articleId +
-                ", content='" + content + '\'' +
-                '}';
-    }
 }
