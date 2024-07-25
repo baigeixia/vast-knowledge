@@ -8,6 +8,7 @@ import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.service.ApArticleContentService;
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.uuid.UUID;
@@ -46,6 +47,8 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
             throw new LeadNewsException("错误的参数");
         }
 
+        Long userId = RequestContextUtil.getUserId();
+        apArticleContent.setAuthorId(userId);
 
         if (ObjectUtils.isEmpty(id)) {
             contentInset(apArticleContent);
@@ -89,8 +92,7 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
     }
 
     private  void  contentInset(ApArticleContent  insetContent  ){
-        Long userId = SecurityContextHolder.getUserId();
-        insetContent.setAuthorId(userId);
+
         int inserted = mapper.insertSelective(insetContent);
         if (inserted == 1) {
             ArticleMg sevenMg = new ArticleMg();

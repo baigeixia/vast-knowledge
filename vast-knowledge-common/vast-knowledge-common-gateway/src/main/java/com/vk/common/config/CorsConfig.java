@@ -1,4 +1,4 @@
-package com.vk.core.config;
+package com.vk.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

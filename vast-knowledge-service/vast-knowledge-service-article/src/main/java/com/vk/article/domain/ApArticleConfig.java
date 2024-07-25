@@ -1,6 +1,7 @@
 package com.vk.article.domain;
 
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +27,7 @@ public class ApArticleConfig implements Serializable {
     /**
      * 主键
      */
-    @Id
+    @Id(keyType = KeyType.Auto)
     private Long id;
 
     /**

@@ -1,13 +1,17 @@
 package com.vk.article.service.impl;
 
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
-import com.vk.article.domain.ApArticleLabel;
+import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
+import com.vk.article.domain.dto.HomeArticleListDto;
+import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.mapper.ApArticleConfigMapper;
 import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.mapper.ApArticleLabelMapper;
@@ -16,21 +20,20 @@ import com.vk.article.service.ApArticleService;
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.redis.service.RedisService;
 import com.vk.db.repository.article.ArticleMgRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
+import static com.vk.article.domain.table.ApArticleTableDef.AP_ARTICLE;
 import static com.vk.common.redis.constants.BusinessConstants.loadingChannel;
-import static com.vk.common.redis.constants.BusinessConstants.loadingLabel;
 
 /**
  * 已发布的文章信息 服务层实现。
@@ -57,6 +60,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     @Autowired
     private ApArticleLabelMapper apArticleLabelMapper;
+
 
     @Autowired
     private RedisService redisService;
@@ -175,5 +179,89 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             log.error("文章信息为空");
         }
         return articleInfoVo;
+    }
+
+    @Override
+    public Long saveOrUpArticle(ArticleAndConfigDto dto) {
+        Long channelId = dto.getChannelId();
+        Long articleId = dto.getArticleId();
+
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        ApArticle article = new ApArticle();
+        article.setImages(dto.getImages());
+        article.setTitle(dto.getTitle());
+
+        if (StringUtils.isLongEmpty(articleId)){
+            article.setCreatedTime(dateTime);
+        }
+
+        if (!StringUtils.isLongEmpty(channelId)){
+            article.setChannelId(channelId);
+            AdChannel cacheList = redisService.getCacheObject(loadingChannel(channelId));
+            article.setChannelName(cacheList.getName());
+        }
+
+        Long userId = RequestContextUtil.getUserId();
+        article.setAuthorId(userId);
+        String userName = RequestContextUtil.getUserName();
+        article.setAuthorName(userName);
+
+        article.setLabels(dto.getLabels());
+        article.setUpdateTime(dateTime);
+
+        Db.tx(()->{
+            mapper.insertOrUpdateSelective(article);
+
+            ApArticleConfig config = new ApArticleConfig();
+            ApArticleConfig dtoConfig = dto.getConfig();
+            BeanUtils.copyProperties(dtoConfig,config);
+            config.setArticleId(article.getId());
+
+            apArticleConfigMapper.insertOrUpdateSelective(config);
+
+            return true;
+        });
+
+        return article.getId();
+    }
+
+    @Override
+    public Page<HomeArticleListDto> listArticle(Long page, Long size, Integer tag) {
+       //tag 标签
+        if (tag == 0){
+            QueryWrapper wrapper = QueryWrapper.create();
+            //推荐
+            return mapper.paginateAs(Page.of(page, size), wrapper,HomeArticleListDto.class);
+        }
+
+        if (tag == 1){
+            //最新
+            QueryWrapper wrapper = QueryWrapper.create();
+            wrapper.select().orderBy(AP_ARTICLE.CREATED_TIME,false);
+            return mapper.paginateAs(Page.of(page, size),wrapper,HomeArticleListDto.class);
+
+        }
+        QueryWrapper where = QueryWrapper.create();
+        where.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
+        return mapper.paginateAs(Page.of(page, size), where,HomeArticleListDto.class);
+    }
+
+    @Override
+    public Page<ArticleListVo> articleListArticle(
+            Long page, Long size, Integer status, String title, Long channelId, LocalDateTime startTime, LocalDateTime endTime
+    ) {
+        Long userId = RequestContextUtil.getUserId();
+        if (StringUtils.isLongEmpty(userId)){
+           throw new LeadNewsException(401,"未登录");
+        }
+
+        QueryWrapper wrapper = QueryWrapper.create();
+        wrapper.where(AP_ARTICLE.AUTHOR_ID.eq(userId))
+                .and(AP_ARTICLE.TITLE.like(title,StringUtils.isNotEmpty(title)))
+                .and(AP_ARTICLE.CHANNEL_ID.eq(channelId,!StringUtils.isLongEmpty(channelId)))
+                .and(AP_ARTICLE.CREATED_TIME.between(startTime,endTime,!ObjectUtils.isEmpty(startTime) &&!ObjectUtils.isEmpty(endTime)));
+
+        return mapper.paginateAs(Page.of(page, size), wrapper, ArticleListVo.class);
     }
 }

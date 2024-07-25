@@ -1,7 +1,10 @@
 package com.vk.analyze.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.analyze.domain.AdChannel;
+import com.vk.analyze.domain.table.AdChannelTableDef;
+import com.vk.analyze.domain.vo.ChannelListVo;
 import com.vk.analyze.service.AdChannelService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.web.controller.BaseController;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.Serializable;
 import java.util.List;
 
+import static com.vk.analyze.domain.table.AdChannelTableDef.AD_CHANNEL;
 import static com.vk.common.core.constant.CacheConstants.AD_CHANNEL_KEY;
 
 /**
@@ -84,9 +88,10 @@ public class AdChannelController  {
      *
      * @return 所有数据
      */
-    @PostMapping("list")
-    public AjaxResult list(@RequestBody AdChannel adChannel) {
-        Page<AdChannel>   list =  adChannelService.getlist(adChannel);
+    @GetMapping ("list")
+    public AjaxResult list(
+    ) {
+        List<ChannelListVo> list = adChannelService.listAs(QueryWrapper.create().select(AD_CHANNEL.NAME, AD_CHANNEL.ID), ChannelListVo.class);
         return AjaxResult.success(list);
     }
 

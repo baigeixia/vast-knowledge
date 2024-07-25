@@ -1,5 +1,6 @@
 package com.vk.analyze.domain;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -43,6 +44,8 @@ public class AdChannel implements Serializable {
      */
     private Integer isDefault;
 
+
+    @Column(isLogicDelete = true)
     private Integer status;
 
     /**

@@ -112,6 +112,10 @@ public class ApArticle implements Serializable {
      * 创建时间
      */
     private LocalDateTime createdTime;
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
 
     /**
      * 发布时间
