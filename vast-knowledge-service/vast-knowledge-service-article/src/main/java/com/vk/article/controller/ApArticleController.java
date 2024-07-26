@@ -67,10 +67,10 @@ public class ApArticleController {
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size ,
             @RequestParam(name = "status" ,defaultValue = "1",required = false) Integer status,
-            @RequestParam(name = "title") String title,
-            @RequestParam(name = "channelId") Long channelId,
-            @RequestParam(name = "startTime") LocalDateTime startTime,
-            @RequestParam(name = "endTime") LocalDateTime endTime
+            @RequestParam(name = "title" ,required = false) String title,
+            @RequestParam(name = "channelId" ,required = false) Long channelId,
+            @RequestParam(name = "startTime" ,required = false) String startTime,
+            @RequestParam(name = "endTime" ,required = false) String endTime
     ) {
         Page<ArticleListVo> resultInfo=apArticleService.articleListArticle(page,size,status,title,channelId,startTime,endTime);
         return AjaxResult.success(resultInfo) ;

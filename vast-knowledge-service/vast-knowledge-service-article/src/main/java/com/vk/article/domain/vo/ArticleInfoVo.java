@@ -1,6 +1,7 @@
 package com.vk.article.domain.vo;
 
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.ApArticleConfig;
 import lombok.Data;
 
 /**
@@ -13,24 +14,6 @@ import lombok.Data;
 @Data
 public class ArticleInfoVo extends ApArticle {
 
-    /**
-     * 是否可评论
-     */
-    private Integer isComment;
-
-    /**
-     * 是否转发
-     */
-    private Integer isForward;
-
-    /**
-     * 是否下架
-     */
-    private Integer isDown;
-
-    /**
-     * 是否已删除
-     */
-    private Integer isDelete;
+   private ApArticleConfig config;
 
 }

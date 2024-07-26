@@ -8,8 +8,6 @@ import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.dto.HomeArticleListDto;
 import com.vk.article.domain.vo.ArticleListVo;
 
-import java.time.LocalDateTime;
-
 /**
  * 已发布的文章信息 服务层。
  *
@@ -26,5 +24,5 @@ public interface ApArticleService extends IService<ApArticle> {
 
     Page<HomeArticleListDto> listArticle(Long page, Long size, Integer tag);
 
-    Page<ArticleListVo> articleListArticle(Long page, Long size, Integer status, String title, Long channelId, LocalDateTime startTime, LocalDateTime endTime);
+    Page<ArticleListVo> articleListArticle(Long page, Long size, Integer status, String title, Long channelId, String startTime, String endTime);
 }

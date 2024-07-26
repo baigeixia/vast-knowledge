@@ -31,9 +31,10 @@ public class ApArticleContent implements Serializable {
     private Long id;
 
     /**
-     * 文章ID
+     * 文章id
      */
     private Long articleId;
+
     /**
      * 作者ID
      */

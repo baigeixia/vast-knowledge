@@ -43,6 +43,11 @@ public class ApArticle implements Serializable {
      */
     private String authorName;
 
+    // /**
+    //  * 文章内容id
+    //  */
+    // private Long contentId;
+
     /**
      * 文章所属频道ID
      */

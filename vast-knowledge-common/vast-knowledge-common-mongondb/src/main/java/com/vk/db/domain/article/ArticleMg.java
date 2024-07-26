@@ -29,7 +29,7 @@ public class ArticleMg implements Serializable {
     private Long id;
 
     /**
-     * 文章ID
+     * 文章id
      */
     @Indexed
     private Long articleId;

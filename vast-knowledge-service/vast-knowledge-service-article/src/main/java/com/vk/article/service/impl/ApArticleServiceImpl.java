@@ -8,6 +8,7 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
+import com.vk.article.domain.ApArticleContent;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.dto.HomeArticleListDto;
@@ -141,6 +142,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 // if (StringUtils.isNotEmpty(insetLabel)){
                 //     apArticleLabelMapper.insertBatch(insetLabel);
                 // }
+
                 return true;
             });
         } catch (Exception e) {
@@ -168,10 +170,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
             ApArticleConfig config = apArticleConfigMapper.selectOneById(articleId);
             if (config != null) {
-                articleInfoVo.setIsComment(config.getIsComment());
-                articleInfoVo.setIsForward(config.getIsForward());
-                articleInfoVo.setIsDown(config.getIsDown());
-                articleInfoVo.setIsDelete(config.getIsDelete());
+                articleInfoVo.setConfig(config);
             } else {
                 log.error("文章配置信息为空");
             }
@@ -194,6 +193,8 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
         if (StringUtils.isLongEmpty(articleId)){
             article.setCreatedTime(dateTime);
+        }else {
+            article.setId(articleId);
         }
 
         if (!StringUtils.isLongEmpty(channelId)){
@@ -249,7 +250,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     @Override
     public Page<ArticleListVo> articleListArticle(
-            Long page, Long size, Integer status, String title, Long channelId, LocalDateTime startTime, LocalDateTime endTime
+            Long page, Long size, Integer status, String title, Long channelId, String startTime, String endTime
     ) {
         Long userId = RequestContextUtil.getUserId();
         if (StringUtils.isLongEmpty(userId)){
