@@ -28,6 +28,11 @@ public class ArticleApplicationTests  {
     @Autowired
     private ApArticleService apArticleService;
 
+
+    @Test
+    void  testArticleContent(){
+    }
+
     @Test
     void  testArticleChannles(){
         ApArticle article = new ApArticle();

@@ -87,15 +87,7 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
         return  apArticleContent.getArticleId();
     }
 
-    private void saveMongoContent(ApArticleContent apArticleContent) {
-        ArticleMg sevenMg = new ArticleMg();
-        BeanUtils.copyProperties(apArticleContent, sevenMg);
-        try {
-            articleMgRepository.updateByArticleId(sevenMg.getArticleId(), sevenMg.getContent());
-        } catch (Exception e) {
-            log.error("更新 MongoDB 失败 文章详情id ： {} error ：{}", apArticleContent.getId(),e.getMessage());
-        }
-    }
+
 
     @Override
     public ApArticleContent getInfoContent(Long id) {

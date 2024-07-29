@@ -3,14 +3,12 @@ package com.vk.article.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.dto.HomeArticleListDto;
+import com.vk.article.domain.dto.HomeArticleListVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.service.ApArticleService;
 import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 /**
  * 已发布的文章信息 控制层。
@@ -51,7 +49,7 @@ public class ApArticleController {
             @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size ,
             @RequestParam(name = "tag",defaultValue = "1",required = false) Integer tag
     ) {
-        Page<HomeArticleListDto> resultInfo=apArticleService.listArticle(page,size,tag);
+        Page<HomeArticleListVo> resultInfo=apArticleService.listArticle(page,size,tag);
         return AjaxResult.success(resultInfo) ;
     }
 

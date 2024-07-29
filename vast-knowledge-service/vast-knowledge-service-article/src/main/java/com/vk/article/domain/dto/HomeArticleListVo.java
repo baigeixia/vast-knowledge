@@ -3,7 +3,7 @@ package com.vk.article.domain.dto;
 import lombok.Data;
 
 @Data
-public class HomeArticleListDto {
+public class HomeArticleListVo {
 
     private Long id;
 

@@ -5,7 +5,7 @@ import com.mybatisflex.core.service.IService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.dto.HomeArticleListDto;
+import com.vk.article.domain.dto.HomeArticleListVo;
 import com.vk.article.domain.vo.ArticleListVo;
 
 /**
@@ -22,7 +22,7 @@ public interface ApArticleService extends IService<ApArticle> {
 
     Long saveOrUpArticle(ArticleAndConfigDto dto);
 
-    Page<HomeArticleListDto> listArticle(Long page, Long size, Integer tag);
+    Page<HomeArticleListVo> listArticle(Long page, Long size, Integer tag);
 
     Page<ArticleListVo> articleListArticle(Long page, Long size, Integer status, String title, Long channelId, String startTime, String endTime);
 }

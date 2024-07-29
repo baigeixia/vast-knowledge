@@ -14,6 +14,7 @@ public interface ArticleMgRepository extends MongoRepository<ArticleMg,Long> {
     ArticleMg findByArticleId(Long id);
 
 
-    @Query("update articleMg a set a.content = ?2 where a.articleId = ?1")
-    void updateByArticleId(Long articleId, String content);
+
+
+
 }

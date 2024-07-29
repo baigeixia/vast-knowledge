@@ -8,10 +8,9 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
-import com.vk.article.domain.ApArticleContent;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.dto.HomeArticleListDto;
+import com.vk.article.domain.dto.HomeArticleListVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.mapper.ApArticleConfigMapper;
 import com.vk.article.mapper.ApArticleContentMapper;
@@ -24,6 +23,7 @@ import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.redis.service.RedisService;
+import com.vk.db.domain.article.ArticleMg;
 import com.vk.db.repository.article.ArticleMgRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -161,12 +161,13 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         ApArticle article = mapper.selectOneById(articleId);
         ArticleInfoVo articleInfoVo = new ArticleInfoVo();
         if (article != null) {
-            articleInfoVo.setId(article.getId());
-            articleInfoVo.setTitle(article.getTitle());
-            articleInfoVo.setChannelId(article.getChannelId());
-            articleInfoVo.setChannelName(article.getChannelName());
-            articleInfoVo.setLabels(article.getLabels());
-            articleInfoVo.setImages(article.getImages());
+            BeanUtils.copyProperties(article, articleInfoVo);
+            // articleInfoVo.setId(article.getId());
+            // articleInfoVo.setTitle(article.getTitle());
+            // articleInfoVo.setChannelId(article.getChannelId());
+            // articleInfoVo.setChannelName(article.getChannelName());
+            // articleInfoVo.setLabels(article.getLabels());
+            // articleInfoVo.setImages(article.getImages());
 
             ApArticleConfig config = apArticleConfigMapper.selectOneById(articleId);
             if (config != null) {
@@ -228,24 +229,45 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     }
 
     @Override
-    public Page<HomeArticleListDto> listArticle(Long page, Long size, Integer tag) {
+    public Page<HomeArticleListVo> listArticle(Long page, Long size, Integer tag) {
+
+        Page<HomeArticleListVo> listVoPage ;
        //tag 标签
         if (tag == 0){
             QueryWrapper wrapper = QueryWrapper.create();
             //推荐
-            return mapper.paginateAs(Page.of(page, size), wrapper,HomeArticleListDto.class);
+            listVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
+            getMongoDescription(listVoPage);
+
+            return listVoPage;
         }
 
         if (tag == 1){
             //最新
             QueryWrapper wrapper = QueryWrapper.create();
             wrapper.select().orderBy(AP_ARTICLE.CREATED_TIME,false);
-            return mapper.paginateAs(Page.of(page, size),wrapper,HomeArticleListDto.class);
+            listVoPage = mapper.paginateAs(Page.of(page, size),wrapper, HomeArticleListVo.class);
+            getMongoDescription(listVoPage);
 
+            return listVoPage;
         }
+
+
         QueryWrapper where = QueryWrapper.create();
         where.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
-        return mapper.paginateAs(Page.of(page, size), where,HomeArticleListDto.class);
+        listVoPage =  mapper.paginateAs(Page.of(page, size), where, HomeArticleListVo.class);
+
+        getMongoDescription(listVoPage);
+        return listVoPage;
+    }
+
+    private void getMongoDescription(Page<HomeArticleListVo> listVoPage) {
+        if (null!= listVoPage.getRecords()){
+            for (HomeArticleListVo record : listVoPage.getRecords()) {
+                ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
+                record.setSimpleDescription(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0, 500) : articleMg.getContent());
+            }
+        }
     }
 
     @Override
