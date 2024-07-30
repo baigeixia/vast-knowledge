@@ -22,6 +22,7 @@ import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
+import com.vk.common.core.utils.html.EscapeUtil;
 import com.vk.common.redis.service.RedisService;
 import com.vk.db.domain.article.ArticleMg;
 import com.vk.db.repository.article.ArticleMgRepository;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.Executors;
 
 import static com.vk.article.domain.table.ApArticleTableDef.AP_ARTICLE;
 import static com.vk.common.redis.constants.BusinessConstants.loadingChannel;
@@ -263,9 +265,17 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     private void getMongoDescription(Page<HomeArticleListVo> listVoPage) {
         if (null!= listVoPage.getRecords()){
-            for (HomeArticleListVo record : listVoPage.getRecords()) {
-                ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
-                record.setSimpleDescription(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0, 500) : articleMg.getContent());
+            try (var executor=Executors.newVirtualThreadPerTaskExecutor()){
+                executor.submit(()->{
+                    for (HomeArticleListVo record : listVoPage.getRecords()) {
+                        ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
+                        record.setSimpleDescription(articleMg.getSimpleDescription());
+                        // record.setSimpleDescription(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0,500) : articleMg.getContent());
+                        // record.setSimpleDescription( EscapeUtil.clean(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0,500) : articleMg.getContent()));
+                    }
+                });
+            } catch (Exception e) {
+               log.error("获取文章描述信息失败 : {}", e.getMessage());
             }
         }
     }

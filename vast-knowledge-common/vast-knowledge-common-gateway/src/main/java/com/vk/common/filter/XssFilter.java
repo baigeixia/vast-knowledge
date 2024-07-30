@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
  * @author vk
  */
 @Component
-@ConditionalOnProperty(value = "security.xss.enabled", havingValue = "true")
+// @ConditionalOnProperty(value = "security.xss.enabled", havingValue = "true")
 public class XssFilter implements GlobalFilter, Ordered
 {
     // 跨站脚本的 xss 配置，nacos自行添加
@@ -83,6 +83,7 @@ public class XssFilter implements GlobalFilter, Ordered
                     String bodyStr = new String(content, StandardCharsets.UTF_8);
                     // 防xss攻击过滤
                     bodyStr = EscapeUtil.clean(bodyStr);
+                    // bodyStr = EscapeUtil.escape(bodyStr);
                     // 转成字节
                     byte[] bytes = bodyStr.getBytes(StandardCharsets.UTF_8);
                     NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);

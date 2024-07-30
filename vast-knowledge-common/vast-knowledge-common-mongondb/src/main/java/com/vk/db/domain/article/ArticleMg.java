@@ -45,5 +45,7 @@ public class ArticleMg implements Serializable {
      */
     private String content;
 
+    private String simpleDescription;
+
 
 }

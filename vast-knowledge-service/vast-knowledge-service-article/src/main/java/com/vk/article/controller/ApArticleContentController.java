@@ -2,6 +2,7 @@ package com.vk.article.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import com.vk.article.domain.ApArticleContent;
+import com.vk.article.domain.dto.SaveArticleContentDto;
 import com.vk.article.service.ApArticleContentService;
 import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class ApArticleContentController {
 
 
     @PostMapping("save")
-    public AjaxResult saveContent(@RequestBody ApArticleContent apArticleContent) {
-        Long contentId = apArticleContentService.contentSave(apArticleContent);
+    public AjaxResult saveContent(@RequestBody SaveArticleContentDto dto) {
+        Long contentId = apArticleContentService.contentSave(dto);
         return AjaxResult.success("保存完成",contentId);
     }
 

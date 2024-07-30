@@ -6,6 +6,7 @@ import com.mybatisflex.core.row.Db;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleContent;
+import com.vk.article.domain.dto.SaveArticleContentDto;
 import com.vk.article.domain.table.ApArticleContentTableDef;
 import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.mapper.ApArticleMapper;
@@ -15,6 +16,7 @@ import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
+import com.vk.common.core.utils.html.EscapeUtil;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.db.domain.article.ArticleMg;
 import com.vk.db.repository.article.ArticleMgRepository;
@@ -47,16 +49,17 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
     private ApArticleMapper apArticleMapper;
 
     @Override
-    public Long contentSave(ApArticleContent apArticleContent) {
-        Long articleId = apArticleContent.getArticleId();
+    public Long contentSave(SaveArticleContentDto dto) {
+        Long articleId = dto.getArticleId();
 
         Long userId = RequestContextUtil.getUserId();
-        apArticleContent.setAuthorId(userId);
+        dto.setAuthorId(userId);
+
 
         if (ObjectUtils.isEmpty(articleId)) {
             //第一次 保存
-            initContentInset(apArticleContent);
-            return apArticleContent.getArticleId();
+            initContentInset(dto);
+            return dto.getArticleId();
         }
 
         ArticleMg articleMg = articleMgRepository.findByArticleId(articleId);
@@ -67,24 +70,26 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
                     .where(AP_ARTICLE_CONTENT.ARTICLE_ID.eq(articleId)));
             if (null == articleContent){
                 //数据库中也没有 走第一次保存
-                initContentInset(apArticleContent);
+                initContentInset(dto);
             }else {
                 ArticleMg sevenMg = new ArticleMg();
-                BeanUtils.copyProperties(apArticleContent, sevenMg);
+                BeanUtils.copyProperties(dto, sevenMg);
+
                 articleMgRepository.insert(sevenMg);
             }
         } else {
             ArticleMg sevenMg = new ArticleMg();
-            BeanUtils.copyProperties(apArticleContent, sevenMg);
+            BeanUtils.copyProperties(dto, sevenMg);
             sevenMg.setId(articleMg.getId());
+
             try {
                 articleMgRepository.save(sevenMg);
             } catch (Exception e) {
-                log.error("更新 MongoDB 失败 文章详情id ： {} error ：{}", apArticleContent.getId(),e.getMessage());
+                log.error("更新 MongoDB 失败 文章详情id ： {} error ：{}", dto.getId(),e.getMessage());
             }
         }
 
-        return  apArticleContent.getArticleId();
+        return  dto.getArticleId();
     }
 
 
@@ -130,7 +135,8 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
         //初始化MongoDB
             ArticleMg sevenMg = new ArticleMg();
             BeanUtils.copyProperties(insetContent, sevenMg);
-            try {
+
+        try {
                 articleMgRepository.insert(sevenMg);
             } catch (Exception e) {
                 log.error("更新 MongoDB 失败 文章详情id ： {} error ：{}",insetContent.getId(),e.getMessage());
