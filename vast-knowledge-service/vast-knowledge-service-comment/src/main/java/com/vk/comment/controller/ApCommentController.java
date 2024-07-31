@@ -1,8 +1,11 @@
 package com.vk.comment.controller;
 
-import com.mybatisflex.core.paginate.Page;
-import com.vk.comment.domain.ApComment;
+import com.vk.comment.domain.dto.CommentSaveDto;
+import com.vk.comment.domain.dto.UpCommentDto;
+import com.vk.comment.domain.vo.CommentList;
+import com.vk.comment.domain.vo.CommentListVo;
 import com.vk.comment.service.ApCommentService;
+import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,13 +28,15 @@ public class ApCommentController {
     /**
      * 添加APP评论信息。
      *
-     * @param apComment APP评论信息
+     * @param dto APP评论信息
      * @return {@code true} 添加成功，{@code false} 添加失败
      */
-    @PostMapping("save")
-    public boolean save(@RequestBody ApComment apComment) {
-        return apCommentService.save(apComment);
+    @PostMapping("saveComment")
+    public AjaxResult saveComment(@RequestBody CommentSaveDto dto) {
+        apCommentService.saveComment(dto);
+        return AjaxResult.success();
     }
+
 
     /**
      * 根据主键删除APP评论信息。
@@ -40,51 +45,40 @@ public class ApCommentController {
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @DeleteMapping("remove/{id}")
-    public boolean remove(@PathVariable Serializable id) {
-        return apCommentService.removeById(id);
+    public AjaxResult removeComment(@PathVariable Serializable id) {
+        apCommentService.removeComment(id);
+        return AjaxResult.success();
     }
 
     /**
      * 根据主键更新APP评论信息。
      *
-     * @param apComment APP评论信息
+     * @param dto APP评论信息
      * @return {@code true} 更新成功，{@code false} 更新失败
      */
     @PutMapping("update")
-    public boolean update(@RequestBody ApComment apComment) {
-        return apCommentService.updateById(apComment);
+    public AjaxResult updateComment(@RequestBody UpCommentDto dto) {
+        apCommentService.updateComment(dto);
+        return AjaxResult.success();
     }
 
-    /**
-     * 查询所有APP评论信息。
-     *
-     * @return 所有数据
-     */
-    @GetMapping("list")
-    public List<ApComment> list() {
-        return apCommentService.list();
-    }
 
     /**
-     * 根据APP评论信息主键获取详细信息。
+     * 根据文章主键查询APP评论信息。
      *
-     * @param id APP评论信息主键
-     * @return APP评论信息详情
+     * @param entryId 文章主键
+     * @return APP评论信息
      */
-    @GetMapping("getInfo/{id}")
-    public ApComment getInfo(@PathVariable Serializable id) {
-        return apCommentService.getById(id);
-    }
+    @GetMapping("getCommentList")
+    public AjaxResult getCommentList(
+            @RequestParam Serializable entryId,
+            @RequestParam(required = false,defaultValue = "1") Long page,
+            @RequestParam(required = false,defaultValue = "10") Long size
+    ) {
 
-    /**
-     * 分页查询APP评论信息。
-     *
-     * @param page 分页对象
-     * @return 分页对象
-     */
-    @GetMapping("page")
-    public Page<ApComment> page(Page<ApComment> page) {
-        return apCommentService.page(page);
+        CommentListVo result = apCommentService.getCommentList(entryId,page,size);
+
+        return AjaxResult.success(result);
     }
 
 }

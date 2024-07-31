@@ -1,6 +1,6 @@
-package com.vk.user.feign.model;
+package com.vk.user.model;
 
-import com.vk.user.feign.domain.ClientApUser;
+import com.vk.user.domain.ClientApUser;
 
 public class LoginApUser {
     /**

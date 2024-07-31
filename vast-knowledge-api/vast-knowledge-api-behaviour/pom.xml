@@ -15,12 +15,5 @@
         用户行为
     </description>
 
-    <dependencies>
 
-        <dependency>
-            <groupId>com.vk</groupId>
-            <artifactId>vast-knowledge-common-core</artifactId>
-        </dependency>
-
-    </dependencies>
 </project>

@@ -1,4 +1,4 @@
-package com.vk.user.feign.domain;
+package com.vk.user.domain;
 
 
 

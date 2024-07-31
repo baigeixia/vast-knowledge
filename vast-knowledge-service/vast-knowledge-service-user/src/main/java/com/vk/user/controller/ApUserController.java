@@ -2,17 +2,15 @@ package com.vk.user.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.security.annotation.InnerAuth;
-import com.vk.system.api.domain.SysUser;
-import com.vk.system.api.model.LoginUser;
 
 import com.vk.user.domain.ApUser;
-import com.vk.user.domain.table.ApUserTableDef;
-import com.vk.user.feign.domain.ClientApUser;
-import com.vk.user.feign.model.LoginApUser;
+import com.vk.user.domain.AuthorInfo;
+import com.vk.user.domain.ClientApUser;
+import com.vk.user.model.LoginApUser;
 import com.vk.user.service.ApUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.vk.user.domain.table.ApUserTableDef.AP_USER;
@@ -56,6 +55,18 @@ public class ApUserController {
         resultVo.setApUser(user);
         return R.ok(resultVo);
     }
+
+
+
+    @PostMapping("/User/getUserList")
+    public R<List<Map<Long, AuthorInfo>> > getUserList(@RequestBody Set<Long> userId)
+    {
+        List<Map<Long, AuthorInfo>>  result=apUserService.getUserList(userId);
+        return R.ok(result);
+    }
+
+
+
 
     /**
      * 添加APP用户信息。

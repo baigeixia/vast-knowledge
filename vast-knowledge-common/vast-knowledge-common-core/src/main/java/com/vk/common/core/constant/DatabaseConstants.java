@@ -9,4 +9,7 @@ public class DatabaseConstants {
     public static final int DB_ROW_STATUS_NO = 1;
 
 
+
+
+
 }

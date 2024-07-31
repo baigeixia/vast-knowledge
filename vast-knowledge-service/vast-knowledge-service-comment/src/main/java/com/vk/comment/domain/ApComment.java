@@ -1,5 +1,6 @@
 package com.vk.comment.domain;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -106,4 +107,6 @@ public class ApComment implements Serializable {
      */
     private LocalDateTime updatedTime;
 
+    @Column(isLogicDelete = true)
+    private  Integer status;
 }

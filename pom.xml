@@ -205,7 +205,11 @@
                 <version>${vk.version}</version>
             </dependency>
 
-
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-article</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
 
             <!-- 数据分析接口 -->
             <dependency>

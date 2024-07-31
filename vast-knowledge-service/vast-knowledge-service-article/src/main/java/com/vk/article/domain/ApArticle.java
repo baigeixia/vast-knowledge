@@ -137,4 +137,6 @@ public class ApArticle implements Serializable {
      */
     private Integer origin;
 
+
+
 }

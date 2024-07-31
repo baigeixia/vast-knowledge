@@ -13,8 +13,8 @@ import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.ip.IpUtils;
 import com.vk.common.redis.service.RedisService;
 import com.vk.user.feign.RemoteClientUserService;
-import com.vk.user.feign.domain.ClientApUser;
-import com.vk.user.feign.model.LoginApUser;
+import com.vk.user.domain.ClientApUser;
+import com.vk.user.model.LoginApUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

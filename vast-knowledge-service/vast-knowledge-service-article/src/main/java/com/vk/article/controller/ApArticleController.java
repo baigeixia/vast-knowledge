@@ -1,11 +1,14 @@
 package com.vk.article.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.dto.HomeArticleListVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.service.ApArticleService;
+import com.vk.common.core.domain.R;
 import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +77,19 @@ public class ApArticleController {
         return AjaxResult.success(resultInfo) ;
     }
 
+
+    /**
+     * 是否存在  true 存在 false  不存在
+     * @param id
+     * @return
+     */
+
+    @GetMapping("getOne")
+    public R<ApArticle> getOneArticle(
+            @RequestParam(name = "id") Long id
+    ) {
+        ApArticle byId = apArticleService.getById(id);
+        return R.ok(byId )  ;
+    }
 
 }

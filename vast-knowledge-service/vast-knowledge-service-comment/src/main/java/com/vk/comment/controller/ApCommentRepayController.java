@@ -2,7 +2,10 @@ package com.vk.comment.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import com.vk.comment.domain.ApCommentRepay;
+import com.vk.comment.domain.dto.CommentReSaveDto;
+import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.service.ApCommentRepayService;
+import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,16 +25,14 @@ public class ApCommentRepayController {
     @Autowired
     private ApCommentRepayService apCommentRepayService;
 
-    /**
-     * 添加APP评论回复信息。
-     *
-     * @param apCommentRepay APP评论回复信息
-     * @return {@code true} 添加成功，{@code false} 添加失败
-     */
-    @PostMapping("save")
-    public boolean save(@RequestBody ApCommentRepay apCommentRepay) {
-        return apCommentRepayService.save(apCommentRepay);
+
+    @PostMapping("saveCommentRe")
+    public AjaxResult saveCommentRe(@RequestBody CommentReSaveDto dto) {
+        apCommentRepayService.saveCommentRe(dto);
+        return AjaxResult.success();
     }
+
+
 
     /**
      * 根据主键删除APP评论回复信息。
@@ -40,51 +41,27 @@ public class ApCommentRepayController {
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @DeleteMapping("remove/{id}")
-    public boolean remove(@PathVariable Serializable id) {
-        return apCommentRepayService.removeById(id);
+    public AjaxResult removeCommentRe(@PathVariable Serializable id) {
+        apCommentRepayService.removeCommentRe(id);
+        return AjaxResult.success();
     }
 
     /**
-     * 根据主键更新APP评论回复信息。
+     * 根据顶级父级 主键查询回复 评论信息。
      *
-     * @param apCommentRepay APP评论回复信息
-     * @return {@code true} 更新成功，{@code false} 更新失败
+     * @param commentId 顶级父级 主键
+     * @return APP评论信息
      */
-    @PutMapping("update")
-    public boolean update(@RequestBody ApCommentRepay apCommentRepay) {
-        return apCommentRepayService.updateById(apCommentRepay);
-    }
+    @GetMapping("getCommentReList")
+    public AjaxResult getCommentReList(
+            @RequestParam Serializable commentId,
+            @RequestParam(required = false,defaultValue = "1") Long page,
+            @RequestParam(required = false,defaultValue = "10") Long size
+    ) {
 
-    /**
-     * 查询所有APP评论回复信息。
-     *
-     * @return 所有数据
-     */
-    @GetMapping("list")
-    public List<ApCommentRepay> list() {
-        return apCommentRepayService.list();
-    }
+        Page<ApCommentRepay> result = apCommentRepayService.getCommentReList(commentId,page,size);
 
-    /**
-     * 根据APP评论回复信息主键获取详细信息。
-     *
-     * @param id APP评论回复信息主键
-     * @return APP评论回复信息详情
-     */
-    @GetMapping("getInfo/{id}")
-    public ApCommentRepay getInfo(@PathVariable Serializable id) {
-        return apCommentRepayService.getById(id);
-    }
-
-    /**
-     * 分页查询APP评论回复信息。
-     *
-     * @param page 分页对象
-     * @return 分页对象
-     */
-    @GetMapping("page")
-    public Page<ApCommentRepay> page(Page<ApCommentRepay> page) {
-        return apCommentRepayService.page(page);
+        return AjaxResult.success(result);
     }
 
 }

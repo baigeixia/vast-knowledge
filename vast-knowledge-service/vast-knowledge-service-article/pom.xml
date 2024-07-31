@@ -22,6 +22,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
 
+
         <!-- SpringCloud Alibaba Nacos -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

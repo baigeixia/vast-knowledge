@@ -1,14 +1,19 @@
-package com.vk.user.feign.factory;
+package com.vk.user.factory;
 
 
 import com.vk.common.core.domain.R;
+import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
-import com.vk.user.feign.domain.ClientApUser;
-import com.vk.user.feign.model.LoginApUser;
+import com.vk.user.domain.ClientApUser;
+import com.vk.user.model.LoginApUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 用户服务降级处理
@@ -37,6 +42,13 @@ public class RemoteClientUserFallbackFactory implements FallbackFactory<RemoteCl
             {
                 return R.fail("注册用户失败:" + throwable.getMessage());
             }
+
+            @Override
+            public R<List<Map<Long, AuthorInfo>>> getUserList(Set<Long> userId) {
+                return R.fail("查询用户失败:" + throwable.getMessage());
+            }
+
+
         };
     }
 }

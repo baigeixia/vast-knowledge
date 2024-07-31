@@ -1,7 +1,6 @@
 package com.vk.auth.controller.user;
 
 
-import com.vk.auth.form.system.SystemLoginBody;
 import com.vk.auth.form.user.UserLoginBody;
 import com.vk.auth.service.system.SysLoginService;
 import com.vk.auth.service.user.UserLoginService;
@@ -11,17 +10,12 @@ import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.service.ClientTokenService;
-import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.model.LoginUser;
-import com.vk.user.feign.model.LoginApUser;
-import feign.Client;
+import com.vk.user.model.LoginApUser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
     @RequestMapping("/security")

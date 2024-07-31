@@ -9,19 +9,12 @@
         <version>0.0.1</version>
     </parent>
 
-    <groupId>com.vk.article</groupId>
+    <groupId>com.vk</groupId>
     <artifactId>vast-knowledge-api-article</artifactId>
 
     <description>
         系统接口模块
     </description>
 
-    <dependencies>
 
-        <dependency>
-            <groupId>com.vk</groupId>
-            <artifactId>vast-knowledge-common-core</artifactId>
-        </dependency>
-
-    </dependencies>
 </project>

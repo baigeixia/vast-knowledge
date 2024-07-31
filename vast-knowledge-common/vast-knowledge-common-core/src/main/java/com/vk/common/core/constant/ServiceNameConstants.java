@@ -32,4 +32,11 @@ public class ServiceNameConstants
      * 客户端用户模块
      */
     public static final String ANALYZE_SERVICE = "vk-service-analyze";
+
+    /**
+     * 文章模块
+     */
+    public static final String ARTICLE_SERVICE = "vk-service-article";
+
+
 }

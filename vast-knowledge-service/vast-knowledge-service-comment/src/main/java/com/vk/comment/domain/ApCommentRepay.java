@@ -1,5 +1,6 @@
 package com.vk.comment.domain;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -44,10 +45,14 @@ public class ApCommentRepay implements Serializable {
 
     private Long commentId;
 
+    private Long commentRepayId;
+
     /**
      * 评论内容
      */
     private String content;
+
+    private String image;
 
     private Long likes;
 
@@ -72,5 +77,8 @@ public class ApCommentRepay implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedTime;
+
+    @Column(isLogicDelete = true)
+    private  Integer status;
 
 }
