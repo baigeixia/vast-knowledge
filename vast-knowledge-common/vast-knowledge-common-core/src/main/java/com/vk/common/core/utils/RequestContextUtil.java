@@ -14,11 +14,12 @@ public class RequestContextUtil {
      * @return
      */
     public static Long getUserId(){
-        Long userid = Long.parseLong(RequestContextUtil.getHeader(SecurityConstants.DETAILS_USER_ID));
-        if(StringUtils.isLongEmpty(userid)){
+        String header = RequestContextUtil.getHeader(SecurityConstants.DETAILS_USER_ID);
+
+        if(StringUtils.isEmpty(header)){
             throw  new LeadNewsException(401,"请登录");
         }
-        return userid;
+        return Long.parseLong(header);
     }
 
     /**

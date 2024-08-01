@@ -1,8 +1,6 @@
-package com.vk.common.security.handler;
+package com.vk.common.core.exception;
 
 import com.vk.common.core.constant.HttpStatus;
-import com.vk.common.core.exception.InnerAuthException;
-import com.vk.common.core.exception.ServiceException;
 import com.vk.common.core.exception.auth.NotPermissionException;
 import com.vk.common.core.exception.auth.NotRoleException;
 import com.vk.common.core.utils.StringUtils;
@@ -30,6 +28,18 @@ import java.util.Objects;
 public class GlobalExceptionHandler
 {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+
+    /**
+     * 基础异常
+     */
+    @ExceptionHandler(LeadNewsException.class)
+    public AjaxResult baseException(LeadNewsException e)
+    {
+        log.error(e.getMessage());
+        return AjaxResult.error(e.getCode(),e.getMessage());
+    }
+
 
     /**
      * 权限码异常

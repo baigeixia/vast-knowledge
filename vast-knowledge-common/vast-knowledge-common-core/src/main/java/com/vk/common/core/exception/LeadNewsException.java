@@ -9,6 +9,7 @@ import com.vk.common.core.enums.HttpCodeEnum;
  * @description 自定义异常，用于区分系统异常与用户友好提示
  * @package
  */
+
 public class LeadNewsException extends RuntimeException{
     /**
      * 错误的状态码
@@ -35,5 +36,14 @@ public class LeadNewsException extends RuntimeException{
         super(codeEnum.getMessage());
         this.code = codeEnum.getCode();
         this.message = codeEnum.getMessage();
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
     }
 }

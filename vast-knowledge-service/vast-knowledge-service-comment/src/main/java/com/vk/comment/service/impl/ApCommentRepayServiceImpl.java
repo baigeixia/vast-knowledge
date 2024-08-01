@@ -55,8 +55,8 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
             throw new LeadNewsException("评论id不能为空");
         }
 
-        if (StringUtils.isEmpty(content) || StringUtils.isEmpty(image)){
-            throw new LeadNewsException("评论内容和回复图片不能为空");
+        if (StringUtils.isEmpty(content) && StringUtils.isEmpty(image)){
+            throw new LeadNewsException("评论内容或回复图片不能为空");
         }
 
         LocalDateTime dateTime = LocalDateTime.now();

@@ -29,4 +29,16 @@ public class CommentConstants {
     public static final Integer FLAG_TYPE_V = 5;
 
 
+    /**
+     * 最新评论
+     */
+    public static final Integer COMMENT_TYPE_NEW = 1;
+    /**
+     * 最热   默认
+     */
+    public static final Integer COMMENT_TYPE_HOT = 0;
+
+
+
+
 }

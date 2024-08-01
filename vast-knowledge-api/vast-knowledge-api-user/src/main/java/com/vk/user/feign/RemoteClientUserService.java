@@ -10,7 +10,6 @@ import com.vk.user.model.LoginApUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +23,6 @@ public interface RemoteClientUserService {
     R<Boolean> registerUserInfo(@RequestBody ClientApUser clientApUser, @RequestHeader(SecurityConstants.FROM_SOURCE)  String source);
 
     @PostMapping("/User/getUserList")
-    R<List<Map<Long, AuthorInfo>>> getUserList(@RequestBody Set<Long> userId);
+    R<Map<Long, AuthorInfo>> getUserList(@RequestBody Set<Long> userId);
 
 }

@@ -4,11 +4,9 @@ import com.mybatisflex.core.service.IService;
 import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.domain.dto.UpCommentDto;
-import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListVo;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * APP评论信息 服务层。
@@ -24,7 +22,5 @@ public interface ApCommentService extends IService<ApComment> {
 
     void updateComment(UpCommentDto dto);
 
-
-
-    CommentListVo getCommentList(Serializable entryId, Long page, Long size);
+    CommentListVo getCommentList(Serializable entryId, Integer type,Long page, Long size);
 }

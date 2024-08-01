@@ -58,10 +58,10 @@ public class ApUserController {
 
 
 
-    @PostMapping("/User/getUserList")
-    public R<List<Map<Long, AuthorInfo>> > getUserList(@RequestBody Set<Long> userId)
+    @PostMapping("/getUserList")
+    public R<Map<Long, AuthorInfo> > getUserList(@RequestBody Set<Long> userId)
     {
-        List<Map<Long, AuthorInfo>>  result=apUserService.getUserList(userId);
+        Map<Long, AuthorInfo> result=apUserService.getUserList(userId);
         return R.ok(result);
     }
 

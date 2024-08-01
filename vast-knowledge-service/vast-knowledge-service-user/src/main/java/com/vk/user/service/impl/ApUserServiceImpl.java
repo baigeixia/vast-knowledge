@@ -8,7 +8,6 @@ import com.vk.user.service.ApUserService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * APP用户信息 服务层实现。
@@ -20,20 +19,19 @@ import java.util.stream.Collectors;
 public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> implements ApUserService {
 
     @Override
-    public List<Map<Long, AuthorInfo>>  getUserList(Set<Long> userId) {
-       List<Map<Long, AuthorInfo>> infoMap = new ArrayList<>();
+    public Map<Long, AuthorInfo> getUserList(Set<Long> userId) {
+        Map<Long, AuthorInfo> infoMap = new HashMap<>();
 
         if (null!=userId){
             List<ApUser> users = mapper.selectListByIds(userId);
-            infoMap = users.stream().map(i -> {
+            for (ApUser i : users) {
                 AuthorInfo info = new AuthorInfo();
                 info.setId(i.getId());
                 info.setUsername(i.getName());
                 info.setPosition(i.getPosition());
                 info.setAvatar(i.getImage());
-
-                return Map.of(i.getId(), info);
-            }).toList();
+                infoMap.put(i.getId(),info);
+            }
         }
 
 

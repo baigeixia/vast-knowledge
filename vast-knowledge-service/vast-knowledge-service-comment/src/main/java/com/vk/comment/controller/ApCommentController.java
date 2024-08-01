@@ -71,12 +71,13 @@ public class ApCommentController {
      */
     @GetMapping("getCommentList")
     public AjaxResult getCommentList(
-            @RequestParam Serializable entryId,
-            @RequestParam(required = false,defaultValue = "1") Long page,
-            @RequestParam(required = false,defaultValue = "10") Long size
+            @RequestParam(name = "entryId") Long entryId,
+            @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
+            @RequestParam(name = "page",required = false,defaultValue = "1") Long page,
+            @RequestParam(name = "size",required = false,defaultValue = "10") Long size
     ) {
 
-        CommentListVo result = apCommentService.getCommentList(entryId,page,size);
+        CommentListVo result = apCommentService.getCommentList(entryId,type,page,size);
 
         return AjaxResult.success(result);
     }

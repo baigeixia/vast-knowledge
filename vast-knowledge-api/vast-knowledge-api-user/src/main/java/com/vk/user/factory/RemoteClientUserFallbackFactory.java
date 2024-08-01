@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +43,7 @@ public class RemoteClientUserFallbackFactory implements FallbackFactory<RemoteCl
             }
 
             @Override
-            public R<List<Map<Long, AuthorInfo>>> getUserList(Set<Long> userId) {
+            public R<Map<Long, AuthorInfo>> getUserList(Set<Long> userId) {
                 return R.fail("查询用户失败:" + throwable.getMessage());
             }
 

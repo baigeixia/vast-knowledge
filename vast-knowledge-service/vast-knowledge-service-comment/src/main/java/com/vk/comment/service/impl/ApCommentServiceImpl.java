@@ -11,6 +11,8 @@ import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.domain.dto.UpCommentDto;
+import com.vk.comment.domain.vo.CommentList;
+import com.vk.comment.domain.vo.CommentListRe;
 import com.vk.comment.domain.vo.CommentListVo;
 import com.vk.comment.mapper.ApCommentMapper;
 import com.vk.comment.mapper.ApCommentRepayMapper;
@@ -38,6 +40,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_HOT;
+import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_NEW;
 import static com.vk.comment.domain.table.ApCommentRepayTableDef.AP_COMMENT_REPAY;
 import static com.vk.comment.domain.table.ApCommentTableDef.AP_COMMENT;
 
@@ -74,7 +78,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
         String content = dto.getContent();
         String image = dto.getImage();
-        if (StringUtils.isEmpty(content) || StringUtils.isEmpty(image)) {
+        if (StringUtils.isEmpty(content) && StringUtils.isEmpty(image)) {
             throw new RuntimeException("评论内容不能为空");
         }
 
@@ -202,52 +206,94 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
     }
 
     @Override
-    public CommentListVo getCommentList(Serializable entryId, Long page, Long size) {
+    public CommentListVo getCommentList(Serializable entryId, Integer type, Long page, Long size) {
         CommentListVo result = new CommentListVo();
         result.setPage(page);
         result.setSize(size);
 
+        QueryWrapper commentWhere = QueryWrapper.create().where(AP_COMMENT.ENTRY_ID.eq(entryId)
+                .and(AP_COMMENT.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)));
+
+        if (Objects.equals(type, COMMENT_TYPE_HOT)) {
+            // 最热
+            commentWhere.orderBy(AP_COMMENT.LIKES, false);
+        } else if (Objects.equals(type, COMMENT_TYPE_NEW)) {
+            // 最新
+            commentWhere.orderBy(AP_COMMENT.UPDATED_TIME, false);
+        }
+
         // 顶级父级分页
-        Page<ApComment> commentPage = mapper.paginate(
-                Page.of(page, size),
-                QueryWrapper.create().where(AP_COMMENT.ENTRY_ID.eq(entryId).and(AP_COMMENT.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)))
-        );
-        List<ApComment> commentList = commentPage.getRecords();
+        Page<ApComment> dbCommentPage = mapper.paginate(Page.of(page, size), commentWhere);
 
-        result.setTotal(commentPage.getTotalRow());
+        List<ApComment> dbCommentList = dbCommentPage.getRecords();
 
-        if (CollectionUtils.isEmpty(commentList)) {
+        result.setTotal(dbCommentPage.getTotalRow());
+
+        if (CollectionUtils.isEmpty(dbCommentList)) {
             return result;
         }
+        // 用户id
+        Set<Long> authorIdSet = dbCommentList.stream().map(ApComment::getAuthorId).collect(Collectors.toSet());
+        //评论集合
+        List<CommentList> comments = result.getComments();
+        // 聚合
+        for (ApComment comment : dbCommentList) {
+            CommentList commentList = new CommentList();
+            commentList.setId(comment.getId());
+            commentList.setText(comment.getContent());
+            commentList.setImage(comment.getImage());
+            commentList.setLikes(comment.getLikes());
+            commentList.setTime(comment.getCreatedTime());
+            commentList.setAuthorId(comment.getAuthorId());
+            // 构建子级
+            Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(page, size),
+                    QueryWrapper.create()
+                            .where(AP_COMMENT_REPAY.COMMENT_ID.eq(comment.getId()))
+                            .and(AP_COMMENT_REPAY.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)).orderBy(AP_COMMENT_REPAY.LIKES, false));
 
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            executor.submit(() -> {
-                // 顶级父级 id
-                Set<Long> apCommentId = commentList.stream().map(ApComment::getId).collect(Collectors.toSet());
+            commentList.setChildCommentCount(commentRepayPage.getTotalRow());
 
-                List<ApCommentRepay> repays = apCommentRepayMapper.selectListByQuery(
-                        QueryWrapper.create().where(AP_COMMENT_REPAY.COMMENT_ID.in(apCommentId))
-                );
+            List<ApCommentRepay> repayList = commentRepayPage.getRecords();
+            List<CommentListRe> commentListRes = commentList.getChildComments();
 
-            });
+            for (ApCommentRepay commentRepay : repayList) {
+                CommentListRe listRe = new CommentListRe();
 
+                listRe.setText(commentRepay.getContent());
+                listRe.setId(commentRepay.getId());
+                listRe.setTime(commentRepay.getCreatedTime());
+                listRe.setLikes(commentRepay.getLikes());
+                listRe.setImage(commentRepay.getImage());
+                listRe.setAuthorId(commentRepay.getAuthorId());
 
-            Future<List<Map<Long, AuthorInfo>>> authorInfoId = executor.submit(() -> {
-                Set<Long> authorIdSet = commentList.stream().map(ApComment::getAuthorId).collect(Collectors.toSet());
-                R<List<Map<Long, AuthorInfo>>> userList = remoteClientUserService.getUserList(authorIdSet);
-                if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
-                    throw new LeadNewsException("错误的用户");
-                }
-                return userList.getData();
-            });
+                listRe.setCommentRepayId(commentRepay.getCommentRepayId());
 
+                commentListRes.add(listRe);
+            }
 
-        } catch (Exception e) {
-            log.error("获取文章描述信息失败 : {}", e.getMessage());
+            List<Long> reAuthorId = repayList.stream().map(ApCommentRepay::getAuthorId).toList();
+            authorIdSet.addAll(reAuthorId);
+            comments.add(commentList);
         }
 
 
-        return null;
+        R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(authorIdSet);
+        if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
+            throw new LeadNewsException("错误的用户");
+        }
+        Map<Long, AuthorInfo> userMap = userList.getData();
+        for (CommentList comment : comments) {
+            comment.setAuthor(userMap.get(comment.getAuthorId()));
+            List<CommentListRe> childComments = comment.getChildComments();
+            for (CommentListRe childComment : childComments) {
+                childComment.setAuthor(userMap.get(childComment.getAuthorId()));
+                Long commentRepayId = childComment.getCommentRepayId();
+                if (!StringUtils.isLongEmpty(commentRepayId)){
+                    childComment.setReply(userMap.get(commentRepayId));
+                }
+            }
+        }
+        return result;
     }
 
 

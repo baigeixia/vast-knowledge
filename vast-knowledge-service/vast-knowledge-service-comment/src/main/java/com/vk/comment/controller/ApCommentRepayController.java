@@ -54,7 +54,7 @@ public class ApCommentRepayController {
      */
     @GetMapping("getCommentReList")
     public AjaxResult getCommentReList(
-            @RequestParam Serializable commentId,
+            @RequestParam Long commentId,
             @RequestParam(required = false,defaultValue = "1") Long page,
             @RequestParam(required = false,defaultValue = "10") Long size
     ) {

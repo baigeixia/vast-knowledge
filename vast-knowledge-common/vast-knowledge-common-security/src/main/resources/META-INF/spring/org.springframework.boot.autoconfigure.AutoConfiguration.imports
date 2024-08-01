@@ -3,4 +3,4 @@ com.vk.common.security.service.TokenService
 com.vk.common.security.service.ClientTokenService
 com.vk.common.security.aspect.PreAuthorizeAspect
 com.vk.common.security.aspect.InnerAuthAspect
-com.vk.common.security.handler.GlobalExceptionHandler
+

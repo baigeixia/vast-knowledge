@@ -1,1 +1,2 @@
 com.vk.common.core.utils.SpringUtils
+com.vk.common.core.exception.GlobalExceptionHandler
