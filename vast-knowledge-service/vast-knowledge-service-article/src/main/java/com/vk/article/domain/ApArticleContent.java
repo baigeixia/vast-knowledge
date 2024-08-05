@@ -3,6 +3,7 @@ package com.vk.article.domain;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import com.mybatisflex.core.keygen.KeyGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,8 @@ public class ApArticleContent implements Serializable {
     /**
      * 主键
      */
-    @Id(keyType = KeyType.Auto)
+    // @Id(keyType = KeyType.Auto)
+    @Id(keyType=KeyType.Generator, value= KeyGenerators.flexId)
     private Long id;
 
     /**

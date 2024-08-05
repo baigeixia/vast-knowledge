@@ -1,8 +1,10 @@
 package com.vk.comment.service.impl;
 
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
+import com.mybatisflex.core.table.TableDef;
 import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.comment.common.CommentConstants;
@@ -11,6 +13,7 @@ import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.domain.dto.UpCommentDto;
+import com.vk.comment.domain.table.ApCommentTableDef;
 import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListRe;
 import com.vk.comment.domain.vo.CommentListVo;
@@ -32,10 +35,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -232,10 +232,12 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         if (CollectionUtils.isEmpty(dbCommentList)) {
             return result;
         }
-        // 用户id
+        // 用户id合集
         Set<Long> authorIdSet = dbCommentList.stream().map(ApComment::getAuthorId).collect(Collectors.toSet());
         //评论集合
         List<CommentList> comments = result.getComments();
+        //子评论用户 map合集
+        var  idMapAuthorId = new  HashMap<Long,Long>();
         // 聚合
         for (ApComment comment : dbCommentList) {
             CommentList commentList = new CommentList();
@@ -246,10 +248,18 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
             commentList.setTime(comment.getCreatedTime());
             commentList.setAuthorId(comment.getAuthorId());
             // 构建子级
-            Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(page, size),
-                    QueryWrapper.create()
-                            .where(AP_COMMENT_REPAY.COMMENT_ID.eq(comment.getId()))
-                            .and(AP_COMMENT_REPAY.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)).orderBy(AP_COMMENT_REPAY.LIKES, false));
+            QueryWrapper wrapper = QueryWrapper.create().where(
+                    AP_COMMENT_REPAY.COMMENT_ID.eq(comment.getId()));
+
+            if (Objects.equals(type, COMMENT_TYPE_HOT)) {
+                // 最热
+                wrapper.orderBy(AP_COMMENT_REPAY.LIKES, false);
+            } else if (Objects.equals(type, COMMENT_TYPE_NEW)) {
+                // 最新
+                wrapper.orderBy(AP_COMMENT_REPAY.UPDATED_TIME, false);
+            }
+
+            Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(1, 5),wrapper);
 
             commentList.setChildCommentCount(commentRepayPage.getTotalRow());
 
@@ -271,8 +281,10 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
                 commentListRes.add(listRe);
             }
 
-            List<Long> reAuthorId = repayList.stream().map(ApCommentRepay::getAuthorId).toList();
-            authorIdSet.addAll(reAuthorId);
+            idMapAuthorId.putAll(repayList.stream().collect(Collectors.toMap(ApCommentRepay::getId, ApCommentRepay::getAuthorId)));
+            // Set<Long> authorRepayIdSet = repayList.stream().map(ApCommentRepay::getAuthorId).collect(Collectors.toSet());
+            // authorIdSet.addAll(authorRepayIdSet);
+            authorIdSet.addAll(Set.copyOf(idMapAuthorId.values()));
             comments.add(commentList);
         }
 
@@ -289,12 +301,19 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
                 childComment.setAuthor(userMap.get(childComment.getAuthorId()));
                 Long commentRepayId = childComment.getCommentRepayId();
                 if (!StringUtils.isLongEmpty(commentRepayId)){
-                    childComment.setReply(userMap.get(commentRepayId));
+                    childComment.setReply(userMap.get(idMapAuthorId.get(commentRepayId)));
                 }
             }
         }
+
+        idMapAuthorId.clear();
+        userMap.clear();
+        authorIdSet.clear();
+
         return result;
     }
+
+
 
 
 }

@@ -3,6 +3,7 @@ package com.vk.article.domain;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import com.mybatisflex.core.keygen.KeyGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,8 @@ public class ApArticleConfig implements Serializable {
     /**
      * 主键
      */
-    @Id(keyType = KeyType.Auto)
+    // @Id(keyType = KeyType.Auto)
+    @Id(keyType=KeyType.Generator, value= KeyGenerators.flexId)
     private Long id;
 
     /**
@@ -38,21 +40,21 @@ public class ApArticleConfig implements Serializable {
     /**
      * 是否可评论
      */
-    private Integer isComment;
+    private Boolean isComment;
 
     /**
      * 是否转发
      */
-    private Integer isForward;
+    private Boolean isForward;
 
     /**
      * 是否下架
      */
-    private Integer isDown;
+    private Boolean isDown;
 
     /**
      * 是否已删除
      */
-    private Integer isDelete;
+    private Boolean isDelete;
 
 }
