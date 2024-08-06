@@ -113,7 +113,7 @@ public class AuthFilter implements GlobalFilter, Ordered
      */
     private String getTokenKey(String token)
     {
-        return CacheConstants.LOGIN_TOKEN_KEY + token;
+        return CacheConstants.LOGIN_CLIENT_TOKEN_KEY + token;
     }
 
     /**
