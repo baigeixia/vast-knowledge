@@ -72,7 +72,7 @@ public class ApUserInfoController {
      * @return APP用户详情信息详情
      */
     @GetMapping("getInfo/{id}")
-    public ApUserInfo getInfo(@PathVariable Serializable id) {
+    public ApUserInfo getInfo(@PathVariable(name = "id") Serializable id) {
         return apUserInfoService.getById(id);
     }
 

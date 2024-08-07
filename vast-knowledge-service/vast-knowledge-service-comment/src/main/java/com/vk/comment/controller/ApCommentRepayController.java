@@ -4,6 +4,8 @@ import com.mybatisflex.core.paginate.Page;
 import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.dto.CommentReSaveDto;
 import com.vk.comment.domain.dto.CommentSaveDto;
+import com.vk.comment.domain.vo.CommentList;
+import com.vk.comment.domain.vo.CommentListRe;
 import com.vk.comment.service.ApCommentRepayService;
 import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +56,12 @@ public class ApCommentRepayController {
      */
     @GetMapping("getCommentReList")
     public AjaxResult getCommentReList(
-            @RequestParam Long commentId,
-            @RequestParam(required = false,defaultValue = "1") Long page,
-            @RequestParam(required = false,defaultValue = "10") Long size
+            @RequestParam(name = "commentId") Long commentId,
+            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
+            @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size
     ) {
 
-        Page<ApCommentRepay> result = apCommentRepayService.getCommentReList(commentId,page,size);
+        List<CommentListRe> result = apCommentRepayService.getCommentReList(commentId,page,size);
 
         return AjaxResult.success(result);
     }

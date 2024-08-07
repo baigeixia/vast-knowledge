@@ -9,19 +9,28 @@ import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.dto.CommentReSaveDto;
 import com.vk.comment.domain.table.ApCommentRepayTableDef;
+import com.vk.comment.domain.vo.CommentList;
+import com.vk.comment.domain.vo.CommentListRe;
 import com.vk.comment.mapper.ApCommentMapper;
 import com.vk.comment.mapper.ApCommentRepayMapper;
 import com.vk.comment.service.ApCommentRepayService;
 import com.vk.common.core.constant.DatabaseConstants;
+import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
+import com.vk.user.domain.AuthorInfo;
+import com.vk.user.feign.RemoteClientUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.vk.comment.domain.table.ApCommentRepayTableDef.AP_COMMENT_REPAY;
 
@@ -39,6 +48,9 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
 
     @Autowired
     private ApCommentMapper apCommentMapper;
+
+    @Autowired
+    private RemoteClientUserService remoteClientUserService;
 
     @Override
     public void saveCommentRe(CommentReSaveDto dto) {
@@ -95,14 +107,48 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
     }
 
     @Override
-    public Page<ApCommentRepay> getCommentReList(Serializable commentId, Long page, Long size) {
+    public List<CommentListRe> getCommentReList(Serializable commentId, Long page, Long size) {
+        List<CommentListRe> resultList = new ArrayList<CommentListRe>();
 
         Page<ApCommentRepay> paginate = mapper.paginate(Page.of(page, size),
                 QueryWrapper.create().where(
                         AP_COMMENT_REPAY.COMMENT_ID.eq(commentId)).orderBy(AP_COMMENT_REPAY.CREATED_TIME, false)
         );
 
+        List<ApCommentRepay> records = paginate.getRecords();
+        Set<Long> authorId = records.stream().map(ApCommentRepay::getAuthorId).collect(Collectors.toSet());
+        Set<Long> commentReList = records.stream().map(ApCommentRepay::getCommentRepayId).collect(Collectors.toSet());
 
-        return paginate;
+        List<ApCommentRepay> apCommentRepays = mapper.selectListByQuery(QueryWrapper.create().where(AP_COMMENT_REPAY.COMMENT_REPAY_ID.in(commentReList)));
+        Set<Long> longSet = apCommentRepays.stream().map(ApCommentRepay::getCommentRepayId).collect(Collectors.toSet());
+
+        authorId.addAll(longSet);
+        R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(authorId);
+        if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
+            throw new LeadNewsException("错误的用户");
+        }
+
+        Map<Long, AuthorInfo> userMapData = userList.getData();
+
+        for (ApCommentRepay record : paginate.getRecords()) {
+
+            CommentListRe listRe = new CommentListRe();
+
+            listRe.setText(record.getContent());
+            listRe.setId(record.getId());
+            listRe.setTime(record.getCreatedTime());
+            listRe.setLikes(record.getLikes());
+            listRe.setImage(record.getImage());
+            listRe.setAuthorId(record.getAuthorId());
+            listRe.setCommentRepayId(record.getCommentRepayId());
+
+            listRe.setReply(userMapData.get(record.getAuthorId()));
+            listRe.setAuthor(userMapData.get(record.getAuthorId()));
+
+            resultList.add(listRe);
+        }
+
+
+        return resultList;
     }
 }
