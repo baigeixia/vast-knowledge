@@ -30,8 +30,8 @@ public class ApCommentRepayController {
 
     @PostMapping("saveCommentRe")
     public AjaxResult saveCommentRe(@RequestBody CommentReSaveDto dto) {
-        apCommentRepayService.saveCommentRe(dto);
-        return AjaxResult.success();
+        CommentListRe result=  apCommentRepayService.saveCommentRe(dto);
+        return AjaxResult.success(result);
     }
 
 
@@ -57,11 +57,12 @@ public class ApCommentRepayController {
     @GetMapping("getCommentReList")
     public AjaxResult getCommentReList(
             @RequestParam(name = "commentId") Long commentId,
+            @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size
     ) {
 
-        List<CommentListRe> result = apCommentRepayService.getCommentReList(commentId,page,size);
+        List<CommentListRe> result = apCommentRepayService.getCommentReList(type,commentId,page,size);
 
         return AjaxResult.success(result);
     }

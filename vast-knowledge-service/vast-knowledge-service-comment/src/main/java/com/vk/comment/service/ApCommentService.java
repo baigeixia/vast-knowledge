@@ -4,6 +4,7 @@ import com.mybatisflex.core.service.IService;
 import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.domain.dto.UpCommentDto;
+import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListVo;
 
 import java.io.Serializable;
@@ -16,7 +17,7 @@ import java.io.Serializable;
  */
 public interface ApCommentService extends IService<ApComment> {
 
-    void saveComment(CommentSaveDto dto);
+    CommentList saveComment(CommentSaveDto dto);
 
     void removeComment(Serializable id);
 

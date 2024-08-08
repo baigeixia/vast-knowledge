@@ -11,5 +11,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class CommentListRe extends CommentListBase{
     private Long  commentRepayId;
+    private Long  commentId;
     private AuthorInfo reply;
 }

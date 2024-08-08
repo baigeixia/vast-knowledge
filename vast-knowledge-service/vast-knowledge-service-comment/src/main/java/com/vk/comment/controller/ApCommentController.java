@@ -33,8 +33,8 @@ public class ApCommentController {
      */
     @PostMapping("saveComment")
     public AjaxResult saveComment(@RequestBody CommentSaveDto dto) {
-        apCommentService.saveComment(dto);
-        return AjaxResult.success();
+        CommentList result = apCommentService.saveComment(dto);
+        return AjaxResult.success(result);
     }
 
 

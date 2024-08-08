@@ -65,7 +65,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
     private RemoteClientUserService remoteClientUserService;
 
     @Override
-    public void saveComment(CommentSaveDto dto) {
+    public CommentList saveComment(CommentSaveDto dto) {
         Long userId = RequestContextUtil.getUserId();
         String userName = RequestContextUtil.getUserName();
 
@@ -98,6 +98,23 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
         mapper.insert(comment);
 
+        CommentList list = new CommentList();
+        list.setId(comment.getId());
+        list.setImage(comment.getImage());
+        list.setTime(comment.getCreatedTime());
+        list.setLikes(comment.getLikes());
+        list.setText(comment.getContent());
+        list.setChildCommentCount(0L);
+        list.setAuthorId(userId);
+
+        R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(Set.of(userId));
+        if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
+            throw new LeadNewsException("错误的用户");
+        }
+        Map<Long, AuthorInfo> data = userList.getData();
+        list.setAuthor(data.get(userId));
+
+        return list;
     }
 
     @Override
@@ -216,7 +233,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
         if (Objects.equals(type, COMMENT_TYPE_HOT)) {
             // 最热
-            commentWhere.orderBy(AP_COMMENT.LIKES, false);
+            commentWhere.orderBy(AP_COMMENT.LIKES, false).orderBy(AP_COMMENT.ID,false);
         } else if (Objects.equals(type, COMMENT_TYPE_NEW)) {
             // 最新
             commentWhere.orderBy(AP_COMMENT.UPDATED_TIME, false);
@@ -253,7 +270,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
             if (Objects.equals(type, COMMENT_TYPE_HOT)) {
                 // 最热
-                wrapper.orderBy(AP_COMMENT_REPAY.LIKES, false);
+                wrapper.orderBy(AP_COMMENT_REPAY.LIKES, false).orderBy(AP_COMMENT_REPAY.ID,false);
             } else if (Objects.equals(type, COMMENT_TYPE_NEW)) {
                 // 最新
                 wrapper.orderBy(AP_COMMENT_REPAY.UPDATED_TIME, false);
@@ -271,6 +288,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
                 listRe.setText(commentRepay.getContent());
                 listRe.setId(commentRepay.getId());
+                listRe.setCommentId(commentRepay.getCommentId());
                 listRe.setTime(commentRepay.getCreatedTime());
                 listRe.setLikes(commentRepay.getLikes());
                 listRe.setImage(commentRepay.getImage());

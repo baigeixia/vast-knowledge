@@ -8,8 +8,6 @@ import com.vk.comment.common.utils.CommentUtils;
 import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.dto.CommentReSaveDto;
-import com.vk.comment.domain.table.ApCommentRepayTableDef;
-import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListRe;
 import com.vk.comment.mapper.ApCommentMapper;
 import com.vk.comment.mapper.ApCommentRepayMapper;
@@ -23,15 +21,15 @@ import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_HOT;
+import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_NEW;
 import static com.vk.comment.domain.table.ApCommentRepayTableDef.AP_COMMENT_REPAY;
 
 /**
@@ -53,7 +51,7 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
     private RemoteClientUserService remoteClientUserService;
 
     @Override
-    public void saveCommentRe(CommentReSaveDto dto) {
+    public CommentListRe saveCommentRe(CommentReSaveDto dto) {
         Long userId = RequestContextUtil.getUserId();
         String userName = RequestContextUtil.getUserName();
 
@@ -63,11 +61,11 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
         String content = dto.getContent();
         String image = dto.getImage();
 
-        if (StringUtils.isLongEmpty(commentId)){
+        if (StringUtils.isLongEmpty(commentId)) {
             throw new LeadNewsException("评论id不能为空");
         }
 
-        if (StringUtils.isEmpty(content) && StringUtils.isEmpty(image)){
+        if (StringUtils.isEmpty(content) && StringUtils.isEmpty(image)) {
             throw new LeadNewsException("评论内容或回复图片不能为空");
         }
 
@@ -85,6 +83,52 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
 
         mapper.insert(commentRepay);
 
+        CommentListRe listRe = new CommentListRe();
+        listRe.setId(commentRepay.getId());
+        listRe.setAuthorId(userId);
+        listRe.setTime(dateTime);
+        listRe.setCommentId(commentId);
+        listRe.setImage(image);
+        listRe.setText(content);
+        listRe.setLikes(0L);
+        listRe.setCommentRepayId(commentRepayId);
+
+        var authorIdRe=0L;
+
+        if (commentRepayId.equals(commentId)){
+            ApComment comment = apCommentMapper.selectOneById(commentId);
+            if (ObjectUtils.isEmpty(comment)){
+                throw new LeadNewsException("回复评论已被删除");
+            }
+            authorIdRe = comment.getAuthorId();
+        }else {
+            ApCommentRepay repay = mapper.selectOneById(commentRepayId);
+            if (ObjectUtils.isEmpty(repay)){
+                throw new LeadNewsException("回复评论已被删除");
+            }
+            authorIdRe = repay.getAuthorId();
+        }
+
+        if (StringUtils.isLongEmpty(authorIdRe)){
+            throw new LeadNewsException("回复用户缺失");
+        }
+
+        HashSet<Long> longHashSet = new HashSet<>();
+
+        longHashSet.add(userId);
+        longHashSet.add(authorIdRe);
+
+        R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(longHashSet);
+        if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
+            throw new LeadNewsException("错误的用户");
+        }
+
+        Map<Long, AuthorInfo> data = userList.getData();
+
+        listRe.setReply(data.get(authorIdRe));
+        listRe.setAuthor(data.get(userId));
+
+        return listRe;
     }
 
     @Override
@@ -93,27 +137,35 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
 
         ApCommentRepay commentRepay = mapper.selectOneById(id);
 
-        if (null== commentRepay){
+        if (null == commentRepay) {
             throw new LeadNewsException("评论已被删除");
         }
         ApComment comment = apCommentMapper.selectOneById(commentRepay.getCommentId());
 
-        commentUtils.getaLong(comment.getEntryId(),commentRepay.getAuthorId(),userId);
+        commentUtils.getaLong(comment.getEntryId(), commentRepay.getAuthorId(), userId);
 
-        ApCommentRepay apCommentRepay = UpdateEntity.of(ApCommentRepay.class,id);
+        ApCommentRepay apCommentRepay = UpdateEntity.of(ApCommentRepay.class, id);
         apCommentRepay.setStatus(DatabaseConstants.DB_ROW_STATUS_NO);
 
         mapper.update(apCommentRepay);
     }
 
     @Override
-    public List<CommentListRe> getCommentReList(Serializable commentId, Long page, Long size) {
-        List<CommentListRe> resultList = new ArrayList<CommentListRe>();
+    public List<CommentListRe> getCommentReList(Integer type, Serializable commentId, Long page, Long size) {
+        List<CommentListRe> resultList = new ArrayList<>();
 
-        Page<ApCommentRepay> paginate = mapper.paginate(Page.of(page, size),
-                QueryWrapper.create().where(
-                        AP_COMMENT_REPAY.COMMENT_ID.eq(commentId)).orderBy(AP_COMMENT_REPAY.CREATED_TIME, false)
-        );
+        QueryWrapper wrapper = QueryWrapper.create().where(
+                AP_COMMENT_REPAY.COMMENT_ID.eq(commentId));
+
+        if (Objects.equals(type, COMMENT_TYPE_HOT)) {
+            // 最热
+            wrapper.orderBy(AP_COMMENT_REPAY.LIKES, false).orderBy(AP_COMMENT_REPAY.ID, false);
+        } else if (Objects.equals(type, COMMENT_TYPE_NEW)) {
+            // 最新
+            wrapper.orderBy(AP_COMMENT_REPAY.UPDATED_TIME, false);
+        }
+
+        Page<ApCommentRepay> paginate = mapper.paginate(Page.of(page, size), wrapper);
 
         List<ApCommentRepay> records = paginate.getRecords();
         Set<Long> authorId = records.stream().map(ApCommentRepay::getAuthorId).collect(Collectors.toSet());
@@ -138,6 +190,7 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
             listRe.setId(record.getId());
             listRe.setTime(record.getCreatedTime());
             listRe.setLikes(record.getLikes());
+            listRe.setCommentId(record.getCommentId());
             listRe.setImage(record.getImage());
             listRe.setAuthorId(record.getAuthorId());
             listRe.setCommentRepayId(record.getCommentRepayId());
