@@ -24,6 +24,7 @@
         <module>vast-knowledge-common-datasource</module>
         <module>vast-knowledge-common-gateway</module>
         <module>vast-knowledge-common-mongondb</module>
+        <module>vast-knowledge-common-mq</module>
     </modules>
 
 </project>

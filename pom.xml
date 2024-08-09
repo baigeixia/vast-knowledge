@@ -55,12 +55,14 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
+            <!--mongodb-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-mongodb</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
 
+            <!-- Spring  依赖-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
@@ -258,6 +260,13 @@
             <dependency>
                 <groupId>com.vk</groupId>
                 <artifactId>vast-knowledge-api-system</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-mq</artifactId>
                 <version>${vk.version}</version>
             </dependency>
 

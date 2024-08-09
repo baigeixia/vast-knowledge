@@ -29,6 +29,7 @@ import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -223,7 +224,9 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
     }
 
     @Override
+
     public CommentListVo getCommentList(Serializable entryId, Integer type, Long page, Long size) {
+
         CommentListVo result = new CommentListVo();
         result.setPage(page);
         result.setSize(size);

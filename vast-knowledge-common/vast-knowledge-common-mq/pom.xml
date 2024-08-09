@@ -5,21 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.vk</groupId>
-        <artifactId>vast-knowledge</artifactId>
+        <artifactId>vast-knowledge-common</artifactId>
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>vast-knowledge-api</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>vast-knowledge-api-system</module>
-        <module>vast-knowledge-api-article</module>
-        <module>vast-knowledge-api-user</module>
-        <module>vast-knowledge-api-analyze</module>
-        <module>vast-knowledge-api-behaviour</module>
-        <module>vast-knowledge-api-search</module>
-        <module>vast-knowledge-api-wemedia</module>
-    </modules>
+    <artifactId>vast-knowledge-common-mq</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -29,16 +19,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.vk</groupId>
-            <artifactId>vast-knowledge-common-core</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+        <!-- kafka依赖 -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
+        </dependency>
     </dependencies>
-
-
-
 </project>

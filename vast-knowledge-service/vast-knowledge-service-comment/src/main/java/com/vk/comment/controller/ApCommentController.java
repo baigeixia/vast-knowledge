@@ -6,11 +6,15 @@ import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListVo;
 import com.vk.comment.service.ApCommentService;
 import com.vk.common.core.web.domain.AjaxResult;
+import com.vk.common.mq.common.MqConstants;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * APP评论信息 控制层。
@@ -76,10 +80,21 @@ public class ApCommentController {
             @RequestParam(name = "page",required = false,defaultValue = "1") Long page,
             @RequestParam(name = "size",required = false,defaultValue = "10") Long size
     ) {
-
+        System.out.println("---> " + Thread.currentThread());
         CommentListVo result = apCommentService.getCommentList(entryId,type,page,size);
-
+        service.test();
         return AjaxResult.success(result);
     }
+    @Resource
+    private TestService service;
 
+    @Autowired
+    private KafkaTemplate kafkaTemplate;
+
+
+    @GetMapping("/test")
+    public String test(){
+        CompletableFuture hello = kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, "hello");
+        return "hello";
+    }
 }

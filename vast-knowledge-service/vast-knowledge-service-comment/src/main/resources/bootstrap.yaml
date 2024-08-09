@@ -3,6 +3,13 @@ spring:
     active: dev
   application:
     name: vk-service-comment
+  kafka:
+    producer:
+      # 配置连接到服务端集群的配置项 ip:port,ip:port
+      bootstrap-servers: 123.207.35.9:19094
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 10
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
   cloud:
     nacos:
       username: nacos
