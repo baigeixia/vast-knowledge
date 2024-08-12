@@ -23,6 +23,11 @@
             <artifactId>vast-knowledge-common-mq</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.corundumstudio.socketio</groupId>
+            <artifactId>netty-socketio</artifactId>
+        </dependency>
+
         <!-- SpringCloud Alibaba Nacos -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

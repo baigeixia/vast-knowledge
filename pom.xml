@@ -42,6 +42,7 @@
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <jakarta.servlet.version>6.1.0-M2</jakarta.servlet.version>
         <mybatis-flex.version>1.8.8</mybatis-flex.version>
+        <netty-socketio.version>2.0.11</netty-socketio.version>
     </properties>
 
     <dependencies>
@@ -198,6 +199,13 @@
                 <groupId>com.mybatis-flex</groupId>
                 <artifactId>mybatis-flex-processor</artifactId>
                 <version>${mybatis-flex.version}</version>
+            </dependency>
+
+            <!--Socket.IO服务器的开源 Java 实现-->
+            <dependency>
+                <groupId>com.corundumstudio.socketio</groupId>
+                <artifactId>netty-socketio</artifactId>
+                <version>${netty-socketio.version}</version>
             </dependency>
 
             <!-- 核心模块 -->

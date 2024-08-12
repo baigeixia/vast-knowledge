@@ -88,13 +88,12 @@ public class ApCommentController {
     @Resource
     private TestService service;
 
-    @Autowired
-    private KafkaTemplate kafkaTemplate;
+
 
 
     @GetMapping("/test")
     public String test(){
-        CompletableFuture hello = kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, "hello");
+        service.test();
         return "hello";
     }
 }
