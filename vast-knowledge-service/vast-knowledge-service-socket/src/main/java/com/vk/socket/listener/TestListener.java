@@ -1,4 +1,4 @@
-package com.vk.comment.listener;
+package com.vk.socket.listener;
 
 import com.vk.common.mq.common.MqConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -7,10 +7,10 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j(topic ="TestListener" )
+@Slf4j(topic ="socket TestListener" )
 public class TestListener {
 
-        // @KafkaListener(topics = MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC,groupId = "test-group")
+        @KafkaListener(topics = MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC,groupId = "test-group")
         public void upOrDown(ConsumerRecord<String,String> record){
             int p = record.partition();
             long o = record.offset();
