@@ -48,6 +48,7 @@ public class CustomObjectMapperConfig {
 		module.addSerializer(Long.class, new Long2StringSerializer());
 		objectMapper.registerModule(module);
 
+
 		return objectMapper;
 	}
 

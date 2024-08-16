@@ -3,7 +3,6 @@ package com.vk.analyze.service.impl;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.analyze.domain.AdLabel;
-import com.vk.analyze.domain.table.AdLabelTableDef;
 import com.vk.analyze.mapper.AdLabelMapper;
 import com.vk.analyze.service.AdLabelService;
 import com.vk.common.redis.service.RedisService;
@@ -49,7 +48,8 @@ public class AdLabelServiceImpl extends ServiceImpl<AdLabelMapper, AdLabel> impl
 
     @Override
     public List<AdLabel> getlist() {
-        Page<AdLabel> paginate = this.mapper.paginate(1, 2, AdLabelTableDef.AD_LABEL.ID.eq(1));
-        return paginate.getRecords();
+        // Page<AdLabel> paginate = this.mapper.paginate(1, 2, AdLabelTableDef.AD_LABEL.ID.eq(1));
+        // return paginate.getRecords();
+        return null;
     }
 }

@@ -1,20 +1,17 @@
 package com.vk.comment.controller;
 
+import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.domain.dto.UpCommentDto;
 import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListVo;
 import com.vk.comment.service.ApCommentService;
 import com.vk.common.core.web.domain.AjaxResult;
-import com.vk.common.mq.common.MqConstants;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * APP评论信息 控制层。
@@ -95,5 +92,10 @@ public class ApCommentController {
     public String test(){
         service.test();
         return "hello";
+    }
+
+    @GetMapping("/test2/{id}")
+    public ApCommentDocument test2(@PathVariable(name = "id") Long id){
+        return service.test2(id);
     }
 }

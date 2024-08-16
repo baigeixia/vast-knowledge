@@ -16,6 +16,7 @@
         <module>vast-knowledge-api</module>
         <module>vast-knowledge-service</module>
         <module>vast-knowledge-common/vast-knowledge-common-websocket</module>
+        <module>vast-knowledge-common/vast-knowledge-common-es</module>
     </modules>
 
     <properties>
@@ -23,10 +24,10 @@
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-cloud.version>2023.0.1</spring-cloud.version>
-        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
-        <spring-boot.version>3.2.5</spring-boot.version>
-        <spring-framework.version>6.1.6</spring-framework.version>
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <spring-cloud-alibaba.version>2023.0.1.2</spring-cloud-alibaba.version>
+        <spring-boot.version>3.3.2</spring-boot.version>
+        <spring-framework.version>6.1.12</spring-framework.version>
         <tobato.version>1.27.2</tobato.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <swagger.core.version>2.5.0</swagger.core.version>
@@ -289,6 +290,13 @@
             <dependency>
                 <groupId>com.vk</groupId>
                 <artifactId>vast-knowledge-common-mongondb</artifactId>
+                <version>${vk.version}</version>
+            </dependency>
+
+            <!-- es -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-common-es</artifactId>
                 <version>${vk.version}</version>
             </dependency>
 
