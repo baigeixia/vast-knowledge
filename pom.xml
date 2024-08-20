@@ -15,8 +15,6 @@
         <module>vast-knowledge-common</module>
         <module>vast-knowledge-api</module>
         <module>vast-knowledge-service</module>
-        <module>vast-knowledge-common/vast-knowledge-common-websocket</module>
-        <module>vast-knowledge-common/vast-knowledge-common-es</module>
     </modules>
 
     <properties>
@@ -57,30 +55,6 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
-            <!--mongodb-->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-mongodb</artifactId>
-                <version>${spring-boot.version}</version>
-            </dependency>
-
-            <!-- Spring  依赖-->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>${spring-boot.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- SpringFramework的依赖配置-->
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-framework-bom</artifactId>
-                <version>${spring-framework.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
             <!-- SpringCloud 微服务 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>

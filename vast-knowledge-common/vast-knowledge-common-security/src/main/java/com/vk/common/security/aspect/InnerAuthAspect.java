@@ -8,6 +8,7 @@ import com.vk.common.security.annotation.InnerAuth;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.aop.Pointcut;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 

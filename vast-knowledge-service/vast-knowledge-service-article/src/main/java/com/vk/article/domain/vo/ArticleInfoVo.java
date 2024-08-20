@@ -3,6 +3,7 @@ package com.vk.article.domain.vo;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 已发布的文章信息 实体类。
@@ -11,6 +12,7 @@ import lombok.Data;
  * @since 2024-07-11
  */
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class ArticleInfoVo extends ApArticle {
 

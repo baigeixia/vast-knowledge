@@ -9,7 +9,6 @@
         <version>0.0.1</version>
     </parent>
 
-    <groupId>com.vk</groupId>
     <artifactId>vast-knowledge-common</artifactId>
     <description>通用模块</description>
     <packaging>pom</packaging>
@@ -25,6 +24,8 @@
         <module>vast-knowledge-common-gateway</module>
         <module>vast-knowledge-common-mongondb</module>
         <module>vast-knowledge-common-mq</module>
+        <module>vast-knowledge-common-es</module>
+        <module>vast-knowledge-common-websocket</module>
     </modules>
 
 </project>

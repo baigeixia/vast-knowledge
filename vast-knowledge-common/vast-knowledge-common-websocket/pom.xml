@@ -5,9 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.vk</groupId>
-        <artifactId>vast-knowledge</artifactId>
+        <artifactId>vast-knowledge-common</artifactId>
         <version>0.0.1</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>vast-knowledge-common-websocket</artifactId>

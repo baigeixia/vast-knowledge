@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.vk</groupId>
-        <artifactId>vast-knowledge</artifactId>
+        <artifactId>vast-knowledge-common</artifactId>
         <version>0.0.1</version>
     </parent>
 
@@ -23,9 +23,6 @@
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
     </dependencies>
+
 </project>

@@ -1,7 +1,9 @@
 package com.vk.comment.controller;
 
+import com.corundumstudio.socketio.SocketIOClient;
 import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.domain.dto.CommentSaveDto;
+import com.vk.comment.domain.dto.SocketHandler;
 import com.vk.comment.domain.dto.UpCommentDto;
 import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListVo;
@@ -85,12 +87,16 @@ public class ApCommentController {
     @Resource
     private TestService service;
 
+    @Resource
+    private SocketHandler socketHandler;
+
 
 
 
     @GetMapping("/test")
     public String test(){
-        service.test();
+        // service.test();
+        // socketHandler.onConnect();
         return "hello";
     }
 
