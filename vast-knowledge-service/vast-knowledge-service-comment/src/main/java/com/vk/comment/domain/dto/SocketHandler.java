@@ -70,8 +70,7 @@ public class SocketHandler {
             // 保存
             clientMap.put(userName, socketIOClient.getSessionId());
             // 发送上线通知
-            this.sendMsg(null, null,
-                    new MessageDto(userName, null, "在线", null));
+            this.sendMsg(null, null,new MessageDto(userName, null, "在线", null));
         }
     }
 
@@ -92,8 +91,7 @@ public class SocketHandler {
             // 移除
             clientMap.remove(userName);
             // 发送下线通知
-            this.sendMsg(null, null,
-                    new MessageDto(userName, null, "离线", null));
+            this.sendMsg(null, null, new MessageDto(userName, null, "离线", null));
         }
     }
 
@@ -117,6 +115,10 @@ public class SocketHandler {
                 }
             });
         }
+    }
+    @OnEvent("hello")
+    public void hello(SocketIOClient socketIOClient, AckRequest ackRequest, String messageDto) {
+        logger.info("{},{},{}",socketIOClient,ackRequest,messageDto);
     }
 
 }
