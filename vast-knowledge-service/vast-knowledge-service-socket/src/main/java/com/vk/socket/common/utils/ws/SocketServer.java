@@ -1,4 +1,4 @@
-package com.vk.comment.common.utils.ws;
+package com.vk.socket.common.utils.ws;
 
 import ch.qos.logback.core.net.server.ServerRunner;
 import com.corundumstudio.socketio.SocketIOServer;

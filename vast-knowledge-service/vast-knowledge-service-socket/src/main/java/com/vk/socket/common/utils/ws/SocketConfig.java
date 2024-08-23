@@ -1,10 +1,13 @@
-package com.vk.comment.common.utils.ws;
+package com.vk.socket.common.utils.ws;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 @Configuration
 public class SocketConfig {
@@ -32,6 +35,9 @@ public class SocketConfig {
 
     @Value("${socketio.maxHttpContentLength}")
     private int maxHttpContentLength;
+
+    @Value("${socketio.nameSpaces}")
+    private String[] nameSpaces;
 
     /**
      * SocketIOServer配置
@@ -64,16 +70,16 @@ public class SocketConfig {
         config.setMaxHttpContentLength(maxHttpContentLength);
         // 设置最大每帧处理数据的长度，防止他人利用大数据来攻击服务器
         config.setMaxFramePayloadLength(maxFramePayloadLength);
-        return new SocketIOServer(config);
+
+        final SocketIOServer server = new SocketIOServer(config);
+        Optional.ofNullable(nameSpaces).ifPresent(nss ->
+                Arrays.stream(nss).forEach(server::addNamespace));
+
+        return  server;
     }
 
     /**
      * 开启SocketIOServer注解支持
-     *
-     * @param socketServer
-     * @return com.corundumstudio.socketio.annotation.SpringAnnotationScanner
-     * @author wliduo[i@dolyw.com]
-     * @date 2019/7/31 18:21
      */
     @Bean
     public SpringAnnotationScanner springAnnotationScanner(SocketIOServer socketServer) {

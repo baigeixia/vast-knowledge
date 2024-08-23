@@ -1,4 +1,4 @@
-package com.vk.comment.common.utils.ws;
+package com.vk.comment.common.utils;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;

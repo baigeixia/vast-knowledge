@@ -1,9 +1,7 @@
 package com.vk.comment.controller;
 
-import com.corundumstudio.socketio.SocketIOClient;
 import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.domain.dto.CommentSaveDto;
-import com.vk.comment.domain.dto.SocketHandler;
 import com.vk.comment.domain.dto.UpCommentDto;
 import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListVo;
@@ -14,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.util.logging.SocketHandler;
+
 
 /**
  * APP评论信息 控制层。
@@ -86,11 +86,6 @@ public class ApCommentController {
     }
     @Resource
     private TestService service;
-
-    @Resource
-    private SocketHandler socketHandler;
-
-
 
 
     @GetMapping("/test")
