@@ -7,6 +7,7 @@ import org.springframework.data.elasticsearch.config.ElasticsearchConfigurationS
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomConversions;
 import org.springframework.lang.NonNull;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -21,7 +22,12 @@ public class ElasticsearchConfiguration extends ElasticsearchConfigurationSuppor
     @NonNull
     public ElasticsearchCustomConversions  elasticsearchCustomConversions() {
         return  new ElasticsearchCustomConversions(
-                Collections.singletonList(new LongToLocalDateTimeConverter())
+                Collections.singletonList(new LocalDateTimeToLongConverter())
+                // Collections.singletonList(new LongToLocalDateTimeConverter())
+                // Arrays.asList(
+                //         new LocalDateTimeToLongConverter(),  // Add the converter here
+                //         new LongToLocalDateTimeConverter()
+                // )
         );
     }
 

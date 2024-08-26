@@ -95,6 +95,14 @@ public class ApCommentController {
         return "hello";
     }
 
+    @GetMapping("/testRe")
+    public String testRe(){
+        service.testRe();
+        // socketHandler.onConnect();
+        return "hello";
+    }
+
+
     @GetMapping("/test2/{id}")
     public ApCommentDocument test2(@PathVariable(name = "id") Long id){
         return service.test2(id);

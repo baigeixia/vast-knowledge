@@ -1,5 +1,8 @@
 package com.vk.comment.document;
 
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.KeyType;
+import com.mybatisflex.core.keygen.KeyGenerators;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -17,13 +20,14 @@ import java.time.LocalDateTime;
  */
 @Data
 // es中的索引名称
-@Document(indexName = "comment")
-public class ApCommentDocument implements Serializable {
+@Document(indexName = "comment_repay")
+public class ApCommentRepayDocument implements Serializable {
 
     /**
      * 主键
      */
     @Id
+    @Field(type = FieldType.Long )
     private Long id;
 
     /**
@@ -36,17 +40,9 @@ public class ApCommentDocument implements Serializable {
      */
     private String authorName;
 
-    private Long entryId;
+    private Long commentId;
 
-    /**
-     * 频道ID
-     */
-    private Long channelId;
-
-    /**
-     * 评论内容类型 0:文章 1:动态
-     */
-    private Integer type;
+    private Long commentRepayId;
 
     /**
      * 评论内容
@@ -56,24 +52,8 @@ public class ApCommentDocument implements Serializable {
 
     private String image;
 
-    /**
-     * 点赞数
-     */
     private Long likes;
 
-    /**
-     * 回复数
-     */
-    private Long reply;
-
-    /**
-     * 文章标记 0:普通评论 1:热点评论 2:推荐评论 3:置顶评论 4:精品评论 5:大V评论
-     */
-    private Integer flag;
-
-    /**
-     * 经度
-     */
     private BigDecimal longitude;
 
     /**
@@ -87,19 +67,17 @@ public class ApCommentDocument implements Serializable {
     private String address;
 
     /**
-     * 评论排列序号
-     */
-    private Long ord;
-
-    /**
      * 创建时间
      */
-    @Field(type = FieldType.Long)
     private LocalDateTime createdTime;
 
     /**
      * 更新时间
      */
-    @Field(type = FieldType.Long )
-    private LocalDateTime  updatedTime;
+    private LocalDateTime updatedTime;
+
+    private  Integer status;
+
+
+
 }

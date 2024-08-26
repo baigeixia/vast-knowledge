@@ -1,24 +1,23 @@
 package com.vk.comment.service.impl;
 
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
-import com.mybatisflex.core.table.TableDef;
 import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.comment.common.CommentConstants;
 import com.vk.comment.common.utils.CommentUtils;
+import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.domain.dto.UpCommentDto;
-import com.vk.comment.domain.table.ApCommentTableDef;
 import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListRe;
 import com.vk.comment.domain.vo.CommentListVo;
 import com.vk.comment.mapper.ApCommentMapper;
 import com.vk.comment.mapper.ApCommentRepayMapper;
+import com.vk.comment.repository.CommentDocumentRepository;
 import com.vk.comment.service.ApCommentService;
 import com.vk.common.core.constant.DatabaseConstants;
 import com.vk.common.core.domain.R;
@@ -28,8 +27,8 @@ import com.vk.common.core.utils.StringUtils;
 import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -37,8 +36,6 @@ import org.springframework.util.ObjectUtils;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_HOT;
@@ -64,6 +61,9 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
     @Autowired
     private RemoteClientUserService remoteClientUserService;
+
+    @Autowired
+    private CommentDocumentRepository commentDocumentRepository;
 
     @Override
     public CommentList saveComment(CommentSaveDto dto) {
@@ -114,6 +114,10 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         }
         Map<Long, AuthorInfo> data = userList.getData();
         list.setAuthor(data.get(userId));
+
+        ApCommentDocument commentDocument = new ApCommentDocument();
+        BeanUtils.copyProperties(comment,commentDocument);
+        commentDocumentRepository.save(commentDocument);
 
         return list;
     }
@@ -224,7 +228,6 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
     }
 
     @Override
-
     public CommentListVo getCommentList(Serializable entryId, Integer type, Long page, Long size) {
 
         CommentListVo result = new CommentListVo();
@@ -303,8 +306,6 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
             }
 
             idMapAuthorId.putAll(repayList.stream().collect(Collectors.toMap(ApCommentRepay::getId, ApCommentRepay::getAuthorId)));
-            // Set<Long> authorRepayIdSet = repayList.stream().map(ApCommentRepay::getAuthorId).collect(Collectors.toSet());
-            // authorIdSet.addAll(authorRepayIdSet);
             authorIdSet.addAll(Set.copyOf(idMapAuthorId.values()));
             comments.add(commentList);
         }

@@ -34,7 +34,6 @@ public class UserSocketListener {
         String userid = record.value();
         //转对象
         socketIOServer.getClient(UUID.fromString(userid)).sendEvent(MqConstants.UserSocketCS.NEWS_LIKE);
-        // log.info("/n p："+p+"/n o："+o+"/n jsonString："+jsonString);
     }
 
 

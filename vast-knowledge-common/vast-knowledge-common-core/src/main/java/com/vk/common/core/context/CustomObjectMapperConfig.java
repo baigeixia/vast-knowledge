@@ -7,7 +7,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -29,6 +31,14 @@ public class CustomObjectMapperConfig {
 	@Primary
 	public ObjectMapper serializingObjectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
+		// ObjectMapper objectMapper = JsonMapper.builder()
+		// 		.findAndAddModules()
+		// 		.build();
+
+		// ObjectMapper objectMapper = JsonMapper.builder()
+		// 		.addModule(new JavaTimeModule())
+		// 		.build();
+
 		SimpleModule module = new SimpleModule();
 
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_PATTERN);
@@ -47,7 +57,6 @@ public class CustomObjectMapperConfig {
 
 		module.addSerializer(Long.class, new Long2StringSerializer());
 		objectMapper.registerModule(module);
-
 
 		return objectMapper;
 	}
