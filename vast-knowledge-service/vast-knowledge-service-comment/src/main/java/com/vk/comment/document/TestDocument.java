@@ -1,25 +1,17 @@
 package com.vk.comment.document;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * @version 1.0
- * @description 说明
- * @package com.itheima.search.document
- */
 @Data
-// es中的索引名称
-@Document(indexName = "comment")
-public class ApCommentDocument implements Serializable {
+public class TestDocument{
 
     /**
      * 主键
@@ -31,10 +23,6 @@ public class ApCommentDocument implements Serializable {
      * 用户ID
      */
     private Long authorId;
-    /**
-     * 文章作者id
-     */
-    private Long arAuthorId;
 
     /**
      * 用户昵称
@@ -107,4 +95,10 @@ public class ApCommentDocument implements Serializable {
      */
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime  updatedTime;
+
+    private Long commentId;
+
+    private Long commentRepayId;
+
+    private  Integer status;
 }

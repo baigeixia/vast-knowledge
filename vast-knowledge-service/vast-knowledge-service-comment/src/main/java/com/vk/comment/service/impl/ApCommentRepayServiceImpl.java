@@ -5,12 +5,15 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.comment.common.utils.CommentUtils;
+import com.vk.comment.document.ApCommentDocument;
+import com.vk.comment.document.ApCommentRepayDocument;
 import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.dto.CommentReSaveDto;
 import com.vk.comment.domain.vo.CommentListRe;
 import com.vk.comment.mapper.ApCommentMapper;
 import com.vk.comment.mapper.ApCommentRepayMapper;
+import com.vk.comment.repository.CommentRepayDocumentRepository;
 import com.vk.comment.service.ApCommentRepayService;
 import com.vk.common.core.constant.DatabaseConstants;
 import com.vk.common.core.domain.R;
@@ -19,6 +22,7 @@ import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -49,6 +53,9 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
 
     @Autowired
     private RemoteClientUserService remoteClientUserService;
+
+    @Autowired
+    private CommentRepayDocumentRepository commentRepayDocumentRepository;
 
     @Override
     public CommentListRe saveCommentRe(CommentReSaveDto dto) {
@@ -127,6 +134,10 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
 
         listRe.setReply(data.get(authorIdRe));
         listRe.setAuthor(data.get(userId));
+
+        ApCommentRepayDocument repayDocument = new ApCommentRepayDocument();
+        BeanUtils.copyProperties(commentRepay,repayDocument);
+        commentRepayDocumentRepository.save(repayDocument);
 
         return listRe;
     }

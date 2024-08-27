@@ -82,6 +82,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         if (StringUtils.isEmpty(content) && StringUtils.isEmpty(image)) {
             throw new RuntimeException("评论内容不能为空");
         }
+        Long arAuthorId = dto.getArAuthorId();
 
         ApComment comment = new ApComment();
         comment.setUpdatedTime(dateTime);
@@ -96,6 +97,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         comment.setEntryId(dto.getEntryId());
         comment.setAuthorId(userId);
         comment.setAuthorName(userName);
+        comment.setArAuthorId(arAuthorId);
 
         mapper.insert(comment);
 

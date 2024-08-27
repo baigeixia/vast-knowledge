@@ -10,6 +10,10 @@ public class CommentSaveDto {
      * 评论内容类型 0:文章 1:动态
      */
     private Integer type;
+    /**
+     * 文章作者id
+     */
+    private Long arAuthorId;
 
     /**
      * 频道ID

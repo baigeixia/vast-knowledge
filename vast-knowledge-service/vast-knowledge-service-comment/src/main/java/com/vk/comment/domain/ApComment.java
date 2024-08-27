@@ -46,6 +46,10 @@ public class ApComment implements Serializable {
     private String authorName;
 
     private Long entryId;
+    /**
+     * 文章作者id
+     */
+    private Long arAuthorId;
 
     /**
      * 频道ID

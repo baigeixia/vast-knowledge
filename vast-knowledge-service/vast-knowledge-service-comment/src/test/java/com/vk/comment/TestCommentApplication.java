@@ -1,9 +1,13 @@
 package com.vk.comment;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alibaba.fastjson2.JSON;
+import com.github.luben.zstd.util.Native;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.document.ApCommentRepayDocument;
+import com.vk.comment.document.TestDocument;
 import com.vk.comment.domain.table.ApCommentRepayTableDef;
 import com.vk.comment.domain.table.ApCommentTableDef;
 import com.vk.comment.repository.CommentDocumentRepository;
@@ -17,15 +21,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.CriteriaQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.Query;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.vk.comment.domain.table.ApCommentRepayTableDef.AP_COMMENT_REPAY;
@@ -47,22 +56,89 @@ public class TestCommentApplication {
     private CommentRepayDocumentRepository commentRepayDocumentRepository;
 
 
-
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
+
+    @Autowired
+    private ReactiveElasticsearchOperations operations;
+
+    @Test
+    void  testOperations(){
+        // .withSort(Sort.by(Sort.Order.desc("createdTime")))
+
+        List<Long> entryIdList = List.of(16L,24L,28L); // Example list of entry IDs
+        int authorId = 1;
+        // Query query = NativeQuery.builder()
+        //         .withQuery( q->q.regexp(ma -> ma))
+        //         .withPageable(PageRequest.of(2, 10))
+        //         .withSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending())
+        //         .build();
+
+        // Query query = NativeQuery.builder()
+        //         .withQuery( q->q.bool(ma -> ma))
+        //         .withPageable(PageRequest.of(2, 10)) // 分页
+        //         .withSort(Sort.by(Sort.Order.desc("createdTime"))) // 排序
+        //         .build();
+
+        Query arAuthorId = new CriteriaQuery(new Criteria("arAuthorId").is(authorId).or("id").is(42695511698000118L));
+        // elasticsearchOperations.save()
+        // operations.search(arAuthorId, TestDocument.class,IndexCoordinates.of("comment"))
+        //         .doOnNext(System.out::println).subscribe();
+
+        // Criteria criteria = new Criteria("arAuthorId").is(authorId)
+        //         .subCriteria(
+        //                 new Criteria().or("commentRepayId").is(
+        //                         new Criteria("arAuthorId").is(authorId)
+        //                 )
+        //         );
+        //
+        // Query query = new CriteriaQuery(criteria);
+        // query.setPageable(PageRequest.of(0, 10)).addSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending());
+        //
+        SearchHits<TestDocument> search = elasticsearchOperations.search(arAuthorId, TestDocument.class, IndexCoordinates.of("comment","comment_repay"));
+        // SearchHits<TestDocument> search = elasticsearchOperations.search(arAuthorId, TestDocument.class, IndexCoordinates.of("comment"));
+        List<TestDocument> list = search.stream().map(SearchHit::getContent).toList();
+
+        Map<String, List<TestDocument>> groupedMap = list.stream()
+                .collect(Collectors.groupingBy(doc -> doc.getCreatedTime().toLocalDate().toString()));
+
+        // 对 groupedMap 进行排序：按键降序排序
+        Map<String, List<TestDocument>> sortedMap = groupedMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, List<TestDocument>>comparingByKey(Comparator.reverseOrder())) // 降序排序
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue,
+                        LinkedHashMap::new // 使用 LinkedHashMap 保持排序顺序
+                ));
+
+        String jsonString = JSON.toJSONString(sortedMap);
+        System.out.println(jsonString);
+    }
 
     @Test
     void  testRepaySaveAll(){
         List<ApCommentRepayDocument> apCommentRepayDocuments = commentRepayService
                 .listAs(QueryWrapper.create().select().where(AP_COMMENT_REPAY.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)), ApCommentRepayDocument.class);
 
-        // apCommentRepayDocuments.forEach(System.out::println);
+        apCommentRepayDocuments.forEach(System.out::println);
         commentRepayDocumentRepository.saveAll(apCommentRepayDocuments);
     }
 
     @Test
+    void  testComSaveAll(){
+        List<ApCommentDocument> apCommentDocuments = apCommentService.listAs(QueryWrapper.create().select().where(ApCommentTableDef.AP_COMMENT.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)), ApCommentDocument.class);
+        try {
+            commentDocumentRepository.saveAll(apCommentDocuments);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     void  testRepayGet(){
-        List<Long> ids = List.of(42448706922000145L);
+        List<Long> ids = List.of(44327337076000185L);
         Iterable<ApCommentRepayDocument> allById = commentRepayDocumentRepository.findAllById(ids);
         allById.forEach(System.out::println);
     }
@@ -73,7 +149,8 @@ public class TestCommentApplication {
         Integer[] arId= {16,24,28};
         int page = 0; // 当前页码
         int size = 10; // 每页大小
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
+        // Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
+        Pageable pageable = PageRequest.of(page, size);
         List<ApCommentDocument> documents = commentDocumentRepository.findAllByEntryIdInOrderByCreatedTimeDesc(arId,pageable);
         // documents.forEach(System.out::println);
 
