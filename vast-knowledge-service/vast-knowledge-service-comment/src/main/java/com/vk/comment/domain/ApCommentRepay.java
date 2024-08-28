@@ -44,6 +44,10 @@ public class ApCommentRepay implements Serializable {
      * 用户昵称
      */
     private String authorName;
+    /**
+     * 回复评论用户id
+     */
+    private  Long repayAuthorId;
 
     private Long commentId;
 

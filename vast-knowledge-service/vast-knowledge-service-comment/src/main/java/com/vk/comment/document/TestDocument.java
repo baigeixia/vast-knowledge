@@ -25,9 +25,22 @@ public class TestDocument{
     private Long authorId;
 
     /**
+     * 文章作者id
+     */
+    private Long arAuthorId;
+
+
+    /**
+     * 回复评论用户id
+     */
+    private  Long repayAuthorId;
+
+    /**
      * 用户昵称
      */
     private String authorName;
+
+
 
     private Long entryId;
 

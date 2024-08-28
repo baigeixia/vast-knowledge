@@ -6,6 +6,10 @@ import lombok.Data;
 public class CommentReSaveDto {
 
     private Long commentId;
+    /**
+     * 回复评论用户id
+     */
+    private  Long repayAuthorId;
 
     private Long commentRepayId;
     /**

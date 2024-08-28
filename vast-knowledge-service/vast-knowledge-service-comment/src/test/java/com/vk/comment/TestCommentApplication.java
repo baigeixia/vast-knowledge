@@ -1,14 +1,10 @@
 package com.vk.comment;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.alibaba.fastjson2.JSON;
-import com.github.luben.zstd.util.Native;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.document.ApCommentRepayDocument;
 import com.vk.comment.document.TestDocument;
-import com.vk.comment.domain.table.ApCommentRepayTableDef;
 import com.vk.comment.domain.table.ApCommentTableDef;
 import com.vk.comment.repository.CommentDocumentRepository;
 import com.vk.comment.repository.CommentRepayDocumentRepository;
@@ -22,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -30,9 +25,8 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.CriteriaQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
-
+import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,11 +56,22 @@ public class TestCommentApplication {
     @Autowired
     private ReactiveElasticsearchOperations operations;
 
+
     @Test
-    void  testOperations(){
+    void testReactiveOperations() {
+        int authorId = 1;
+        Query arAuthorId = new CriteriaQuery(new Criteria("arAuthorId").is(authorId).or("id").is(42695511698000118L));
+        operations.search(arAuthorId, TestDocument.class, IndexCoordinates.of("comment", "comment_repay")).doOnNext(System.out::println).onErrorResume(e -> {
+            System.err.println("Error occurred: " + e.getMessage());
+            return Mono.empty(); // Handle the error and return an empty result
+        }).subscribe();
+    }
+
+    @Test
+    void testOperations() {
         // .withSort(Sort.by(Sort.Order.desc("createdTime")))
 
-        List<Long> entryIdList = List.of(16L,24L,28L); // Example list of entry IDs
+        List<Long> entryIdList = List.of(16L, 24L, 28L); // Example list of entry IDs
         int authorId = 1;
         // Query query = NativeQuery.builder()
         //         .withQuery( q->q.regexp(ma -> ma))
@@ -81,6 +86,52 @@ public class TestCommentApplication {
         //         .build();
 
         Query arAuthorId = new CriteriaQuery(new Criteria("arAuthorId").is(authorId).or("id").is(42695511698000118L));
+        // .withAggregation("lastNames", Aggregation.of(a -> a
+        //       .terms(ta -> ta.field("lastName").size(10))))
+        // Query query = NativeQuery.builder()
+        //         .withQuery(q -> q
+        //                 .bool(b ->b
+        //                         .should(s->s
+        //                                 .match(m-> m.field("arAuthorId").query(authorId))
+        //                         )
+        //                         .should(s->s.
+        //                                 nested(n->n.
+        //                                         path("comment_repay")
+        //                                         .query(nq -> nq
+        //                                                 .bool(bn -> bn
+        //                                                         .must(m -> m
+        //                                                                 .match(mq -> mq
+        //                                                                         .field("comment_repay.commentRepayId")
+        //                                                                         .query("comment.id")
+        //                                                                 )
+        //                                                         )
+        //                                                         .must(m -> m
+        //                                                                 .match(mq -> mq
+        //                                                                         .field("comment.authorId")
+        //                                                                         .query(authorId)
+        //                                                                 )
+        //                                                         )
+        //                                                 )
+        //                                         )
+        //                                 )
+        //                         )
+        //                 )
+        //         )
+        //         .withPageable(PageRequest.of(0, 10))
+        //         .withSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending())
+        //         .build();
+        Query query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> b
+                                .should(s -> s.term(m -> m.field("arAuthorId").value(authorId)))
+                                .should(s -> s.term(m -> m.field("repayAuthorId").value(authorId)))
+                                .mustNot(m -> m.term(t -> t.field("authorId").value(authorId)))
+                                .minimumShouldMatch("1")
+                        )
+                )
+                .withPageable(PageRequest.of(0, 10))
+                .withSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending())
+                .build();
         // elasticsearchOperations.save()
         // operations.search(arAuthorId, TestDocument.class,IndexCoordinates.of("comment"))
         //         .doOnNext(System.out::println).subscribe();
@@ -94,8 +145,55 @@ public class TestCommentApplication {
         //
         // Query query = new CriteriaQuery(criteria);
         // query.setPageable(PageRequest.of(0, 10)).addSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending());
-        //
-        SearchHits<TestDocument> search = elasticsearchOperations.search(arAuthorId, TestDocument.class, IndexCoordinates.of("comment","comment_repay"));
+
+        // Query simpleQuery = NativeQuery.builder()
+        //         .withQuery(q -> q
+        //                 .match(m -> m.field("arAuthorId").query(authorId))
+        //         )
+        //         .build();
+
+        // Query simpleQuery = NativeQuery.builder()
+        //         .withQuery(q -> q
+        //                 .bool(b -> b
+        //                         .must(m -> m
+        //                                 .matchAll(mm -> mm)  // 匹配 ap_comment_repay 表中的所有记录
+        //                         )
+        //                         .should(sh -> sh
+        //                                 .bool(b1 -> b1
+        //                                         .must(m1 -> m1
+        //                                                 .term(t -> t
+        //                                                         .field("comment_repay_id")  // 连接条件1
+        //                                                         .value(1)  // 用于 ap_comment 表中 author_id = 1 的 ID
+        //                                                 )
+        //                                         )
+        //                                         .must(m2 -> m2
+        //                                                 .term(t -> t
+        //                                                         .field("author_id")  // 限制 author_id 为 1
+        //                                                         .value(1)
+        //                                                 )
+        //                                         )
+        //                                 )
+        //                         )
+        //                         .should(sh -> sh
+        //                                 .bool(b2 -> b2
+        //                                         .must(m3 -> m3
+        //                                                 .term(t -> t
+        //                                                         .field("comment_repay_id")  // 连接条件2
+        //                                                         .value(1)  // 用于 ap_comment_repay 表中 author_id = 1 的 ID
+        //                                                 )
+        //                                         )
+        //                                         .must(m4 -> m4
+        //                                                 .term(t -> t
+        //                                                         .field("author_id")  // 限制 author_id 为 1
+        //                                                         .value(1)
+        //                                                 )
+        //                                         )
+        //                                 )
+        //                         )
+        //                 )
+        //         ).build();
+
+        SearchHits<TestDocument> search = elasticsearchOperations.search(query, TestDocument.class, IndexCoordinates.of("comment", "comment_repay"));
         // SearchHits<TestDocument> search = elasticsearchOperations.search(arAuthorId, TestDocument.class, IndexCoordinates.of("comment"));
         List<TestDocument> list = search.stream().map(SearchHit::getContent).toList();
 
@@ -118,7 +216,7 @@ public class TestCommentApplication {
     }
 
     @Test
-    void  testRepaySaveAll(){
+    void testRepaySaveAll() {
         List<ApCommentRepayDocument> apCommentRepayDocuments = commentRepayService
                 .listAs(QueryWrapper.create().select().where(AP_COMMENT_REPAY.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)), ApCommentRepayDocument.class);
 
@@ -127,7 +225,7 @@ public class TestCommentApplication {
     }
 
     @Test
-    void  testComSaveAll(){
+    void testComSaveAll() {
         List<ApCommentDocument> apCommentDocuments = apCommentService.listAs(QueryWrapper.create().select().where(ApCommentTableDef.AP_COMMENT.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)), ApCommentDocument.class);
         try {
             commentDocumentRepository.saveAll(apCommentDocuments);
@@ -137,7 +235,7 @@ public class TestCommentApplication {
     }
 
     @Test
-    void  testRepayGet(){
+    void testRepayGet() {
         List<Long> ids = List.of(44327337076000185L);
         Iterable<ApCommentRepayDocument> allById = commentRepayDocumentRepository.findAllById(ids);
         allById.forEach(System.out::println);
@@ -145,13 +243,13 @@ public class TestCommentApplication {
 
 
     @Test
-    void  testEsGetInfo(){
-        Integer[] arId= {16,24,28};
+    void testEsGetInfo() {
+        Integer[] arId = {16, 24, 28};
         int page = 0; // 当前页码
         int size = 10; // 每页大小
         // Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdTime")));
         Pageable pageable = PageRequest.of(page, size);
-        List<ApCommentDocument> documents = commentDocumentRepository.findAllByEntryIdInOrderByCreatedTimeDesc(arId,pageable);
+        List<ApCommentDocument> documents = commentDocumentRepository.findAllByEntryIdInOrderByCreatedTimeDesc(arId, pageable);
         // documents.forEach(System.out::println);
 
         Map<String, List<ApCommentDocument>> collect = documents.stream()
@@ -165,11 +263,12 @@ public class TestCommentApplication {
         // });
 
     }
+
     @Test
-    void  testComment(){
-        long i=1722583380009L;
+    void testComment() {
+        long i = 1722583380009L;
         long time = new Date().getTime();
-        System.out.println(time-i);
+        System.out.println(time - i);
         // CommentSaveDto saveDto = new CommentSaveDto();
         // saveDto.setContent("");
         // apCommentService.saveComment(saveDto);
@@ -177,23 +276,23 @@ public class TestCommentApplication {
 
 
     @Test
-    void  testComment1(){
+    void testComment1() {
 
         // ApCommentDocument commentDocument = elasticsearchOperations.get("42696889904000157", ApCommentDocument.class);
         // System.out.println(commentDocument);
         Criteria criteria = new Criteria("entryId").is(16)
                 .subCriteria(
-                new Criteria("id").is(1)
-                        .or("id").is(6)
-        );
+                        new Criteria("id").is(1)
+                                .or("id").is(6)
+                );
 
-        SearchHits<ApCommentDocument> search = elasticsearchOperations.search( new CriteriaQuery(criteria), ApCommentDocument.class);
+        SearchHits<ApCommentDocument> search = elasticsearchOperations.search(new CriteriaQuery(criteria), ApCommentDocument.class);
         search.forEach(System.out::println);
 
     }
 
     @Test
-    void  testComment2(){
+    void testComment2() {
 
         // SearchHits<ApCommentDocument> searchHits = commentDocumentRepository.findByEntryIdAndId(24L, 42696601722000119L, "重要");
         // searchHits.forEach(hit -> {
@@ -207,7 +306,7 @@ public class TestCommentApplication {
         //     });
         // });
 
-        SearchHits<ApCommentDocument> searchHits = commentDocumentRepository.findByContent( "重要");
+        SearchHits<ApCommentDocument> searchHits = commentDocumentRepository.findByContent("重要");
         searchHits.forEach(hit -> {
             // 打印原始文档内容
             System.out.println("Document: " + hit.getContent());
