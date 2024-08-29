@@ -5,21 +5,22 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
 import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import com.vk.article.feign.RemoteClientArticleQueryService;
 import com.vk.comment.common.CommentConstants;
 import com.vk.comment.common.utils.CommentUtils;
 import com.vk.comment.document.ApCommentDocument;
+import com.vk.comment.document.NotificationDocument;
 import com.vk.comment.domain.ApComment;
 import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.domain.dto.UpCommentDto;
-import com.vk.comment.domain.vo.CommentList;
-import com.vk.comment.domain.vo.CommentListRe;
-import com.vk.comment.domain.vo.CommentListVo;
+import com.vk.comment.domain.vo.*;
 import com.vk.comment.mapper.ApCommentMapper;
 import com.vk.comment.mapper.ApCommentRepayMapper;
 import com.vk.comment.repository.CommentDocumentRepository;
 import com.vk.comment.service.ApCommentService;
 import com.vk.common.core.constant.DatabaseConstants;
+import com.vk.common.core.constant.HttpStatus;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
@@ -29,13 +30,25 @@ import com.vk.user.feign.RemoteClientUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_HOT;
@@ -57,6 +70,9 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
     private CommentUtils commentUtils;
 
     @Autowired
+    private ElasticsearchOperations elasticsearchOperations;
+
+    @Autowired
     private ApCommentRepayMapper apCommentRepayMapper;
 
     @Autowired
@@ -64,6 +80,9 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
     @Autowired
     private CommentDocumentRepository commentDocumentRepository;
+
+    @Autowired
+    private RemoteClientArticleQueryService remoteClientArticleQueryService;
 
     @Override
     public CommentList saveComment(CommentSaveDto dto) {
@@ -118,7 +137,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         list.setAuthor(data.get(userId));
 
         ApCommentDocument commentDocument = new ApCommentDocument();
-        BeanUtils.copyProperties(comment,commentDocument);
+        BeanUtils.copyProperties(comment, commentDocument);
         commentDocumentRepository.save(commentDocument);
 
         return list;
@@ -230,7 +249,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
     }
 
     @Override
-    public CommentListVo getCommentList(Serializable entryId, Integer type, Long page, Long size) {
+    public CommentListVo getCommentList(Long notificationId, Serializable entryId, Integer type, Long page, Long size) {
 
         CommentListVo result = new CommentListVo();
         result.setPage(page);
@@ -241,12 +260,14 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
         if (Objects.equals(type, COMMENT_TYPE_HOT)) {
             // 最热
-            commentWhere.orderBy(AP_COMMENT.LIKES, false).orderBy(AP_COMMENT.ID,false);
+            commentWhere.orderBy(AP_COMMENT.LIKES, false).orderBy(AP_COMMENT.ID, false);
         } else if (Objects.equals(type, COMMENT_TYPE_NEW)) {
             // 最新
             commentWhere.orderBy(AP_COMMENT.UPDATED_TIME, false);
         }
 
+        // commentWhere.limit((page-1)*size,size);
+        // List<ApComment> dbCommentPage = mapper.selectListByQuery(commentWhere);
         // 顶级父级分页
         Page<ApComment> dbCommentPage = mapper.paginate(Page.of(page, size), commentWhere);
 
@@ -259,10 +280,10 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         }
         // 用户id合集
         Set<Long> authorIdSet = dbCommentList.stream().map(ApComment::getAuthorId).collect(Collectors.toSet());
-        //评论集合
+        // 评论集合
         List<CommentList> comments = result.getComments();
-        //子评论用户 map合集
-        var  idMapAuthorId = new  HashMap<Long,Long>();
+        // 子评论用户 map合集
+        var idMapAuthorId = new HashMap<Long, Long>();
         // 聚合
         for (ApComment comment : dbCommentList) {
             CommentList commentList = new CommentList();
@@ -278,13 +299,13 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
             if (Objects.equals(type, COMMENT_TYPE_HOT)) {
                 // 最热
-                wrapper.orderBy(AP_COMMENT_REPAY.LIKES, false).orderBy(AP_COMMENT_REPAY.ID,false);
+                wrapper.orderBy(AP_COMMENT_REPAY.LIKES, false).orderBy(AP_COMMENT_REPAY.ID, false);
             } else if (Objects.equals(type, COMMENT_TYPE_NEW)) {
                 // 最新
                 wrapper.orderBy(AP_COMMENT_REPAY.UPDATED_TIME, false);
             }
 
-            Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(1, 5),wrapper);
+            Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(1, 5), wrapper);
 
             commentList.setChildCommentCount(commentRepayPage.getTotalRow());
 
@@ -324,7 +345,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
             for (CommentListRe childComment : childComments) {
                 childComment.setAuthor(userMap.get(childComment.getAuthorId()));
                 Long commentRepayId = childComment.getCommentRepayId();
-                if (!StringUtils.isLongEmpty(commentRepayId)){
+                if (!StringUtils.isLongEmpty(commentRepayId)) {
                     childComment.setReply(userMap.get(idMapAuthorId.get(commentRepayId)));
                 }
             }
@@ -337,7 +358,130 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         return result;
     }
 
+    @Override
+    public List<NotificationListVo> getNotification(Integer page, Integer size) {
+        List<NotificationListVo> listVos = new ArrayList<>();
+        Long userId = RequestContextUtil.getUserId();
+
+        Map<String, List<NotificationDocument>> notificationMapEs = timeNotificationOpenES(userId, page, size);
+
+        Set<Long> entryIdSet = notificationMapEs.values().stream()
+                .flatMap(List::stream) // 将所有 List<NotificationDocument> 展开成一个流
+                .map(NotificationDocument::getEntryId)
+                .collect(Collectors.toSet());
+
+        var titleMap = new HashMap<Long, String>();
+
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            // executor.submit(()->{
+            //     R<Map<Long, String>> title = remoteClientArticleQueryService.getArticleTitle(entryIdSet);
+            //     if (!ObjectUtils.isEmpty(title.getData())){
+            //         titleMap.putAll(title.getData());
+            //     }
+            // });
+            // 使用 Callable 来封装任务
+            Callable<Map<Long, String>> task = () -> {
+                R<Map<Long, String>> title = remoteClientArticleQueryService.getArticleTitle(entryIdSet);
+                if (title.getCode() != HttpStatus.SUCCESS){
+                    log.error(title.getMsg());
+                }
+                return title.getData();
+            };
+
+            // 提交任务并获取 Future
+            Future<Map<Long, String>> future = executor.submit(task);
+
+            // 获取结果并更新 titleMap
+            try {
+                Map<Long, String> data = future.get(); // 阻塞直到任务完成
+                if (data != null && !data.isEmpty()) {
+                    titleMap.putAll(data); // 更新 titleMap
+                }
+            } catch (Exception e) {
+                log.error("获取文章信息失败 : {}", e.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("虚拟线程池创建失败 : {}", e.getMessage());
+        }
 
 
+        listVos = notificationMapEs.keySet().stream().map(k -> {
+            List<NotificationDocument> notificationDocuments = notificationMapEs.get(k);
+            if (!ObjectUtils.isEmpty(notificationDocuments)) {
+                NotificationListVo listVo = new NotificationListVo();
+                listVo.setStatisticsTime(k);
+
+                List<NotificationInfo> list = notificationDocuments.stream().map(n -> {
+                    Long entryId = n.getEntryId();
+                    // 这里的 commentId 是顶级 评论父级
+                    Long commentId = n.getCommentId();
+
+                    NotificationInfo info = new NotificationInfo();
+                    info.setId(entryId);
+                    info.setTitle(titleMap.get(entryId) == null ? "文章已经被删除" : titleMap.get(entryId));
+                    // info.setCommentId(commentId == null ? n.getId() : commentId);
+                    info.setCommentId(n.getId());
+
+                    Actors actors = new Actors();
+                    actors.setId(n.getAuthorId());
+                    actors.setVerb(n.getStatus() == 1 ? "评论已经被删除" : (commentId == null ? "评论了您的文章" : "回复了您的评论"));
+                    actors.setUsername(n.getAuthorName());
+                    actors.setReplyContent(n.getContent());
+                    actors.setReplyContentTime(localDatetimeFormat(n.getCreatedTime()));
+
+                    info.setActors(actors);
+
+                    return info;
+                }).toList();
+
+                listVo.setNotificationInfoList(list);
+
+                return listVo;
+            }
+
+            return null;
+        }).toList();
+
+        return listVos;
+    }
+
+
+    private String localDatetimeFormat(LocalDateTime local) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return local.format(formatter);
+    }
+
+    private Map<String, List<NotificationDocument>> timeNotificationOpenES(Long authorId, Integer page, Integer size) {
+        Query query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> b
+                                .should(s -> s.term(m -> m.field("arAuthorId").value(authorId)))
+                                .should(s -> s.term(m -> m.field("repayAuthorId").value(authorId)))
+                                .mustNot(m -> m.term(t -> t.field("authorId").value(authorId)))
+                                .minimumShouldMatch("1")
+                        )
+                )
+                .withPageable(PageRequest.of((page - 1) * size, size))
+                .withSort(Sort.sort(NotificationDocument.class).by(NotificationDocument::getCreatedTime).descending())
+                .build();
+
+        SearchHits<NotificationDocument> search = elasticsearchOperations.search(query, NotificationDocument.class, IndexCoordinates.of("comment", "comment_repay"));
+
+        List<NotificationDocument> list = search.stream().map(SearchHit::getContent).toList();
+
+        Map<String, List<NotificationDocument>> groupedMap = list.stream()
+                .collect(Collectors.groupingBy(doc -> doc.getCreatedTime().toLocalDate().toString()));
+
+        // 对 groupedMap 进行排序：按键降序排序
+        return groupedMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, List<NotificationDocument>>comparingByKey(Comparator.reverseOrder())) // 降序排序
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue,
+                        LinkedHashMap::new // 使用 LinkedHashMap 保持排序顺序
+                ));
+    }
 
 }

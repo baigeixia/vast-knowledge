@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * 用户服务降级处理
  * 
@@ -28,6 +31,11 @@ public class RemoteClientArticleQueryFallbackFactory implements FallbackFactory<
             @Override
             public R<ApArticle> getOneArticle(Long id ) {
                 return R.fail("查询文章存在失败"+throwable.getMessage());
+            }
+
+            @Override
+            public R<Map<Long, String>> getArticleTitle(Set<Long> ids) {
+                return R.fail("获取文章标题失败"+throwable.getMessage());
             }
         };
     }

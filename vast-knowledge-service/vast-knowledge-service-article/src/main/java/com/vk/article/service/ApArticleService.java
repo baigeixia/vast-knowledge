@@ -8,6 +8,9 @@ import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.dto.HomeArticleListVo;
 import com.vk.article.domain.vo.ArticleListVo;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * 已发布的文章信息 服务层。
  *
@@ -25,4 +28,6 @@ public interface ApArticleService extends IService<ApArticle> {
     Page<HomeArticleListVo> listArticle(Long page, Long size, Integer tag);
 
     Page<ArticleListVo> articleListArticle(Long page, Long size, Integer status, String title, Long channelId, String startTime, String endTime);
+
+    Map<Long, String> getArticleTitle(Set<Long> ids);
 }

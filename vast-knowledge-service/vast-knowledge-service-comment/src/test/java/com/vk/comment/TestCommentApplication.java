@@ -4,13 +4,16 @@ import com.alibaba.fastjson2.JSON;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.document.ApCommentRepayDocument;
-import com.vk.comment.document.TestDocument;
+import com.vk.comment.document.NotificationDocument;
+import com.vk.comment.domain.ApComment;
+import com.vk.comment.domain.ApCommentRepay;
 import com.vk.comment.domain.table.ApCommentTableDef;
 import com.vk.comment.repository.CommentDocumentRepository;
 import com.vk.comment.repository.CommentRepayDocumentRepository;
 import com.vk.comment.service.ApCommentRepayService;
 import com.vk.comment.service.ApCommentService;
 import com.vk.common.core.constant.DatabaseConstants;
+import com.vk.common.core.utils.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,6 +42,8 @@ public class TestCommentApplication {
 
     @Autowired
     private ApCommentService apCommentService;
+    @Autowired
+    private ApCommentRepayService apCommentRepayService;
 
     @Autowired
     private ApCommentRepayService commentRepayService;
@@ -55,13 +60,31 @@ public class TestCommentApplication {
 
     @Autowired
     private ReactiveElasticsearchOperations operations;
+    @Test
+    void testUpRepayEntryId() {
+        List<ApCommentRepay> list = apCommentRepayService.list();
+        for (ApCommentRepay commentRepay : list) {
+            Long entryId = commentRepay.getEntryId();
+            if (StringUtils.isLongEmpty(entryId)){
+                Long commentId = commentRepay.getCommentId();
+                ApComment byId = apCommentService.getById(commentId);
+                if (null!=byId){
+                    Long byIdEntryId = byId.getEntryId();
+                    ApCommentRepay repay = new ApCommentRepay();
+                    repay.setId(commentRepay.getId());
+                    repay.setEntryId(byIdEntryId);
+                    apCommentRepayService.updateById(repay);
+                }
+            }
+        }
 
+    }
 
     @Test
     void testReactiveOperations() {
         int authorId = 1;
         Query arAuthorId = new CriteriaQuery(new Criteria("arAuthorId").is(authorId).or("id").is(42695511698000118L));
-        operations.search(arAuthorId, TestDocument.class, IndexCoordinates.of("comment", "comment_repay")).doOnNext(System.out::println).onErrorResume(e -> {
+        operations.search(arAuthorId, NotificationDocument.class, IndexCoordinates.of("comment", "comment_repay")).doOnNext(System.out::println).onErrorResume(e -> {
             System.err.println("Error occurred: " + e.getMessage());
             return Mono.empty(); // Handle the error and return an empty result
         }).subscribe();
@@ -76,7 +99,7 @@ public class TestCommentApplication {
         // Query query = NativeQuery.builder()
         //         .withQuery( q->q.regexp(ma -> ma))
         //         .withPageable(PageRequest.of(2, 10))
-        //         .withSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending())
+        //         .withSort(Sort.sort(NotificationDocument.class).by(NotificationDocument::getCreatedTime).descending())
         //         .build();
 
         // Query query = NativeQuery.builder()
@@ -118,7 +141,7 @@ public class TestCommentApplication {
         //                 )
         //         )
         //         .withPageable(PageRequest.of(0, 10))
-        //         .withSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending())
+        //         .withSort(Sort.sort(NotificationDocument.class).by(NotificationDocument::getCreatedTime).descending())
         //         .build();
         Query query = NativeQuery.builder()
                 .withQuery(q -> q
@@ -130,10 +153,10 @@ public class TestCommentApplication {
                         )
                 )
                 .withPageable(PageRequest.of(0, 10))
-                .withSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending())
+                .withSort(Sort.sort(NotificationDocument.class).by(NotificationDocument::getCreatedTime).descending())
                 .build();
         // elasticsearchOperations.save()
-        // operations.search(arAuthorId, TestDocument.class,IndexCoordinates.of("comment"))
+        // operations.search(arAuthorId, NotificationDocument.class,IndexCoordinates.of("comment"))
         //         .doOnNext(System.out::println).subscribe();
 
         // Criteria criteria = new Criteria("arAuthorId").is(authorId)
@@ -144,7 +167,7 @@ public class TestCommentApplication {
         //         );
         //
         // Query query = new CriteriaQuery(criteria);
-        // query.setPageable(PageRequest.of(0, 10)).addSort(Sort.sort(TestDocument.class).by(TestDocument::getCreatedTime).descending());
+        // query.setPageable(PageRequest.of(0, 10)).addSort(Sort.sort(NotificationDocument.class).by(NotificationDocument::getCreatedTime).descending());
 
         // Query simpleQuery = NativeQuery.builder()
         //         .withQuery(q -> q
@@ -193,23 +216,26 @@ public class TestCommentApplication {
         //                 )
         //         ).build();
 
-        SearchHits<TestDocument> search = elasticsearchOperations.search(query, TestDocument.class, IndexCoordinates.of("comment", "comment_repay"));
-        // SearchHits<TestDocument> search = elasticsearchOperations.search(arAuthorId, TestDocument.class, IndexCoordinates.of("comment"));
-        List<TestDocument> list = search.stream().map(SearchHit::getContent).toList();
+        SearchHits<NotificationDocument> search = elasticsearchOperations.search(query, NotificationDocument.class, IndexCoordinates.of("comment", "comment_repay"));
+        // SearchHits<NotificationDocument> search = elasticsearchOperations.search(arAuthorId, NotificationDocument.class, IndexCoordinates.of("comment"));
+        List<NotificationDocument> notificationDocuments = search.stream().map(SearchHit::getContent).toList();
 
-        Map<String, List<TestDocument>> groupedMap = list.stream()
+        Map<String, List<NotificationDocument>> groupedMap = notificationDocuments.stream()
                 .collect(Collectors.groupingBy(doc -> doc.getCreatedTime().toLocalDate().toString()));
 
         // 对 groupedMap 进行排序：按键降序排序
-        Map<String, List<TestDocument>> sortedMap = groupedMap.entrySet()
+        Map<String, List<NotificationDocument>> sortedMap = groupedMap.entrySet()
                 .stream()
-                .sorted(Map.Entry.<String, List<TestDocument>>comparingByKey(Comparator.reverseOrder())) // 降序排序
+                .sorted(Map.Entry.<String, List<NotificationDocument>>comparingByKey(Comparator.reverseOrder())) // 降序排序
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue,
                         LinkedHashMap::new // 使用 LinkedHashMap 保持排序顺序
                 ));
+
+
+
 
         String jsonString = JSON.toJSONString(sortedMap);
         System.out.println(jsonString);

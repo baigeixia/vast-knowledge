@@ -68,6 +68,7 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
         String content = dto.getContent();
         String image = dto.getImage();
         Long repayAuthorId = dto.getRepayAuthorId();
+        Long entryId = dto.getEntryId();
 
         if (StringUtils.isLongEmpty(commentId)) {
             throw new LeadNewsException("评论id不能为空");
@@ -86,9 +87,11 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
         commentRepay.setCommentRepayId(commentRepayId);
         commentRepay.setContent(content);
         commentRepay.setImage(image);
+        commentRepay.setImage(image);
         commentRepay.setCreatedTime(dateTime);
         commentRepay.setUpdatedTime(dateTime);
         commentRepay.setRepayAuthorId(repayAuthorId);
+        commentRepay.setEntryId(entryId);
 
         mapper.insert(commentRepay);
 

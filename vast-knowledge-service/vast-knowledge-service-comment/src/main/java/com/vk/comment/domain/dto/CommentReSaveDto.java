@@ -10,6 +10,10 @@ public class CommentReSaveDto {
      * 回复评论用户id
      */
     private  Long repayAuthorId;
+    /**
+     * 回复评论用户id
+     */
+    private  Long entryId;
 
     private Long commentRepayId;
     /**

@@ -33,6 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 import static com.vk.article.domain.table.ApArticleTableDef.AP_ARTICLE;
@@ -296,5 +300,20 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 .and(AP_ARTICLE.CREATED_TIME.between(startTime,endTime,!ObjectUtils.isEmpty(startTime) &&!ObjectUtils.isEmpty(endTime)));
 
         return mapper.paginateAs(Page.of(page, size), wrapper, ArticleListVo.class);
+    }
+
+    @Override
+    public Map<Long, String> getArticleTitle(Set<Long> ids) {
+        if (!ObjectUtils.isEmpty(ids)){
+            Map<Long, String> map = new HashMap<>();
+            List<ApArticle> apArticles = mapper.selectListByIds(ids);
+            for (ApArticle apArticle : apArticles) {
+                String title = apArticle.getTitle();
+                map.put(apArticle.getId(),title);
+            }
+
+            return map;
+        }
+        return null;
     }
 }

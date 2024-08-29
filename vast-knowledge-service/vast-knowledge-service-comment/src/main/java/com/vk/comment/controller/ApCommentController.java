@@ -5,6 +5,7 @@ import com.vk.comment.domain.dto.CommentSaveDto;
 import com.vk.comment.domain.dto.UpCommentDto;
 import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListVo;
+import com.vk.comment.domain.vo.NotificationListVo;
 import com.vk.comment.service.ApCommentService;
 import com.vk.common.core.web.domain.AjaxResult;
 import jakarta.annotation.Resource;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.logging.SocketHandler;
 
 
@@ -75,15 +77,27 @@ public class ApCommentController {
     @GetMapping("getCommentList")
     public AjaxResult getCommentList(
             @RequestParam(name = "entryId") Long entryId,
+            @RequestParam(name = "notificationId") Long notificationId,
             @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
             @RequestParam(name = "page",required = false,defaultValue = "1") Long page,
             @RequestParam(name = "size",required = false,defaultValue = "10") Long size
     ) {
         System.out.println("---> " + Thread.currentThread());
-        CommentListVo result = apCommentService.getCommentList(entryId,type,page,size);
+        CommentListVo result = apCommentService.getCommentList(notificationId,entryId,type,page,size);
         service.test();
         return AjaxResult.success(result);
     }
+
+    @GetMapping("notification")
+    public AjaxResult getNotification(
+            @RequestParam(name = "page",required = false,defaultValue = "1") Integer page,
+            @RequestParam(name = "size",required = false,defaultValue = "10") Integer size
+    ){
+        List<NotificationListVo> result=apCommentService.getNotification(page,size);
+
+        return AjaxResult.success(result);
+    }
+
     @Resource
     private TestService service;
 

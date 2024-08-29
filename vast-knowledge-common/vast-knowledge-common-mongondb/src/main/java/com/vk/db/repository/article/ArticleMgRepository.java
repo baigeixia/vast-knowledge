@@ -17,4 +17,8 @@ public interface ArticleMgRepository extends MongoRepository<ArticleMg,Long> {
 
 
 
+
+
+
+
 }

@@ -13,6 +13,9 @@ import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * 已发布的文章信息 控制层。
  *
@@ -89,6 +92,20 @@ public class ApArticleController {
             @RequestParam(name = "id") Long id
     ) {
         ApArticle byId = apArticleService.getById(id);
+        return R.ok(byId )  ;
+    }
+
+    /**
+     * 通过 set Id  获取文章 标题
+     * @param ids 文章id
+     * @return
+     */
+
+    @PostMapping("getTitle")
+    public R<Map<Long,String>> getArticleTitle(
+            @RequestBody Set<Long> ids
+    ) {
+        Map<Long,String> byId = apArticleService.getArticleTitle(ids);
         return R.ok(byId )  ;
     }
 
