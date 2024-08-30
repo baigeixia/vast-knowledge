@@ -17,6 +17,16 @@
     </description>
 
     <dependencies>
+        <!-- socket 通讯-->
+        <dependency>
+            <groupId>com.corundumstudio.socketio</groupId>
+            <artifactId>netty-socketio</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-mq</artifactId>
+        </dependency>
 
         <!-- SpringCloud Alibaba Nacos -->
         <dependency>

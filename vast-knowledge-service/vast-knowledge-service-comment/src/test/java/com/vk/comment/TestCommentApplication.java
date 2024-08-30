@@ -95,7 +95,7 @@ public class TestCommentApplication {
         // .withSort(Sort.by(Sort.Order.desc("createdTime")))
 
         List<Long> entryIdList = List.of(16L, 24L, 28L); // Example list of entry IDs
-        int authorId = 1;
+        int authorId = 2;
         // Query query = NativeQuery.builder()
         //         .withQuery( q->q.regexp(ma -> ma))
         //         .withPageable(PageRequest.of(2, 10))
@@ -152,7 +152,7 @@ public class TestCommentApplication {
                                 .minimumShouldMatch("1")
                         )
                 )
-                .withPageable(PageRequest.of(0, 10))
+                .withPageable(PageRequest.of(1, 10))
                 .withSort(Sort.sort(NotificationDocument.class).by(NotificationDocument::getCreatedTime).descending())
                 .build();
         // elasticsearchOperations.save()

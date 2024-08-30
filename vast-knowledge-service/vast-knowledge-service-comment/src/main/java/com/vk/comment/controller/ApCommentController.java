@@ -77,7 +77,7 @@ public class ApCommentController {
     @GetMapping("getCommentList")
     public AjaxResult getCommentList(
             @RequestParam(name = "entryId") Long entryId,
-            @RequestParam(name = "notificationId") Long notificationId,
+            @RequestParam(name = "notificationId",required = false) Long notificationId,
             @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
             @RequestParam(name = "page",required = false,defaultValue = "1") Long page,
             @RequestParam(name = "size",required = false,defaultValue = "10") Long size

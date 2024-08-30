@@ -211,7 +211,7 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
             listRe.setAuthorId(record.getAuthorId());
             listRe.setCommentRepayId(record.getCommentRepayId());
 
-            listRe.setReply(userMapData.get(record.getAuthorId()));
+            listRe.setReply(record.getCommentId().equals(record.getCommentRepayId()) ? null : userMapData.get(record.getAuthorId()));
             listRe.setAuthor(userMapData.get(record.getAuthorId()));
 
             resultList.add(listRe);

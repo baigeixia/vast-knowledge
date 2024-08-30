@@ -22,8 +22,12 @@ public interface MqConstants {
 
 
     interface UserSocketCS{
-        /** 点赞通知 */
-        String NEWS_LIKE = "newsLike";
+        /** 点赞或者取消点赞 通知 */
+        Integer NEWS_COMMENT = 1;
+        Integer NEWS_LIKE = 2;
+        Integer NEWS_FAN = 3;
+        Integer NEWS_PRIVATE_MSG = 4;
+        Integer NEWS_SYSTEM_MSG = 5;
 
     }
 

@@ -1,8 +1,7 @@
-package com.vk.socket.listener;
+package com.vk.behaviour.listener;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.nacos.shaded.io.grpc.internal.JsonUtil;
+
 import com.corundumstudio.socketio.SocketIOServer;
 import com.vk.common.mq.common.MqConstants;
 import com.vk.common.mq.domain.NewMsg;
@@ -10,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 @Slf4j(topic ="UserSocketListener" )
@@ -21,7 +17,7 @@ public class UserSocketListener {
 
 
     @Autowired
-    private  SocketIOServer socketIOServer;
+    private SocketIOServer socketIOServer;
 
 
     @KafkaListener(topics = MqConstants.TopicCS.NEWS_LIKE_TOPIC,groupId = MqConstants.NOTIFY_GROUP)

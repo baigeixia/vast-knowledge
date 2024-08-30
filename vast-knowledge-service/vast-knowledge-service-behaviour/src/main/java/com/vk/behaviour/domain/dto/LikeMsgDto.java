@@ -1,13 +1,16 @@
-package com.vk.socket.domain;
+package com.vk.behaviour.domain.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * 添加喜欢 消息
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class LikeMsgDto {
+public class LikeMsgDto extends BaseMsgDto implements Serializable {
     /**
      * 文章id
      */

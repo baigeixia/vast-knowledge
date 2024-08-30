@@ -266,6 +266,14 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
             commentWhere.orderBy(AP_COMMENT.UPDATED_TIME, false);
         }
 
+        var oneComment = new ApComment();
+        if (!StringUtils.isLongEmpty(notificationId)) {
+            // oneComment = mapper.selectOneById(notificationId);
+            // commentWhere.union(QueryWrapper.create().where(AP_COMMENT.ENTRY_ID.eq(entryId)).and(AP_COMMENT.ID.eq(notificationId)));
+            commentWhere.or(AP_COMMENT.ID.eq(notificationId).and(AP_COMMENT.ENTRY_ID.eq(entryId))).orderBy("id="+notificationId,false);
+        }
+
+
         // commentWhere.limit((page-1)*size,size);
         // List<ApComment> dbCommentPage = mapper.selectListByQuery(commentWhere);
         // 顶级父级分页
@@ -273,6 +281,9 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
         List<ApComment> dbCommentList = dbCommentPage.getRecords();
 
+        // if (!ObjectUtils.isEmpty(oneComment)) {
+        //     dbCommentList.addFirst(oneComment);
+        // }
         result.setTotal(dbCommentPage.getTotalRow());
 
         if (CollectionUtils.isEmpty(dbCommentList)) {
@@ -305,7 +316,12 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
                 wrapper.orderBy(AP_COMMENT_REPAY.UPDATED_TIME, false);
             }
 
-            Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(1, 5), wrapper);
+            if (!StringUtils.isLongEmpty(notificationId)) {
+                wrapper.or(AP_COMMENT_REPAY.ID.eq(notificationId).and(AP_COMMENT_REPAY.COMMENT_ID.eq(comment.getId()))).orderBy("id ="+notificationId,false);
+            }
+
+
+                Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(1, 5), wrapper);
 
             commentList.setChildCommentCount(commentRepayPage.getTotalRow());
 
@@ -382,7 +398,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
             // 使用 Callable 来封装任务
             Callable<Map<Long, String>> task = () -> {
                 R<Map<Long, String>> title = remoteClientArticleQueryService.getArticleTitle(entryIdSet);
-                if (title.getCode() != HttpStatus.SUCCESS){
+                if (title.getCode() != HttpStatus.SUCCESS) {
                     log.error(title.getMsg());
                 }
                 return title.getData();
@@ -461,7 +477,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
                                 .minimumShouldMatch("1")
                         )
                 )
-                .withPageable(PageRequest.of((page - 1) * size, size))
+                .withPageable(PageRequest.of(page - 1, size))
                 .withSort(Sort.sort(NotificationDocument.class).by(NotificationDocument::getCreatedTime).descending())
                 .build();
 
