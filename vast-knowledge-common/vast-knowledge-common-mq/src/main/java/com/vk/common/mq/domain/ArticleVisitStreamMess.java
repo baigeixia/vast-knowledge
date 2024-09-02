@@ -1,11 +1,11 @@
-package com.vk.user.domain.dto;
+package com.vk.common.mq.domain;
 
 import lombok.Data;
 
 /**
  * @version 1.0
  * @description 说明
- * @package com.vk.article.dto
+ * @package com.itheima.article.dto
  */
 @Data
 public class ArticleVisitStreamMess {

@@ -38,3 +38,6 @@ socketio:
   # 命名空间
   nameSpaces: /collect,/admin
   context: /behaviour
+kafka:
+  hosts: 193.112.60.103:19094
+  group: notify-group

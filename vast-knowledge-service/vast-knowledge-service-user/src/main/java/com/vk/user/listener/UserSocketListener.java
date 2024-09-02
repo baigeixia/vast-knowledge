@@ -1,0 +1,32 @@
+package com.vk.user.listener;
+
+import com.alibaba.fastjson2.JSONObject;
+import com.vk.common.mq.common.MqConstants;
+import com.vk.user.domain.ApUserMessage;
+import com.vk.user.mapper.ApUserMessageMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
+@Component
+@Slf4j(topic = "UserSocketListener")
+public class UserSocketListener {
+
+    @Autowired
+    private ApUserMessageMapper apUserMessageMapper;
+
+    @KafkaListener(topics = MqConstants.TopicCS.NEWS_LIKE_TOPIC, groupId = MqConstants.NOTIFY_GROUP)
+    public void upOrDown(ConsumerRecord<String, String> record) {
+        int p = record.partition();
+        long o = record.offset();
+        String jsonString = record.value();
+        ApUserMessage apUserMessage = JSONObject.parseObject(jsonString, ApUserMessage.class);
+
+        apUserMessageMapper.insert(apUserMessage);
+
+    }
+
+
+}

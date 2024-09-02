@@ -30,7 +30,7 @@ public class ApFollowBehavior implements Serializable {
     /**
      * 实体ID
      */
-    private Long entryId;
+    private Long authorId;
 
     /**
      * 文章ID

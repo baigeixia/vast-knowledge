@@ -49,7 +49,7 @@ public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMappe
             }
             ApLikesBehavior behavior = new ApLikesBehavior();
             behavior.setId(id);
-            behavior.setOperation(CollectionConstants.LIKE_NO);
+            // behavior.setOperation(CollectionConstants.LIKE_NO);
             mapper.update(behavior);
         }else {
             ApLikesBehavior behavior = new ApLikesBehavior();
@@ -60,8 +60,8 @@ public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMappe
             mapper.insert(behavior);
 
             try {
-                NewMsg newMsg = new NewMsg(repayAuthorId,MqConstants.UserSocketCS.NEWS_LIKE);
-                kafkaTemplate.send(MqConstants.TopicCS.NEWS_LIKE_TOPIC, JSON.toJSONString(newMsg));
+                // NewMsg newMsg = new NewMsg(repayAuthorId,MqConstants.UserSocketCS.NEWS_LIKE);
+                // kafkaTemplate.send(MqConstants.TopicCS.NEWS_LIKE_TOPIC, JSON.toJSONString(newMsg));
             } catch (Exception e) {
                 log.error("点赞行为发送kafka失败 id: {} 错误:{}",id,e.getMessage());
             }

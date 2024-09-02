@@ -9,6 +9,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -170,6 +171,9 @@ public class TokenUtils {
      */
     public static String getValue(Claims claims, String key)
     {
+        if (ObjectUtils.isEmpty(claims)){
+            return "";
+        }
         return Convert.toStr(claims.get(key), "");
     }
 

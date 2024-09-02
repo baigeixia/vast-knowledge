@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 私信消息
@@ -11,15 +12,33 @@ import java.io.Serializable;
 @Data
 public class ChatMsgDto implements Serializable {
     /**
-     * 对方用户id
+     * 用户id
      */
-    private  Long otherSideUserId;
+    private  Long userId;
+    /**
+     * 发送人ID
+     */
+    private  Long senderId;
+    /**
+     * 发送人昵称
+     */
+    private  String senderName;
+
     /**
      * 私信内容
      */
-    private  String msg;
+    private  String content;
     /**
-     * 私信图片内容
+     * 是否阅读
      */
-    private  String image;
+    private  Integer isRead;
+    /**
+     * 创建时间
+     */
+    private  LocalDateTime createdTime;
+
+    /**
+     * 阅读时间
+     */
+    private LocalDateTime readTime;
 }

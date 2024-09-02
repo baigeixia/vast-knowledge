@@ -13,4 +13,7 @@ public class BusinessConstants {
     }
 
 
+    public static String  SOCKET_USER_ID = "socket_user_id:";
+
+
 }

@@ -10,5 +10,10 @@ public class BaseMsgDto {
     /**
      * 当前用户id
      */
-    private String token;
+    private Long authorId;
+
+    /**
+     * 当前用户id
+     */
+    private Long commentId;
 }
