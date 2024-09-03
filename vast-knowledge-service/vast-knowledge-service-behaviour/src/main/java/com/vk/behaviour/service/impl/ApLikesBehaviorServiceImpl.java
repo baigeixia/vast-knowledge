@@ -1,6 +1,5 @@
 package com.vk.behaviour.service.impl;
 
-import com.alibaba.fastjson2.JSON;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.behaviour.domain.ApLikesBehavior;
 import com.vk.behaviour.domain.dto.LikesBehaviorDto;
@@ -11,8 +10,6 @@ import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.bean.BeanUtils;
-import com.vk.common.mq.common.MqConstants;
-import com.vk.common.mq.domain.NewMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -60,7 +57,7 @@ public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMappe
             mapper.insert(behavior);
 
             try {
-                // NewMsg newMsg = new NewMsg(repayAuthorId,MqConstants.UserSocketCS.NEWS_LIKE);
+                // NewUserMsg newMsg = new NewUserMsg(repayAuthorId,MqConstants.UserSocketCS.NEW_LIKE);
                 // kafkaTemplate.send(MqConstants.TopicCS.NEWS_LIKE_TOPIC, JSON.toJSONString(newMsg));
             } catch (Exception e) {
                 log.error("点赞行为发送kafka失败 id: {} 错误:{}",id,e.getMessage());

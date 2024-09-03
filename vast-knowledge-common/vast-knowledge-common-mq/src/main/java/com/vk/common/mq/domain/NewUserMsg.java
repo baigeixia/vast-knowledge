@@ -9,17 +9,21 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewMsg {
+public class NewUserMsg {
     /**
      * 用户id
      */
     private  Long userId;
     /**
-     * 发送人 id
+     * 用户名称
+     */
+    private  String userName;
+    /**
+     * 要发送的 id
      */
     private  Long senderId;
     /**
-     * 发送人 名称
+     * 要发送人 名称
      */
     private  String senderName;
     /**
@@ -30,16 +34,5 @@ public class NewMsg {
      * 消息类型
      */
     private  Integer type;
-    /**
-     * 是否阅读
-     */
-    private  Integer isRead;
-    /**
-     * 创造时间
-     */
-    private  LocalDateTime createdTime;
-    /**
-     * 阅读时间
-     */
-    private  LocalDateTime readTime;
+
 }

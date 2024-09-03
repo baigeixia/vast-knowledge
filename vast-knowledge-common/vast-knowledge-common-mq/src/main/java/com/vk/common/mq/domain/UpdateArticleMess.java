@@ -1,13 +1,17 @@
 package com.vk.common.mq.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * @version 1.0
  * @description 说明
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UpdateArticleMess {
 
     /**

@@ -17,17 +17,21 @@ public interface MqConstants {
         String HOT_ARTICLE_INCR_HANDLE_TOPIC="article_behavior_out";
 
         String NEWS_LIKE_TOPIC = "news.like.topic";
+        String NEWS_COMMENT_TOPIC = "news.comment.topic";
     }
 
 
 
     interface UserSocketCS{
-        /** 点赞或者取消点赞 通知 */
-        Integer NEWS_COMMENT = 1;
-        String NEWS_LIKE = "new_like";
-        Integer NEWS_FAN = 3;
-        Integer NEWS_PRIVATE_MSG = 4;
-        Integer NEWS_SYSTEM_MSG = 5;
+        /** 点赞或者取消点赞 通知
+         * 1 评论  2 点赞   3 粉丝  4 关注  5 私信  6 系统消息
+         */
+        int NEW_COMMENT = 1;
+        int NEW_LIKE = 2;
+        int NEW_FAN = 3;
+        int NEW_PRIVATE_MSG = 4;
+        int NEW_CHAT_MSG = 5;
+        int NEW_SYSTEM_MSG = 6;
 
     }
 

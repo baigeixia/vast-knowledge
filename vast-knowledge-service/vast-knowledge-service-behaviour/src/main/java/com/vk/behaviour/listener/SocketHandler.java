@@ -8,20 +8,15 @@ import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.vk.behaviour.common.BeCommonConstants;
-import com.vk.behaviour.domain.ApFollowBehavior;
-import com.vk.behaviour.domain.ApLikesBehavior;
-import com.vk.behaviour.domain.ApReadBehavior;
-import com.vk.behaviour.domain.ApShowBehavior;
+import com.vk.behaviour.domain.*;
+import com.vk.behaviour.mapper.*;
+import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.behaviour.domain.dto.ChatMsgDto;
 import com.vk.behaviour.domain.dto.CommentMsg;
-import com.vk.behaviour.mapper.ApFollowBehaviorMapper;
-import com.vk.behaviour.mapper.ApLikesBehaviorMapper;
-import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.mq.common.MqConstants;
-import com.vk.common.mq.domain.NewMsg;
+import com.vk.common.mq.domain.NewUserMsg;
 import com.vk.common.mq.domain.UpdateArticleMess;
 import com.vk.common.redis.service.RedisService;
 import org.slf4j.Logger;
@@ -36,11 +31,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.vk.behaviour.common.BeCommonConstants.BASE_LiKE;
-import static com.vk.behaviour.common.BeCommonConstants.BASE_LiKE_NO;
+import static com.vk.behaviour.common.BeCommonConstants.*;
 import static com.vk.behaviour.domain.table.ApLikesBehaviorTableDef.AP_LIKES_BEHAVIOR;
 import static com.vk.common.mq.common.MqConstants.SocketType.*;
-import static com.vk.common.mq.common.MqConstants.TopicCS.NEWS_LIKE_TOPIC;
 import static com.vk.common.redis.constants.BusinessConstants.SOCKET_USER_ID;
 
 /**
@@ -65,36 +58,47 @@ public class SocketHandler {
     @Autowired
     private ApFollowBehaviorMapper apFollowBehaviorMapper;
 
-
-    /**
-     * socketIOServer
-     */
-    private final SocketIOServer socketIOServer;
+    @Autowired
+    private ApCollectBehaviorMapper apCollectBehaviorMapper;
 
     @Autowired
-    public SocketHandler(SocketIOServer socketIOServer) {
-        this.socketIOServer = socketIOServer;
-    }
+    private ApForwardBehaviorMapper apForwardBehaviorMapper;
+
+    @Autowired
+    private ApReadBehaviorMapper apReadBehaviorMapper;
+
+    @Autowired
+    private ApShowBehaviorMapper apShowBehaviorMapper;
+
+    @Autowired
+    private ApShareBehaviorMapper apShareBehaviorMapper;
+
+    @Autowired
+    private ApUnlikesBehaviorMapper apUnlikesBehaviorMapper;
+
+    @Autowired
+    private  SocketIOServer socketIOServer;
+
 
     /**
      * 当客户端发起连接时调用
      */
     @OnConnect
     public void onConnect(SocketIOClient socketIOClient) {
-        UUID sessionId = socketIOClient.getSessionId();
-        log.info("发起连接 : {}", sessionId);
+        TaskVirtualExecutorUtil.executeWith(()->{
+            UUID sessionId = socketIOClient.getSessionId();
+            log.info("发起连接 : {}", sessionId);
 
-        Long userId = clientGetUserId(socketIOClient);
-        if (!StringUtils.isLongEmpty(userId)) {
-            redisService.setCacheObject(getRedisUserIdKey(userId), sessionId);
-        } else {
-            log.error("错误的用户： {}", sessionId);
-        }
+            Long userId = clientGetUserId(socketIOClient);
+            if (!StringUtils.isLongEmpty(userId)) {
+                redisService.setCacheObject(getRedisUserIdKey(userId), sessionId);
+            } else {
+                log.error("错误的用户： {}", sessionId);
+            }
+        });
     }
 
-    private static String getRedisUserIdKey(Long userId) {
-        return SOCKET_USER_ID + userId;
-    }
+
 
 
     /**
@@ -102,16 +106,17 @@ public class SocketHandler {
      */
     @OnDisconnect
     public void onDisConnect(SocketIOClient socketIOClient) {
-        UUID sessionId = socketIOClient.getSessionId();
-        log.info(sessionId + " 断开连接");
+        TaskVirtualExecutorUtil.executeWith(()->{
+            UUID sessionId = socketIOClient.getSessionId();
+            log.info(sessionId + " 断开连接");
 
-        Long userId = clientGetUserId(socketIOClient);
-        if (StringUtils.isLongEmpty(userId)) {
-            redisService.deleteObject(getRedisUserIdKey(userId));
-        } else {
-            log.error("错误的用户： {}", sessionId);
-        }
-
+            Long userId = clientGetUserId(socketIOClient);
+            if (StringUtils.isLongEmpty(userId)) {
+                redisService.deleteObject(getRedisUserIdKey(userId));
+            } else {
+                log.error("错误的用户： {}", sessionId);
+            }
+        });
     }
 
 
@@ -122,136 +127,79 @@ public class SocketHandler {
     public void likeMsg(SocketIOClient socketIOClient, AckRequest ackRequest, ApLikesBehavior dto) {
         UUID sessionId = socketIOClient.getSessionId();
         log.info("LikeMsg 点赞 事件 -> dto:{} sessionId:{}", dto, sessionId);
-        // Long authorId = dto.getAuthorId();
         Long authorId = clientGetUserId(socketIOClient);
         String userName = clientGetUserName(socketIOClient);
 
         Integer type = dto.getType();
         Long commentId = dto.getCommentId();
         Long articleId = dto.getArticleId();
-        Integer operation = dto.getOperation();
+        String repayAuthorName = dto.getAuthorName();
         Long repayAuthorId = dto.getRepayAuthorId();
 
         if (StringUtils.isLongEmpty(repayAuthorId)) {
-            log.error("被点赞人不能为空");
+            errorMessage(ackRequest,"被点赞人不能为空");
             return;
         }
         if (StringUtils.isLongEmpty(articleId)) {
-            log.error("文章id不能为空");
+            errorMessage(ackRequest,"文章id不能为空");
             return;
         }
 
-        if (type == LIKE_TYPE_ARTICLE) {
-            if (StringUtils.isLongEmpty(articleId)) {
-                log.error("文章id不能为空");
-                return;
-            }
-        } else if (type == LIKE_TYPE_ARTICLE_NO) {
+       if (type == LIKE_TYPE_ARTICLE_NO) {
             if (StringUtils.isLongEmpty(commentId)) {
-                log.error("评论id不能为空");
+                errorMessage(ackRequest,"评论id不能为空");
                 return;
             }
-        }else {
-            return;
         }
 
         QueryWrapper where = QueryWrapper.create().where(AP_LIKES_BEHAVIOR.AUTHOR_ID.eq(authorId)
                 .and(AP_LIKES_BEHAVIOR.COMMENT_ID.eq(commentId, type == LIKE_TYPE_ARTICLE_NO)
-                .and(AP_LIKES_BEHAVIOR.ARTICLE_ID.eq(articleId))));
+                        .and(AP_LIKES_BEHAVIOR.ARTICLE_ID.eq(articleId))));
         ApLikesBehavior behavior = apLikesBehaviorMapper.selectOneByQuery(where);
 
         ApLikesBehavior likesBehavior = new ApLikesBehavior();
-        if (null==behavior){
-            BeanUtils.copyProperties(dto,likesBehavior);
+
+        if (null == behavior) {
+            BeanUtils.copyProperties(dto, likesBehavior);
             likesBehavior.setCreatedTime(LocalDateTime.now());
             likesBehavior.setOperation(BASE_LiKE);
             likesBehavior.setAuthorId(authorId);
             likesBehavior.setAuthorName(userName);
-        }else {
-            likesBehavior.setId(behavior.getId());
-            likesBehavior.setOperation(behavior.getOperation() == BASE_LiKE ?BASE_LiKE_NO : BASE_LiKE);
-        }
-        apLikesBehaviorMapper.insertOrUpdate(likesBehavior,true);
-        // if (operation ==  BASE_LiKE){
-        //     if (null==behavior){
-        //         ApLikesBehavior likesBehavior = new ApLikesBehavior();
-        //         likesBehavior.setCommentId(commentId);
-        //         likesBehavior.setCreatedTime(LocalDateTime.now());
-        //         likesBehavior.setOperation(BASE_LiKE);
-        //         likesBehavior.setType(type);
-        //         likesBehavior.setArticleId(articleId);
-        //         likesBehavior.setAuthorId(authorId);
-        //         likesBehavior.setAuthorName(userName);
-        //
-        //         apLikesBehaviorMapper.insert(likesBehavior);
-        //     }else {
-        //         if (behavior.getOperation()==BASE_LiKE_NO) {
-        //             ApLikesBehavior likesBehavior = new ApLikesBehavior();
-        //             likesBehavior.setId(behavior.getId());
-        //             likesBehavior.setOperation(BASE_LiKE);
-        //             apLikesBehaviorMapper.update(likesBehavior);
-        //         }
-        //     }
-        // }else {
-        //     if(null == behavior){
-        //         log.error("还没有点赞");
-        //
-        //         return;
-        //     }
-        //
-        //     if (behavior.getOperation()==BASE_LiKE) {
-        //         ApLikesBehavior likesBehavior = new ApLikesBehavior();
-        //         likesBehavior.setId(behavior.getId());
-        //         likesBehavior.setOperation(BASE_LiKE_NO);
-        //         apLikesBehaviorMapper.update(likesBehavior);
-        //     }
-        // }
 
-        UpdateArticleMess msg = new UpdateArticleMess();
-        msg.setArticleId(articleId);
-        msg.setType(UpdateArticleMess.UpdateArticleType.LIKES);
-        msg.setNum(operation == BASE_LiKE  ? 1: -1);
-log.info(JSON.toJSONString(msg));
-        kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, JSON.toJSONString(msg));
-        //点赞查询 点赞还是取消  true = 取消 false = 点赞
-        // boolean isOperation = null == behavior || behavior.getOperation();
-        //
-        // dto.setId(!isOperation ? behavior.getId() : null);
-        // if (operation == BASE_LiKE){
-        //     dto.setAuthorId(authorId);
-        //     dto.setAuthorName(userName);
-        //     dto.setCreatedTime(LocalDateTime.now());
-        // }else {
-        //     dto.setArticleId(null);
-        //     dto.setRepayAuthorId(null);
-        //     dto.setType(null);
-        //     dto.setCommentId(null);
-        // }
-        // dto.setOperation(!isOperation);
-        // apLikesBehaviorMapper.insertOrUpdate(dto,true);
-
-        // NewMsg newMsg = new NewMsg();
-        // newMsg.setUserId(authorId);
-        // newMsg.setSenderName(userName);
-        // newMsg.setSenderId(repayAuthorId);
-        // newMsg.setCreatedTime(dto.getCreatedTime());
-
-        /* 文章点赞
-        if (type == LIKE_TYPE_ARTICLE) {
-            newMsg.setType(isOperation ? LIKE_NO : LIKE);
-            kafkaTemplate.send(NEWS_LIKE_TOPIC, JSON.toJSONString(newMsg));
         } else {
-            newMsg.setType(isOperation ? LIKE_COMMENT_NO : LIKE_COMMENT);
-            kafkaTemplate.send(NEWS_LIKE_TOPIC, JSON.toJSONString(newMsg));
-        }*/
+            likesBehavior.setId(behavior.getId());
+            likesBehavior.setOperation(behavior.getOperation() == BASE_LiKE ? BASE_LiKE_NO : BASE_LiKE);
+        }
+        apLikesBehaviorMapper.insertOrUpdate(likesBehavior, true);
+
+
+            NewUserMsg message = new NewUserMsg();
+            message.setUserId(authorId);
+            message.setUserName(userName);
+            message.setSenderId(repayAuthorId);
+            message.setSenderName(repayAuthorName);
+            if (StringUtils.isLongEmpty(likesBehavior.getCommentId())){
+                message.setType(likesBehavior.getOperation()==BASE_LiKE ? LIKE : LIKE_NO);
+            }else {
+                message.setType(likesBehavior.getOperation()==BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO);
+            }
+            kafkaTemplate.send(MqConstants.TopicCS.NEWS_LIKE_TOPIC, JSON.toJSONString(message));
+
 
         // 发送消息给 kafka stream 的input topic，做实时计算
+        UpdateArticleMess msg = new UpdateArticleMess(
+                UpdateArticleMess.UpdateArticleType.LIKES,
+                articleId,
+                likesBehavior.getOperation() == BASE_LiKE ? 1 : -1
+        );
+        kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, JSON.toJSONString(msg));
 
 
         // String repaySessionId = redisService.getCacheObject(getRedisUserIdKey(repayAuthorId));
         // SocketIOClient client = socketIOServer.getClient(UUID.fromString(repaySessionId));
-        // client.sendEvent(MqConstants.UserSocketCS.NEWS_LIKE, "test new_like");
+        // client.sendEvent(MqConstants.UserSocketCS.NEW_LIKE, "test new_like");
     }
+
 
     /**
      * commentMsg 评论后事件
@@ -259,6 +207,9 @@ log.info(JSON.toJSONString(msg));
     @OnEvent("commentMsg")
     public void commentMsg(SocketIOClient socketIOClient, AckRequest ackRequest, CommentMsg dto) {
         log.info("commentMsg 评论 事件 {}", dto);
+        UpdateArticleMess msg = new UpdateArticleMess();
+        kafkaTemplate.send(MqConstants.TopicCS.NEWS_COMMENT_TOPIC, JSON.toJSONString(msg));
+
     }
 
     /**
@@ -288,7 +239,15 @@ log.info(JSON.toJSONString(msg));
     }
 
     /**
-     * display 展示消息发送事件
+     * collect 收藏事件
+     */
+    @OnEvent("collect")
+    public void collect(SocketIOClient socketIOClient, AckRequest ackRequest, ChatMsgDto dto) {
+        log.info("chatMsg 私信 事件 {}", dto);
+    }
+
+    /**
+     * display 展示消息事件
      */
     @OnEvent("display")
     public void display(SocketIOClient socketIOClient, AckRequest ackRequest, ApShowBehavior dto) {
@@ -297,7 +256,7 @@ log.info(JSON.toJSONString(msg));
     }
 
     /**
-     * read 阅读消息发送事件
+     * read 阅读事件
      */
     @OnEvent("read")
     public void read(SocketIOClient socketIOClient, AckRequest ackRequest, ApReadBehavior dto) {
@@ -305,12 +264,21 @@ log.info(JSON.toJSONString(msg));
         log.info("display 展示 事件 {}", dto);
     }
 
+    private void errorMessage(AckRequest ackRequest,String msg) {
+        log.error(msg);
+        ackRequest.sendAckData(msg);
+    }
+
+    private static String getRedisUserIdKey(Long userId) {
+        return SOCKET_USER_ID + userId;
+    }
+
     private Long clientGetUserId(SocketIOClient socketIOClient) {
         UUID sessionId = socketIOClient.getSessionId();
         String token = clientGetToken(socketIOClient, sessionId);
         if (StringUtils.isNotEmpty(token)) {
             String userId = TokenUtils.getUserId(token);
-            if (StringUtils.isNotEmpty(userId)){
+            if (StringUtils.isNotEmpty(userId)) {
                 return Long.valueOf(userId);
             }
             return null;
@@ -342,6 +310,8 @@ log.info(JSON.toJSONString(msg));
         }
         return null;
     }
+
+
 
 
 }

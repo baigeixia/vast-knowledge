@@ -1,19 +1,14 @@
 package com.vk.socket.listener;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.nacos.shaded.io.grpc.internal.JsonUtil;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.vk.common.mq.common.MqConstants;
-import com.vk.common.mq.domain.NewMsg;
+import com.vk.common.mq.domain.NewUserMsg;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 @Slf4j(topic ="UserSocketListener" )
@@ -29,9 +24,9 @@ public class UserSocketListener {
         int p = record.partition();
         long o = record.offset();
         String jsonString = record.value();
-        NewMsg newMsg = JSONObject.parseObject(jsonString, NewMsg.class);
-        // Long notifyUserId = newMsg.getNotifyUserId();
-        // Integer messageType = newMsg.getMessageType();
+        NewUserMsg newUserMsg = JSONObject.parseObject(jsonString, NewUserMsg.class);
+        // Long notifyUserId = newUserMsg.getNotifyUserId();
+        // Integer messageType = newUserMsg.getMessageType();
 
         System.out.println(p);
         System.out.println(o);
@@ -40,7 +35,7 @@ public class UserSocketListener {
         // System.out.println(messageType);
         //手动提交offset
         //转对象
-        // socketIOServer.getClient(UUID.fromString(userid)).sendEvent(MqConstants.UserSocketCS.NEWS_LIKE);
+        // socketIOServer.getClient(UUID.fromString(userid)).sendEvent(MqConstants.UserSocketCS.NEW_LIKE);
     }
 
 
