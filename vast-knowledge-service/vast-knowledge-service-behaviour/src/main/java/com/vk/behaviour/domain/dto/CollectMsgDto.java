@@ -1,18 +1,15 @@
 package com.vk.behaviour.domain.dto;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@EqualsAndHashCode(callSuper = true)
+/**
+ * 私信消息
+ */
 @Data
-public class CommentMsg extends  BaseMsgDto{
-
-    /**
-     * 文章ID
-     */
-    private Long articleId;
+public class CollectMsgDto implements Serializable {
 
     /**
      * 发送人ID
@@ -22,6 +19,11 @@ public class CommentMsg extends  BaseMsgDto{
      * 发送人名称
      */
     private  String senderName;
+
+    /**
+     * 文章ID
+     */
+    private Long articleId;
 
 
 

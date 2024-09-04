@@ -34,5 +34,4 @@ public class NewUserMsg {
      * 消息类型
      */
     private  Integer type;
-
 }

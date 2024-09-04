@@ -115,6 +115,8 @@ public class TokenUtils {
     }
 
 
+
+
     /**
      * 根据身份信息获取用户ID
      *
@@ -136,7 +138,6 @@ public class TokenUtils {
     {
         return getValue(claims, SecurityConstants.DETAILS_USERNAME);
     }
-
 
 
     /**

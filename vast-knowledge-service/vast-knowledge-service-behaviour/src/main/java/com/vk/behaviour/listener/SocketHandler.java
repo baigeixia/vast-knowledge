@@ -3,18 +3,24 @@ package com.vk.behaviour.listener;
 import com.alibaba.fastjson2.JSON;
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.vk.behaviour.domain.*;
-import com.vk.behaviour.mapper.*;
-import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
+import com.vk.behaviour.common.utils.ws.SocketConstants;
+import com.vk.behaviour.domain.ApFollowBehavior;
+import com.vk.behaviour.domain.ApLikesBehavior;
+import com.vk.behaviour.domain.ApReadBehavior;
 import com.vk.behaviour.domain.dto.ChatMsgDto;
+import com.vk.behaviour.domain.dto.CollectMsgDto;
 import com.vk.behaviour.domain.dto.CommentMsg;
+import com.vk.behaviour.domain.vo.AckDataMsg;
+import com.vk.behaviour.mapper.*;
+import com.vk.behaviour.notifications.PushNotificationsHandler;
+import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
+import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.mq.common.MqConstants;
 import com.vk.common.mq.domain.NewUserMsg;
 import com.vk.common.mq.domain.UpdateArticleMess;
@@ -29,12 +35,15 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
-import static com.vk.behaviour.common.BeCommonConstants.*;
+import static com.vk.behaviour.common.BeCommonConstants.BASE_LiKE;
+import static com.vk.behaviour.common.BeCommonConstants.BASE_LiKE_NO;
+import static com.vk.behaviour.domain.table.ApFollowBehaviorTableDef.AP_FOLLOW_BEHAVIOR;
 import static com.vk.behaviour.domain.table.ApLikesBehaviorTableDef.AP_LIKES_BEHAVIOR;
+import static com.vk.behaviour.domain.table.ApReadBehaviorTableDef.AP_READ_BEHAVIOR;
 import static com.vk.common.mq.common.MqConstants.SocketType.*;
-import static com.vk.common.redis.constants.BusinessConstants.SOCKET_USER_ID;
 
 /**
  * SocketHandler
@@ -77,7 +86,7 @@ public class SocketHandler {
     private ApUnlikesBehaviorMapper apUnlikesBehaviorMapper;
 
     @Autowired
-    private  SocketIOServer socketIOServer;
+    private PushNotificationsHandler pushNotificationsHandler;
 
 
     /**
@@ -85,13 +94,14 @@ public class SocketHandler {
      */
     @OnConnect
     public void onConnect(SocketIOClient socketIOClient) {
-        TaskVirtualExecutorUtil.executeWith(()->{
+        TaskVirtualExecutorUtil.executeWith(() -> {
             UUID sessionId = socketIOClient.getSessionId();
             log.info("发起连接 : {}", sessionId);
 
             Long userId = clientGetUserId(socketIOClient);
             if (!StringUtils.isLongEmpty(userId)) {
-                redisService.setCacheObject(getRedisUserIdKey(userId), sessionId);
+                String userIdKey = SocketConstants.getRedisUserIdKey(userId);
+                redisService.setCacheObject(userIdKey, sessionId);
             } else {
                 log.error("错误的用户： {}", sessionId);
             }
@@ -99,20 +109,19 @@ public class SocketHandler {
     }
 
 
-
-
     /**
      * 客户端断开连接时调用，刷新客户端信息
      */
     @OnDisconnect
     public void onDisConnect(SocketIOClient socketIOClient) {
-        TaskVirtualExecutorUtil.executeWith(()->{
+        TaskVirtualExecutorUtil.executeWith(() -> {
             UUID sessionId = socketIOClient.getSessionId();
             log.info(sessionId + " 断开连接");
 
             Long userId = clientGetUserId(socketIOClient);
-            if (StringUtils.isLongEmpty(userId)) {
-                redisService.deleteObject(getRedisUserIdKey(userId));
+            if (!StringUtils.isLongEmpty(userId)) {
+                String userIdKey = SocketConstants.getRedisUserIdKey(userId);
+                redisService.deleteObject(userIdKey);
             } else {
                 log.error("错误的用户： {}", sessionId);
             }
@@ -130,27 +139,37 @@ public class SocketHandler {
         Long authorId = clientGetUserId(socketIOClient);
         String userName = clientGetUserName(socketIOClient);
 
+
         Integer type = dto.getType();
         Long commentId = dto.getCommentId();
         Long articleId = dto.getArticleId();
         String repayAuthorName = dto.getAuthorName();
         Long repayAuthorId = dto.getRepayAuthorId();
 
-        if (StringUtils.isLongEmpty(repayAuthorId)) {
-            errorMessage(ackRequest,"被点赞人不能为空");
-            return;
-        }
-        if (StringUtils.isLongEmpty(articleId)) {
-            errorMessage(ackRequest,"文章id不能为空");
-            return;
+        validaParameter(ackRequest, repayAuthorId, "被点赞人不能为空");
+        // if (StringUtils.isLongEmpty(repayAuthorId)) {
+        //     errorMessage(ackRequest, "被点赞人不能为空");
+        //     return;
+        // }
+        validaParameter(ackRequest, articleId, "文章id不能为空");
+
+
+        // if (StringUtils.isLongEmpty(articleId)) {
+        //     errorMessage(ackRequest, "文章id不能为空");
+        //     return;
+        // }
+
+        if (type == LIKE_TYPE_ARTICLE_NO) {
+            validaParameter(ackRequest, commentId, "评论id不能为空");
+            // if (StringUtils.isLongEmpty(commentId)) {
+            //     errorMessage(ackRequest, "评论id不能为空");
+            //     return;
+            // }
         }
 
-       if (type == LIKE_TYPE_ARTICLE_NO) {
-            if (StringUtils.isLongEmpty(commentId)) {
-                errorMessage(ackRequest,"评论id不能为空");
-                return;
-            }
-        }
+        //不能与自己互动
+        excludeYourself(ackRequest,authorId,repayAuthorId);
+
 
         QueryWrapper where = QueryWrapper.create().where(AP_LIKES_BEHAVIOR.AUTHOR_ID.eq(authorId)
                 .and(AP_LIKES_BEHAVIOR.COMMENT_ID.eq(commentId, type == LIKE_TYPE_ARTICLE_NO)
@@ -172,45 +191,46 @@ public class SocketHandler {
         }
         apLikesBehaviorMapper.insertOrUpdate(likesBehavior, true);
 
-
-            NewUserMsg message = new NewUserMsg();
-            message.setUserId(authorId);
-            message.setUserName(userName);
-            message.setSenderId(repayAuthorId);
-            message.setSenderName(repayAuthorName);
-            if (StringUtils.isLongEmpty(likesBehavior.getCommentId())){
-                message.setType(likesBehavior.getOperation()==BASE_LiKE ? LIKE : LIKE_NO);
-            }else {
-                message.setType(likesBehavior.getOperation()==BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO);
-            }
-            kafkaTemplate.send(MqConstants.TopicCS.NEWS_LIKE_TOPIC, JSON.toJSONString(message));
-
-
-        // 发送消息给 kafka stream 的input topic，做实时计算
-        UpdateArticleMess msg = new UpdateArticleMess(
+        int messageType;
+        if (StringUtils.isLongEmpty(likesBehavior.getCommentId())) {
+            messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE : LIKE_NO;
+        } else {
+            messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO;
+        }
+        streamProcessingStandard(
+                socketIOClient, repayAuthorId, repayAuthorName, articleId, messageType,
                 UpdateArticleMess.UpdateArticleType.LIKES,
-                articleId,
                 likesBehavior.getOperation() == BASE_LiKE ? 1 : -1
         );
-        kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, JSON.toJSONString(msg));
 
-
+        // NewUserMsg message = new NewUserMsg();
+        // message.setUserId(authorId);
+        // message.setUserName(userName);
+        // message.setSenderId(repayAuthorId);
+        // message.setSenderName(repayAuthorName);
+        // if (StringUtils.isLongEmpty(likesBehavior.getCommentId())) {
+        //     message.setType(likesBehavior.getOperation() == BASE_LiKE ? LIKE : LIKE_NO);
+        // } else {
+        //     message.setType(likesBehavior.getOperation() == BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO);
+        // }
+        // kafkaTemplate.send(MqConstants.TopicCS.NEWS_USER_MESSAGE_TOPIC, JSON.toJSONString(message));
+        //
+        //
+        // // 发送消息给 kafka stream 的input topic，做实时计算
+        // UpdateArticleMess msg = new UpdateArticleMess(
+        //         UpdateArticleMess.UpdateArticleType.LIKES,
+        //         articleId,
+        //         likesBehavior.getOperation() == BASE_LiKE ? 1 : -1
+        // );
+        // kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, JSON.toJSONString(msg));
+        //
+        //
+        // pushNotificationsHandler.msgPush(message);
         // String repaySessionId = redisService.getCacheObject(getRedisUserIdKey(repayAuthorId));
         // SocketIOClient client = socketIOServer.getClient(UUID.fromString(repaySessionId));
         // client.sendEvent(MqConstants.UserSocketCS.NEW_LIKE, "test new_like");
     }
 
-
-    /**
-     * commentMsg 评论后事件
-     */
-    @OnEvent("commentMsg")
-    public void commentMsg(SocketIOClient socketIOClient, AckRequest ackRequest, CommentMsg dto) {
-        log.info("commentMsg 评论 事件 {}", dto);
-        UpdateArticleMess msg = new UpdateArticleMess();
-        kafkaTemplate.send(MqConstants.TopicCS.NEWS_COMMENT_TOPIC, JSON.toJSONString(msg));
-
-    }
 
     /**
      * fanMsg 关注后事件
@@ -219,15 +239,68 @@ public class SocketHandler {
     public void fanMsg(SocketIOClient socketIOClient, AckRequest ackRequest, ApFollowBehavior dto) {
         UUID sessionId = socketIOClient.getSessionId();
         log.info("fanMsg 关注事件 -> dto:{} sessionId:{}", dto, sessionId);
-        Long authorId = dto.getAuthorId();
+        Long authorId = clientGetUserId(socketIOClient);
+        String userName = clientGetUserName(socketIOClient);
         if (StringUtils.isLongEmpty(authorId)) {
-            log.error("用户错误");
+            // log.error("用户错误");
+            errorMessage(ackRequest, "用户错误");
         }
         Long followId = dto.getFollowId();
         if (StringUtils.isLongEmpty(followId)) {
-            log.error("被关注人不能为空");
+            // log.error("被关注人不能为空");
+            errorMessage(ackRequest, "被关注人不能为空");
         }
-        apFollowBehaviorMapper.insert(dto);
+
+        excludeYourself(ackRequest,authorId,followId);
+
+
+        NewUserMsg message = new NewUserMsg();
+        message.setUserId(authorId);
+        message.setUserName(userName);
+        message.setSenderId(followId);
+
+        ApFollowBehavior followBehavior = apFollowBehaviorMapper.selectOneByQuery(
+                QueryWrapper.create()
+                        .where(AP_FOLLOW_BEHAVIOR.AUTHOR_ID.eq(authorId))
+                        .and(AP_FOLLOW_BEHAVIOR.FOLLOW_ID.eq(followId))
+        );
+        if (null == followBehavior) {
+            apFollowBehaviorMapper.insert(dto);
+            message.setType(FOLLOW);
+        } else {
+            apFollowBehaviorMapper.deleteById(followBehavior.getId());
+            message.setType(FOLLOW_NO);
+        }
+
+        kafkaTemplate.send(MqConstants.TopicCS.NEWS_USER_MESSAGE_TOPIC, JSON.toJSONString(message));
+
+        pushNotificationsHandler.msgPush(message);
+    }
+
+    /**
+     * commentMsg 评论后事件
+     */
+    @OnEvent("commentMsg")
+    public void commentMsg(SocketIOClient socketIOClient, AckRequest ackRequest, CommentMsg dto) {
+        log.info("commentMsg 评论 事件 {}", dto);
+        Long authorId = clientGetUserId(socketIOClient);
+        Long articleId = dto.getArticleId();
+        if (StringUtils.isLongEmpty(articleId)) {
+            errorMessage(ackRequest, "文章id不能为空");
+        }
+        Long senderId = dto.getSenderId();
+        if (StringUtils.isLongEmpty(senderId)) {
+            errorMessage(ackRequest, "回复用户id不能为空");
+        }
+        String senderName = dto.getSenderName();
+        if (StringUtils.isEmpty(senderName)) {
+            errorMessage(ackRequest, "发送人名称不能为空");
+        }
+
+        excludeYourself(ackRequest,authorId,senderId);
+
+        // 流标准 通知类型 与 kafka 流处理
+        streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COMMENT, UpdateArticleMess.UpdateArticleType.COMMENT, 1);
     }
 
     /**
@@ -236,24 +309,46 @@ public class SocketHandler {
     @OnEvent("chatMsg")
     public void chatMsg(SocketIOClient socketIOClient, AckRequest ackRequest, ChatMsgDto dto) {
         log.info("chatMsg 私信 事件 {}", dto);
+        Long authorId = clientGetUserId(socketIOClient);
+        Long senderId = dto.getSenderId();
+        validaParameter(ackRequest, senderId, "发送人id不能为空");
+        String senderName = dto.getSenderName();
+        validaParameter(ackRequest, senderName, "发送人名称不能为空");
+        String content = dto.getContent();
+        validaParameter(ackRequest, content.trim(), "内容不能为空");
+
+        excludeYourself(ackRequest,authorId,senderId);
+
+        // 流标准 通知类型处理 不包括kafka  提供 私信使用
+        streamProcessingStandard(senderId, senderName, content, socketIOClient);
     }
 
     /**
      * collect 收藏事件
      */
     @OnEvent("collect")
-    public void collect(SocketIOClient socketIOClient, AckRequest ackRequest, ChatMsgDto dto) {
-        log.info("chatMsg 私信 事件 {}", dto);
+    public void collect(SocketIOClient socketIOClient, AckRequest ackRequest, CollectMsgDto dto) {
+        log.info("collect 收藏事件 {}", dto);
+        Long authorId = clientGetUserId(socketIOClient);
+        Long senderId = dto.getSenderId();
+        if (StringUtils.isLongEmpty(senderId)) {
+            errorMessage(ackRequest, "发送人id不能为空");
+        }
+        String senderName = dto.getSenderName();
+        if (StringUtils.isEmpty(senderName)) {
+            errorMessage(ackRequest, "发送人名称不能为空");
+        }
+        Long articleId = dto.getArticleId();
+        if (StringUtils.isLongEmpty(senderId)) {
+            errorMessage(ackRequest, "文章id不能为空");
+        }
+
+        excludeYourself(ackRequest,authorId,senderId);
+
+        streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COLLECT, UpdateArticleMess.UpdateArticleType.COLLECTION, 1);
+
     }
 
-    /**
-     * display 展示消息事件
-     */
-    @OnEvent("display")
-    public void display(SocketIOClient socketIOClient, AckRequest ackRequest, ApShowBehavior dto) {
-        UUID sessionId = socketIOClient.getSessionId();
-        log.info("display 展示 事件 {}", dto);
-    }
 
     /**
      * read 阅读事件
@@ -261,17 +356,133 @@ public class SocketHandler {
     @OnEvent("read")
     public void read(SocketIOClient socketIOClient, AckRequest ackRequest, ApReadBehavior dto) {
         UUID sessionId = socketIOClient.getSessionId();
-        log.info("display 展示 事件 {}", dto);
+
+        log.info("read 阅读 事件 {}", dto);
+        Long articleId = dto.getArticleId();
+        validaParameter(ackRequest, articleId, "文章id不能为空");
+        Long userId = clientGetUserId(socketIOClient);
+
+
+        ApReadBehavior readBehavior = apReadBehaviorMapper.selectOneByQuery(
+                QueryWrapper.create().where(
+                        AP_READ_BEHAVIOR.ENTRY_ID.eq(userId).and(AP_READ_BEHAVIOR.ARTICLE_ID.eq(articleId))
+                )
+        );
+
+        if (null == readBehavior) {
+            apReadBehaviorMapper.insert(dto);
+            streamProcessingStandard(articleId, UpdateArticleMess.UpdateArticleType.VIEWS, 1);
+        } else {
+            apReadBehaviorMapper.update(dto, true);
+        }
     }
 
-    private void errorMessage(AckRequest ackRequest,String msg) {
-        log.error(msg);
+
+    private void  excludeYourself(AckRequest ackRequest,Long senderId,Long localId){
+        if (Objects.equals(senderId, localId)){
+            errorMessage(ackRequest,"不能与自己互动",400);
+        }
+    }
+    /**
+     * 流标准 通知类型 与 kafka 流处理
+     *
+     * @param socketIOClient socketIO客户端
+     * @param senderId       发送人id
+     * @param senderName     发送人名称
+     * @param articleId      文章id
+     * @param type           发送类型
+     * @param collection     流处理类型
+     */
+    private void streamProcessingStandard(
+            SocketIOClient socketIOClient, Long senderId, String senderName, Long articleId, Integer type,
+            UpdateArticleMess.UpdateArticleType collection, Integer num
+    ) {
+        streamProcessingStandard(senderId, senderName, type, socketIOClient);
+        streamProcessingStandard(articleId, collection, num);
+    }
+
+    /**
+     * 流标准 通知类型处理 不包括kafka
+     *
+     * @param senderId       发送人id
+     * @param senderName     发送人名称
+     * @param type           发送类型
+     * @param socketIOClient socketIO客户端
+     */
+    private void streamProcessingStandard(Long senderId, String senderName, Integer type, SocketIOClient socketIOClient) {
+        conventionalNewUserMsg(senderId, senderName, null, type, socketIOClient);
+    }
+
+    /**
+     * 流标准 通知类型处理 不包括kafka  提供 私信使用
+     *
+     * @param senderId       发送人id
+     * @param senderName     发送人名称
+     * @param socketIOClient socketIO客户端
+     */
+    private void streamProcessingStandard(Long senderId, String senderName, String content, SocketIOClient socketIOClient) {
+        conventionalNewUserMsg(senderId, senderName, content, CHAT_MSG, socketIOClient);
+    }
+
+    private void conventionalNewUserMsg(Long senderId, String senderName, String content, Integer type, SocketIOClient socketIOClient) {
+        Long authorId = clientGetUserId(socketIOClient);
+        String userName = clientGetUserName(socketIOClient);
+
+        NewUserMsg message = new NewUserMsg();
+        message.setUserId(authorId);
+        message.setUserName(userName);
+        message.setSenderId(senderId);
+        message.setContent(content);
+        message.setSenderName(senderName);
+        message.setType(type);
+        // 消息通知存储
+        kafkaTemplate.send(MqConstants.TopicCS.NEWS_USER_MESSAGE_TOPIC, JSON.toJSONString(message));
+        // 同步通知用户
+        pushNotificationsHandler.msgPush(message);
+    }
+
+    /**
+     * 流标准 单独kafka流处理 只做添加
+     *
+     * @param articleId  文章id
+     * @param collection 流处理类型
+     */
+    private void streamProcessingStandard(Long articleId, UpdateArticleMess.UpdateArticleType collection, Integer num) {
+        // 流处理消息 更新文章数据
+        UpdateArticleMess msg = new UpdateArticleMess();
+        msg.setArticleId(articleId);
+        msg.setNum(num);
+        msg.setType(collection);
+        kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, JSON.toJSONString(msg));
+    }
+
+    private void validaParameter(AckRequest ackRequest, Long par, String msg) {
+        if (StringUtils.isLongEmpty(par)) {
+            errorMessage(ackRequest,msg);
+        }
+    }
+
+    private void validaParameter(AckRequest ackRequest, String par, String msg) {
+        if (StringUtils.isEmpty(par)) {
+            errorMessage(ackRequest, msg);
+        }
+    }
+
+
+
+    private void errorMessage(AckRequest ackRequest, String msg,Integer code) {
+        errorMessage(ackRequest,AckDataMsg.setAckDataMsg(msg,code));
+    }
+
+    private void errorMessage(AckRequest ackRequest, String msg) {
+        errorMessage(ackRequest,AckDataMsg.setAckDataMsg(msg));
+    }
+
+    private void errorMessage(AckRequest ackRequest, AckDataMsg msg) {
         ackRequest.sendAckData(msg);
+        throw new LeadNewsException(msg.getMsg());
     }
 
-    private static String getRedisUserIdKey(Long userId) {
-        return SOCKET_USER_ID + userId;
-    }
 
     private Long clientGetUserId(SocketIOClient socketIOClient) {
         UUID sessionId = socketIOClient.getSessionId();
@@ -310,8 +521,6 @@ public class SocketHandler {
         }
         return null;
     }
-
-
 
 
 }

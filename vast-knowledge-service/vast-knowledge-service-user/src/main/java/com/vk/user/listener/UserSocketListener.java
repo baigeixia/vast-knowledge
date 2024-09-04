@@ -11,9 +11,6 @@ import com.vk.user.domain.ApUserFan;
 import com.vk.user.domain.ApUserFollow;
 import com.vk.user.domain.ApUserLetter;
 import com.vk.user.domain.ApUserMessage;
-import com.vk.user.domain.table.ApUserFanTableDef;
-import com.vk.user.domain.table.ApUserLetterTableDef;
-import com.vk.user.domain.table.ApUserMessageTableDef;
 import com.vk.user.mapper.ApUserFanMapper;
 import com.vk.user.mapper.ApUserFollowMapper;
 import com.vk.user.mapper.ApUserLetterMapper;
@@ -31,7 +28,6 @@ import java.time.LocalDateTime;
 import static com.vk.common.mq.common.MqConstants.SocketType.*;
 import static com.vk.user.domain.table.ApUserFanTableDef.AP_USER_FAN;
 import static com.vk.user.domain.table.ApUserFollowTableDef.AP_USER_FOLLOW;
-import static com.vk.user.domain.table.ApUserLetterTableDef.AP_USER_LETTER;
 import static com.vk.user.domain.table.ApUserMessageTableDef.AP_USER_MESSAGE;
 
 @Component
@@ -51,7 +47,7 @@ public class UserSocketListener {
     private ApUserLetterMapper apUserLetterMapper;
 
 
-    @KafkaListener(topics = MqConstants.TopicCS.NEWS_LIKE_TOPIC, groupId = MqConstants.NOTIFY_GROUP)
+    @KafkaListener(topics = MqConstants.TopicCS.NEWS_USER_MESSAGE_TOPIC, groupId = MqConstants.NOTIFY_GROUP)
     public void upOrDown(ConsumerRecord<String, String> record) {
         int p = record.partition();
         long o = record.offset();
@@ -141,7 +137,9 @@ public class UserSocketListener {
         ApUserMessage message = apUserMessageMapper.selectOneByQuery(
                 QueryWrapper.create()
                         .where(AP_USER_MESSAGE.USER_ID.eq(userMsg.getUserId())
-                                .and(AP_USER_MESSAGE.SENDER_ID.eq(userMsg.getSenderId())))
+                                .and(AP_USER_MESSAGE.SENDER_ID.eq(userMsg.getSenderId()))
+                                .and(AP_USER_MESSAGE.IS_READ.eq(false))
+                        )
         );
 
         if(!ObjectUtils.isEmpty(message)){
@@ -192,7 +190,7 @@ public class UserSocketListener {
             ApUserFollow follow = new ApUserFollow();
             follow.setUserId(userMsg.getUserId());
             follow.setFollowId(userMsg.getSenderId());
-            follow.setFollowName(userMsg.getUserName());
+            follow.setFollowName(userMsg.getSenderName());
             follow.setLevel(0);
             follow.setIsNotice(1);
             follow.setCreatedTime(LocalDateTime.now());
