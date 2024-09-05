@@ -60,6 +60,9 @@ public class TestCommentApplication {
 
     @Autowired
     private ReactiveElasticsearchOperations operations;
+
+
+
     @Test
     void testUpRepayEntryId() {
         List<ApCommentRepay> list = apCommentRepayService.list();

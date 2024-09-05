@@ -12,9 +12,9 @@ public class FanMsgDto extends  BaseMsgDto{
     /**
      * 用户id
      */
-    private Long userId;
+    private Long followId;
     /**
      * 关注或取消关注
      */
-    private Integer followOfUnfollow;
+    private String followName;
 }

@@ -16,7 +16,7 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/FollowBehavior")
+@RequestMapping("/follow")
 public class ApFollowBehaviorController {
 
     @Autowired

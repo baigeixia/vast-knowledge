@@ -3,6 +3,9 @@ package com.vk.behaviour.service;
 import com.mybatisflex.core.service.IService;
 import com.vk.behaviour.domain.ApLikesBehavior;
 import com.vk.behaviour.domain.dto.LikesBehaviorDto;
+import com.vk.behaviour.domain.vo.LikeNotificationListVo;
+
+import java.util.List;
 
 /**
  * APP点赞行为 服务层。
@@ -12,5 +15,7 @@ import com.vk.behaviour.domain.dto.LikesBehaviorDto;
  */
 public interface ApLikesBehaviorService extends IService<ApLikesBehavior> {
 
-    void saveLike(LikesBehaviorDto dto);
+
+
+    List<LikeNotificationListVo> likeList(Long page, Long size);
 }

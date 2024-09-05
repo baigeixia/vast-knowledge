@@ -14,6 +14,7 @@ import com.vk.behaviour.domain.ApReadBehavior;
 import com.vk.behaviour.domain.dto.ChatMsgDto;
 import com.vk.behaviour.domain.dto.CollectMsgDto;
 import com.vk.behaviour.domain.dto.CommentMsg;
+import com.vk.behaviour.domain.dto.FanMsgDto;
 import com.vk.behaviour.domain.vo.AckDataMsg;
 import com.vk.behaviour.mapper.*;
 import com.vk.behaviour.notifications.PushNotificationsHandler;
@@ -145,26 +146,11 @@ public class SocketHandler {
         Long articleId = dto.getArticleId();
         String repayAuthorName = dto.getAuthorName();
         Long repayAuthorId = dto.getRepayAuthorId();
-
         validaParameter(ackRequest, repayAuthorId, "被点赞人不能为空");
-        // if (StringUtils.isLongEmpty(repayAuthorId)) {
-        //     errorMessage(ackRequest, "被点赞人不能为空");
-        //     return;
-        // }
         validaParameter(ackRequest, articleId, "文章id不能为空");
-
-
-        // if (StringUtils.isLongEmpty(articleId)) {
-        //     errorMessage(ackRequest, "文章id不能为空");
-        //     return;
-        // }
 
         if (type == LIKE_TYPE_ARTICLE_NO) {
             validaParameter(ackRequest, commentId, "评论id不能为空");
-            // if (StringUtils.isLongEmpty(commentId)) {
-            //     errorMessage(ackRequest, "评论id不能为空");
-            //     return;
-            // }
         }
 
         //不能与自己互动
@@ -202,33 +188,6 @@ public class SocketHandler {
                 UpdateArticleMess.UpdateArticleType.LIKES,
                 likesBehavior.getOperation() == BASE_LiKE ? 1 : -1
         );
-
-        // NewUserMsg message = new NewUserMsg();
-        // message.setUserId(authorId);
-        // message.setUserName(userName);
-        // message.setSenderId(repayAuthorId);
-        // message.setSenderName(repayAuthorName);
-        // if (StringUtils.isLongEmpty(likesBehavior.getCommentId())) {
-        //     message.setType(likesBehavior.getOperation() == BASE_LiKE ? LIKE : LIKE_NO);
-        // } else {
-        //     message.setType(likesBehavior.getOperation() == BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO);
-        // }
-        // kafkaTemplate.send(MqConstants.TopicCS.NEWS_USER_MESSAGE_TOPIC, JSON.toJSONString(message));
-        //
-        //
-        // // 发送消息给 kafka stream 的input topic，做实时计算
-        // UpdateArticleMess msg = new UpdateArticleMess(
-        //         UpdateArticleMess.UpdateArticleType.LIKES,
-        //         articleId,
-        //         likesBehavior.getOperation() == BASE_LiKE ? 1 : -1
-        // );
-        // kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, JSON.toJSONString(msg));
-        //
-        //
-        // pushNotificationsHandler.msgPush(message);
-        // String repaySessionId = redisService.getCacheObject(getRedisUserIdKey(repayAuthorId));
-        // SocketIOClient client = socketIOServer.getClient(UUID.fromString(repaySessionId));
-        // client.sendEvent(MqConstants.UserSocketCS.NEW_LIKE, "test new_like");
     }
 
 
@@ -236,45 +195,41 @@ public class SocketHandler {
      * fanMsg 关注后事件
      */
     @OnEvent("fanMsg")
-    public void fanMsg(SocketIOClient socketIOClient, AckRequest ackRequest, ApFollowBehavior dto) {
+    public void fanMsg(SocketIOClient socketIOClient, AckRequest ackRequest, FanMsgDto dto) {
         UUID sessionId = socketIOClient.getSessionId();
         log.info("fanMsg 关注事件 -> dto:{} sessionId:{}", dto, sessionId);
         Long authorId = clientGetUserId(socketIOClient);
         String userName = clientGetUserName(socketIOClient);
-        if (StringUtils.isLongEmpty(authorId)) {
-            // log.error("用户错误");
-            errorMessage(ackRequest, "用户错误");
-        }
         Long followId = dto.getFollowId();
-        if (StringUtils.isLongEmpty(followId)) {
-            // log.error("被关注人不能为空");
-            errorMessage(ackRequest, "被关注人不能为空");
-        }
+        String followName = dto.getFollowName();
+        validaParameter(ackRequest,authorId,"粉丝错误");
+        validaParameter(ackRequest,followName,"粉丝名称不能为空");
+        validaParameter(ackRequest,followId,"被关注人不能为空");
 
         excludeYourself(ackRequest,authorId,followId);
-
-
-        NewUserMsg message = new NewUserMsg();
-        message.setUserId(authorId);
-        message.setUserName(userName);
-        message.setSenderId(followId);
 
         ApFollowBehavior followBehavior = apFollowBehaviorMapper.selectOneByQuery(
                 QueryWrapper.create()
                         .where(AP_FOLLOW_BEHAVIOR.AUTHOR_ID.eq(authorId))
                         .and(AP_FOLLOW_BEHAVIOR.FOLLOW_ID.eq(followId))
         );
+
+        int messageType;
         if (null == followBehavior) {
-            apFollowBehaviorMapper.insert(dto);
-            message.setType(FOLLOW);
+            ApFollowBehavior behavior = new ApFollowBehavior();
+            behavior.setAuthorId(authorId);
+            behavior.setAuthorName(userName);
+            behavior.setFollowId(followId);
+            behavior.setCreatedTime(LocalDateTime.now());
+            apFollowBehaviorMapper.insert(behavior);
+            messageType=FOLLOW;
         } else {
             apFollowBehaviorMapper.deleteById(followBehavior.getId());
-            message.setType(FOLLOW_NO);
+            messageType=FOLLOW_NO;
         }
 
-        kafkaTemplate.send(MqConstants.TopicCS.NEWS_USER_MESSAGE_TOPIC, JSON.toJSONString(message));
+        streamProcessingStandard(followId, followName,messageType, socketIOClient);
 
-        pushNotificationsHandler.msgPush(message);
     }
 
     /**

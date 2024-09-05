@@ -60,7 +60,7 @@ public class ApUserMessage implements Serializable {
     private Integer type;
 
     /**
-     * 是否阅读
+     * 是否阅读  0未 1已读
      */
     private Integer isRead;
 

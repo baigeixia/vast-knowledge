@@ -161,6 +161,7 @@ public class UserSocketListener {
         ApUserMessage message = new ApUserMessage();
         BeanUtils.copyProperties(userMsg,message);
         message.setCreatedTime(LocalDateTime.now());
+        message.setIsRead(0);
         apUserMessageMapper.insert(message);
     }
 

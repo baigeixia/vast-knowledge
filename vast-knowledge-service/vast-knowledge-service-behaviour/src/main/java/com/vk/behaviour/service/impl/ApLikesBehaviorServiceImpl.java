@@ -2,20 +2,24 @@ package com.vk.behaviour.service.impl;
 
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.behaviour.domain.ApLikesBehavior;
-import com.vk.behaviour.domain.dto.LikesBehaviorDto;
+import com.vk.behaviour.domain.entity.LikesBehaviorTimeCount;
+import com.vk.behaviour.domain.vo.Actors;
+import com.vk.behaviour.domain.vo.AttachInfo;
+import com.vk.behaviour.domain.vo.LikeNotificationListVo;
+import com.vk.behaviour.domain.vo.NotificationInfo;
 import com.vk.behaviour.mapper.ApLikesBehaviorMapper;
 import com.vk.behaviour.service.ApLikesBehaviorService;
-import com.vk.common.core.constant.CollectionConstants;
-import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.utils.bean.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * APP点赞行为 服务层实现。
@@ -27,42 +31,56 @@ import java.time.LocalDateTime;
 @Slf4j
 public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMapper, ApLikesBehavior> implements ApLikesBehaviorService {
 
-    @Autowired
-    private KafkaTemplate<String,String> kafkaTemplate;
+
     @Override
-    public void saveLike(LikesBehaviorDto dto) {
+    public List<LikeNotificationListVo> likeList(Long page, Long size) {
+        List<LikeNotificationListVo> vos = new ArrayList<>();
         Long userId = RequestContextUtil.getUserId();
-        String userName = RequestContextUtil.getUserName();
+        // List<String> dataTime= mapper.getTimeRange((page-1)*size,size);
+        List<LikesBehaviorTimeCount> rawData = mapper.getLikesBehaviorTimeCountList(userId, (page - 1) * size, size);
+        if (!ObjectUtils.isEmpty(rawData)){
+            List<LikeNotificationListVo> liked = rawData.stream()
+                    .collect(Collectors.groupingBy(
+                            LikesBehaviorTimeCount::getTime,
+                            Collectors.mapping(
+                                    data -> {
+                                        NotificationInfo info = new NotificationInfo();
+                                        info.setVerb("Liked");
+                                        info.setMergeCount(data.getTotal());
+                                        info.setCommentEndTime(data.getTime());
+                                        // Placeholder for Actors and AttachInfo
+                                        info.setActors(new Actors());
+                                        info.setAttachInfo(new AttachInfo());
+                                        return info;
+                                    },
+                                    Collectors.toList()
+                            )
+                    ))
+                    .entrySet().stream()
+                    .map(entry -> {
+                        LikeNotificationListVo listVo = new LikeNotificationListVo();
+                        listVo.setStatisticsTime(entry.getKey());
+                        listVo.setNotificationInfoList(entry.getValue());
+                        return listVo;
+                    })
+                    .toList();
 
-        Long id = dto.getId();
-        Long articleId = dto.getArticleId();
-        Long repayAuthorId = dto.getRepayAuthorId();
-        Integer operation = dto.getOperation();
-        Integer type = dto.getType();
+            System.out.println(liked);
 
-        if (operation == CollectionConstants.LIKE_NO){
-            if (StringUtils.isLongEmpty(id)) {
-                throw new LeadNewsException("错误的参数");
-            }
-            ApLikesBehavior behavior = new ApLikesBehavior();
-            behavior.setId(id);
-            // behavior.setOperation(CollectionConstants.LIKE_NO);
-            mapper.update(behavior);
-        }else {
-            ApLikesBehavior behavior = new ApLikesBehavior();
-            BeanUtils.copyProperties(dto,behavior);
-            behavior.setAuthorId(userId);
-            behavior.setAuthorName(userName);
-            behavior.setCreatedTime(LocalDateTime.now());
-            mapper.insert(behavior);
-
-            try {
-                // NewUserMsg newMsg = new NewUserMsg(repayAuthorId,MqConstants.UserSocketCS.NEW_LIKE);
-                // kafkaTemplate.send(MqConstants.TopicCS.NEWS_LIKE_TOPIC, JSON.toJSONString(newMsg));
-            } catch (Exception e) {
-                log.error("点赞行为发送kafka失败 id: {} 错误:{}",id,e.getMessage());
-            }
-
+            // Print result (for demonstration)
+            // result.forEach((time, vo) -> {
+            //     System.out.println("Time: " + time);
+            //     vo.getNotificationInfoList().forEach(info -> {
+            //         System.out.println("Verb: " + info.getVerb());
+            //         System.out.println("MergeCount: " + info.getMergeCount());
+            //         System.out.println("CommentEndTime: " + info.getCommentEndTime());
+            //         // Additional info
+            //         System.out.println("Actors: " + info.getActors());
+            //         System.out.println("AttachInfo: " + info.getAttachInfo());
+            //     });
+            // });
         }
+
+        return vos;
     }
 }
