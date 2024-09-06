@@ -1,9 +1,11 @@
-package com.vk.behaviour.domain.vo;
+package com.vk.behaviour.domain.vo.notification.like;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class NotificationInfo {
+public class LikeNotificationInfo {
     /**
      * 提示消息
      */
@@ -22,7 +24,7 @@ public class NotificationInfo {
     /**
      * 对应用户
      */
-    private Actors actors;
+    private List<LikeActors> actors;
 
     /**
      * 文章信息

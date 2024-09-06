@@ -1,15 +1,11 @@
 package com.vk.behaviour.controller;
 
-import com.mybatisflex.core.paginate.Page;
-import com.vk.behaviour.domain.ApLikesBehavior;
-import com.vk.behaviour.domain.dto.LikesBehaviorDto;
-import com.vk.behaviour.domain.vo.LikeNotificationListVo;
+import com.vk.behaviour.domain.vo.notification.like.LikeNotificationListVo;
 import com.vk.behaviour.service.ApLikesBehaviorService;
 import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**

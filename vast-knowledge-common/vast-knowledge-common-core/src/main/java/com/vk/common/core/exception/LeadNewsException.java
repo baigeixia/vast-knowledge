@@ -34,14 +34,12 @@ public class LeadNewsException extends RuntimeException{
     public LeadNewsException(String message){
         super(message);
         this.message = message;
-        log.error(message);
     }
 
     public LeadNewsException(Integer code, String message){
         super(message);
         this.code = code;
         this.message = message;
-        log.error(message);
     }
 
     public LeadNewsException(HttpCodeEnum codeEnum){

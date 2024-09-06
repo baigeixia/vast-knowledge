@@ -2,8 +2,7 @@ package com.vk.behaviour.service;
 
 import com.mybatisflex.core.service.IService;
 import com.vk.behaviour.domain.ApLikesBehavior;
-import com.vk.behaviour.domain.dto.LikesBehaviorDto;
-import com.vk.behaviour.domain.vo.LikeNotificationListVo;
+import com.vk.behaviour.domain.vo.notification.like.LikeNotificationListVo;
 
 import java.util.List;
 

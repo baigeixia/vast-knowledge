@@ -255,6 +255,8 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         result.setPage(page);
         result.setSize(size);
 
+
+
         QueryWrapper commentWhere = QueryWrapper.create().where(AP_COMMENT.ENTRY_ID.eq(entryId)
                 .and(AP_COMMENT.STATUS.eq(DatabaseConstants.DB_ROW_STATUS_YES)));
 
@@ -266,24 +268,23 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
             commentWhere.orderBy(AP_COMMENT.UPDATED_TIME, false);
         }
 
-        var oneComment = new ApComment();
         if (!StringUtils.isLongEmpty(notificationId)) {
-            // oneComment = mapper.selectOneById(notificationId);
-            // commentWhere.union(QueryWrapper.create().where(AP_COMMENT.ENTRY_ID.eq(entryId)).and(AP_COMMENT.ID.eq(notificationId)));
-            commentWhere.or(AP_COMMENT.ID.eq(notificationId).and(AP_COMMENT.ENTRY_ID.eq(entryId))).orderBy("id="+notificationId,false);
+            Long notificationCommentId = mapper.selectGetNotificationCommentId(notificationId);
+            if (!StringUtils.isLongEmpty(notificationCommentId)){
+                commentWhere.or(AP_COMMENT.ID.eq(notificationCommentId).and(AP_COMMENT.ENTRY_ID.eq(entryId))).orderBy(AP_COMMENT.ID.getName()+"="+notificationCommentId,false);
+            }
         }
 
+        // if (!StringUtils.isLongEmpty(notificationId)) {
+        //     commentWhere.or(AP_COMMENT.ID.eq(notificationId).and(AP_COMMENT.ENTRY_ID.eq(entryId))).orderBy(AP_COMMENT.ID.eq(notificationId).toString(),false);
+        // }
 
-        // commentWhere.limit((page-1)*size,size);
-        // List<ApComment> dbCommentPage = mapper.selectListByQuery(commentWhere);
         // 顶级父级分页
         Page<ApComment> dbCommentPage = mapper.paginate(Page.of(page, size), commentWhere);
 
         List<ApComment> dbCommentList = dbCommentPage.getRecords();
 
-        // if (!ObjectUtils.isEmpty(oneComment)) {
-        //     dbCommentList.addFirst(oneComment);
-        // }
+
         result.setTotal(dbCommentPage.getTotalRow());
 
         if (CollectionUtils.isEmpty(dbCommentList)) {
@@ -317,11 +318,12 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
             }
 
             if (!StringUtils.isLongEmpty(notificationId)) {
-                wrapper.or(AP_COMMENT_REPAY.ID.eq(notificationId).and(AP_COMMENT_REPAY.COMMENT_ID.eq(comment.getId()))).orderBy("id ="+notificationId,false);
+                // wrapper.or(AP_COMMENT_REPAY.ID.eq(notificationId).and(AP_COMMENT_REPAY.COMMENT_ID.eq(comment.getId()))).orderBy("id ="+notificationId,false);
+                wrapper.or(AP_COMMENT_REPAY.ID.eq(notificationId).and(AP_COMMENT_REPAY.COMMENT_ID.eq(comment.getId()))).orderBy(AP_COMMENT_REPAY.ID.getName()+"="+notificationId.toString(),false);
             }
 
 
-                Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(1, 5), wrapper);
+            Page<ApCommentRepay> commentRepayPage = apCommentRepayMapper.paginate(Page.of(1, 5), wrapper);
 
             commentList.setChildCommentCount(commentRepayPage.getTotalRow());
 

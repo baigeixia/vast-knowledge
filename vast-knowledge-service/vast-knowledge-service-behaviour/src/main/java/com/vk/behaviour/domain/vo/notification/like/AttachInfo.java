@@ -1,9 +1,13 @@
-package com.vk.behaviour.domain.vo;
+package com.vk.behaviour.domain.vo.notification.like;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AttachInfo {
     /**
      * 文章id

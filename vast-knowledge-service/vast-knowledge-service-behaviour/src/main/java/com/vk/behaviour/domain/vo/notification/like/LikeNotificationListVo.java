@@ -1,4 +1,4 @@
-package com.vk.behaviour.domain.vo;
+package com.vk.behaviour.domain.vo.notification.like;
 
 import lombok.Data;
 
@@ -13,5 +13,5 @@ public class LikeNotificationListVo {
     /**
      * 评论通知 详情
      */
-    private List<NotificationInfo> notificationInfoList;
+    private List<LikeNotificationInfo> notificationInfoList;
 }
