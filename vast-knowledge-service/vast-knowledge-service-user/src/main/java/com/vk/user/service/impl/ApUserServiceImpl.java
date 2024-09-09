@@ -6,6 +6,7 @@ import com.vk.user.domain.AuthorInfo;
 import com.vk.user.mapper.ApUserMapper;
 import com.vk.user.service.ApUserService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 
@@ -22,7 +23,7 @@ public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> impleme
     public Map<Long, AuthorInfo> getUserList(Set<Long> userId) {
         Map<Long, AuthorInfo> infoMap = new HashMap<>();
 
-        if (null!=userId){
+        if (!ObjectUtils.isEmpty(userId)){
             List<ApUser> users = mapper.selectListByIds(userId);
             for (ApUser i : users) {
                 AuthorInfo info = new AuthorInfo();

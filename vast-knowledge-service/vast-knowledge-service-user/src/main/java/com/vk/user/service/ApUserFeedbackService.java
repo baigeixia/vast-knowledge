@@ -2,6 +2,7 @@ package com.vk.user.service;
 
 import com.mybatisflex.core.service.IService;
 import com.vk.user.domain.ApUserFeedback;
+import com.vk.user.domain.dto.FeedbackDto;
 
 /**
  * APP用户反馈信息 服务层。
@@ -11,4 +12,5 @@ import com.vk.user.domain.ApUserFeedback;
  */
 public interface ApUserFeedbackService extends IService<ApUserFeedback> {
 
+    void feedbackSave(FeedbackDto dto);
 }

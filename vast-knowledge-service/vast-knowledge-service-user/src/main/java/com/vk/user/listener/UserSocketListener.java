@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.nacos.common.utils.UuidUtils;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
+import com.vk.common.core.constant.UserBehaviourConstants;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.mq.common.MqConstants;
 import com.vk.common.mq.domain.NewUserMsg;
@@ -58,67 +59,67 @@ public class UserSocketListener {
 
             String uuid = UuidUtils.generateUuid();
             Integer type = userMsg.getType();
-            switch (type){
+            switch (type) {
                 case FOLLOW:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("FOLLOW 关注 mark:{}",uuid);
+                        log.info("FOLLOW 关注 mark:{}", uuid);
                         followOrFanAdd(userMsg);
                         userLetterAdd(userMsg);
                     });
                     break;
                 case FOLLOW_NO:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("FOLLOW_NO 取消关注 mark:{}",uuid);
+                        log.info("FOLLOW_NO 取消关注 mark:{}", uuid);
                         followOrFanDel(userMsg);
                         userMessageDel(userMsg);
                     });
                     break;
                 case LIKE:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("LIKE 点赞文章 mark:{}",uuid);
+                        log.info("LIKE 点赞文章 mark:{}", uuid);
                         userMessageAdd(userMsg);
                     });
                     break;
                 case LIKE_NO:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("LIKE_NO 取消点赞文章 mark:{}",uuid);
+                        log.info("LIKE_NO 取消点赞文章 mark:{}", uuid);
                         userMessageDel(userMsg);
                     });
                     break;
                 case FORWARD:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("FORWARD 转发文章  mark:{}",uuid);
+                        log.info("FORWARD 转发文章  mark:{}", uuid);
                         userMessageAdd(userMsg);
                     });
                     break;
                 case LIKE_COMMENT:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("LIKE_COMMENT 点赞评论 mark:{}",uuid);
+                        log.info("LIKE_COMMENT 点赞评论 mark:{}", uuid);
                         userMessageAdd(userMsg);
                     });
                     break;
                 case LIKE_COMMENT_NO:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("LIKE_COMMENT_NO 取消评论点赞 mark:{}",uuid);
+                        log.info("LIKE_COMMENT_NO 取消评论点赞 mark:{}", uuid);
                         userMessageDel(userMsg);
                     });
                     break;
                 case CHAT_MSG:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("CHAT_MSG 私信通知 mark:{}",uuid);
+                        log.info("CHAT_MSG 私信通知 mark:{}", uuid);
                         userLetterAdd(userMsg);
                         userMessageAdd(userMsg);
                     });
                     break;
                 case COMMENT:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("COLLECT 评论通知 mark:{}",uuid);
+                        log.info("COLLECT 评论通知 mark:{}", uuid);
                         userMessageAdd(userMsg);
                     });
                     break;
                 case SHARE:
                     TaskVirtualExecutorUtil.executeWith(() -> {
-                        log.info("COLLECT 分享通知 mark:{}",uuid);
+                        log.info("COLLECT 分享通知 mark:{}", uuid);
                         userMessageAdd(userMsg);
                     });
                     break;
@@ -126,7 +127,7 @@ public class UserSocketListener {
                     log.error("NEWS_LIKE_TOPIC 没有对应类型错误");
             }
 
-        }else {
+        } else {
             log.error("错误的 userMsg 为空");
         }
 
@@ -142,35 +143,36 @@ public class UserSocketListener {
                         )
         );
 
-        if(!ObjectUtils.isEmpty(message)){
+        if (!ObjectUtils.isEmpty(message)) {
             apUserMessageMapper.deleteById(message.getId());
         }
     }
 
     private void userLetterAdd(NewUserMsg userMsg) {
-            ApUserLetter letter = new ApUserLetter();
-            letter.setUserId(userMsg.getUserId());
-            letter.setSenderId(userMsg.getSenderId());
-            letter.setSenderName(userMsg.getSenderName());
-            letter.setContent(userMsg.getContent());
-            letter.setCreatedTime(LocalDateTime.now());
-            apUserLetterMapper.insert(letter);
+        ApUserLetter letter = new ApUserLetter();
+        letter.setUserId(userMsg.getUserId());
+        letter.setSenderId(userMsg.getSenderId());
+        letter.setSenderName(userMsg.getSenderName());
+        letter.setContent(userMsg.getContent());
+        letter.setCreatedTime(LocalDateTime.now());
+        letter.setIsRead(UserBehaviourConstants.USER_READ_NO);
+        apUserLetterMapper.insert(letter);
     }
 
     private void userMessageAdd(NewUserMsg userMsg) {
         ApUserMessage message = new ApUserMessage();
-        BeanUtils.copyProperties(userMsg,message);
+        BeanUtils.copyProperties(userMsg, message);
         message.setCreatedTime(LocalDateTime.now());
         message.setIsRead(0);
         apUserMessageMapper.insert(message);
     }
 
     private void followOrFanDel(NewUserMsg userMsg) {
-        Db.tx(()->{
+        Db.tx(() -> {
             ApUserFollow follow = apUserFollowMapper.selectOneByQuery(QueryWrapper.create()
                     .where(AP_USER_FOLLOW.USER_ID.eq(userMsg.getUserId())
                             .and(AP_USER_FOLLOW.FOLLOW_ID.eq(userMsg.getSenderId()))));
-            if(!ObjectUtils.isEmpty(follow)){
+            if (!ObjectUtils.isEmpty(follow)) {
                 apUserFollowMapper.deleteById(follow.getId());
             }
 
@@ -178,7 +180,7 @@ public class UserSocketListener {
                     .where(AP_USER_FAN.USER_ID.eq(userMsg.getSenderId()))
                     .and(AP_USER_FAN.FANS_ID.eq(userMsg.getUserId())));
 
-            if(!ObjectUtils.isEmpty(fan)){
+            if (!ObjectUtils.isEmpty(fan)) {
                 apUserFanMapper.deleteById(fan.getId());
             }
             return true;
@@ -187,7 +189,7 @@ public class UserSocketListener {
     }
 
     private void followOrFanAdd(NewUserMsg userMsg) {
-        Db.tx(()->{
+        Db.tx(() -> {
             ApUserFollow follow = new ApUserFollow();
             follow.setUserId(userMsg.getUserId());
             follow.setFollowId(userMsg.getSenderId());

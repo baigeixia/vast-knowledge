@@ -1,6 +1,9 @@
 package com.vk.user.domain;
 
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import com.mybatisflex.core.keygen.KeyGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +29,7 @@ public class ApUserFeedback implements Serializable {
     /**
      * 主键
      */
+    @Id(keyType= KeyType.Generator, value= KeyGenerators.flexId)
     private Long id;
 
     /**
@@ -39,7 +43,7 @@ public class ApUserFeedback implements Serializable {
     private String userName;
 
     /**
-     * 私信内容
+     * 内容
      */
     private String content;
 

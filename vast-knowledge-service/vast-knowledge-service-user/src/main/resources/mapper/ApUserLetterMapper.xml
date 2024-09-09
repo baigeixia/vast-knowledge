@@ -4,4 +4,65 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.user.mapper.ApUserLetterMapper">
 
+    <resultMap id="MsgUserListMap" type="com.vk.user.domain.vo.MsgUserListVo">
+        <result property="id" column="user_id"/>
+        <result property="snippet" column="content"/>
+        <result property="senderTime" column="created_time"/>
+        <result property="unread" column="is_read"/>
+    </resultMap>
+
+
+    <select id="getRecentList" resultMap="MsgUserListMap">
+        SELECT
+            m.user_id ,
+            m.content ,
+            m.created_time ,
+            m.is_read
+        FROM ap_user_letter m
+                 JOIN (
+            SELECT user_id, MAX(created_time) AS latest_time
+            FROM ap_user_letter
+            WHERE sender_id = #{userId}
+            GROUP BY user_id
+        ) l ON m.user_id = l.user_id AND m.created_time = l.latest_time
+        WHERE m.sender_id = #{userId} ORDER BY m.created_time DESC LIMIT #{page} , #{size}
+    </select>
+
+    <select id="getStrangerList" resultMap="MsgUserListMap">
+        SELECT
+            m.user_id ,
+            m.content ,
+            m.created_time ,
+            m.is_read
+        FROM ap_user_letter m
+                 JOIN (
+            SELECT user_id, MAX(created_time) AS latest_time
+            FROM ap_user_letter
+            WHERE sender_id = #{userId}
+            GROUP BY user_id
+            HAVING COUNT(*) = 1
+        ) l ON m.user_id = l.user_id AND m.created_time = l.latest_time
+        WHERE m.sender_id = #{userId} ORDER BY m.created_time DESC LIMIT #{page} , #{size}
+    </select>
+
+
+    <select id="getMutualConcernList" resultMap="MsgUserListMap">
+        SELECT ml.user_id,
+               ml.content,
+               ml.created_time,
+               ml.is_read
+        FROM ap_user_letter ml
+                 JOIN(SELECT m.user_id userid, MAX(m.created_time) latest_time
+                      FROM ap_user_letter m
+                               JOIN (SELECT f1.follow_id AS id
+                                     FROM ap_user_follow f1
+                                              JOIN ap_user_follow f2
+                                                   ON f1.user_id = f2.follow_id
+                                                       AND f1.follow_id = f2.user_id
+                                     WHERE f1.user_id = #{userId}) l ON m.user_id = l.id
+                      WHERE m.sender_id = #{userId}
+                      GROUP BY m.user_id) lm ON ml.user_id = lm.userid AND ml.created_time = lm.latest_time
+        WHERE ml.sender_id = #{userId}
+        ORDER BY ml.created_time DESC LIMIT #{page}, #{size}
+    </select>
 </mapper>

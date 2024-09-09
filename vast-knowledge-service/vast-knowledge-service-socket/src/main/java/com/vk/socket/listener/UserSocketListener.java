@@ -19,7 +19,7 @@ public class UserSocketListener {
     private  SocketIOServer socketIOServer;
 
 
-    @KafkaListener(topics = MqConstants.TopicCS.NEWS_LIKE_TOPIC,groupId = MqConstants.NOTIFY_GROUP)
+    // @KafkaListener(topics = MqConstants.TopicCS.NEWS_LIKE_TOPIC,groupId = MqConstants.NOTIFY_GROUP)
     public void upOrDown(ConsumerRecord<String,String> record){
         int p = record.partition();
         long o = record.offset();

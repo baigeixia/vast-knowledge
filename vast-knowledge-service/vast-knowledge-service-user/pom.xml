@@ -22,6 +22,12 @@
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-mq</artifactId>
         </dependency>
+        <!-- socket 通讯-->
+        <dependency>
+            <groupId>com.corundumstudio.socketio</groupId>
+            <artifactId>netty-socketio</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

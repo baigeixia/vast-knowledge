@@ -2,6 +2,9 @@ package com.vk.user.service;
 
 import com.mybatisflex.core.service.IService;
 import com.vk.user.domain.ApUserLetter;
+import com.vk.user.domain.vo.MsgUserListVo;
+
+import java.util.List;
 
 /**
  * APP用户私信信息 服务层。
@@ -11,4 +14,5 @@ import com.vk.user.domain.ApUserLetter;
  */
 public interface ApUserLetterService extends IService<ApUserLetter> {
 
+    List<MsgUserListVo> letterList(Integer type, Integer page, Integer size);
 }

@@ -10,76 +10,78 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 /**
- * APP用户私信信息 实体类。
+ * APP用户举报信息 实体类。
  *
  * @author 张三
- * @since 2024-05-13
+ * @since 2024-09-09
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "ap_user_letter")
-public class ApUserLetter implements Serializable {
+@Table(value = "ap_user_report")
+public class ApUserReport implements Serializable {
 
     /**
      * 主键
      */
     @Id(keyType= KeyType.Generator, value= KeyGenerators.flexId)
-    private Long id;
+    private BigInteger id;
 
     /**
-     * 用户ID
+     * 举报人用户ID
      */
     private Long userId;
 
     /**
-     * 发送人ID
+     * 举报人昵称
      */
-    private Long senderId;
+    private String userName;
 
     /**
-     * 发送人昵称
+     * 被举报人用户ID
      */
-    private String senderName;
+    private Long reportUserId;
 
     /**
-     * 私信内容
+     * 被举报人昵称
      */
-    private String content;
+    private String reportUserName;
 
     /**
-     * 图片
+     * 文章id
      */
-    private String image;
+    private Long articleId;
 
     /**
-     * 是否删除
+     * 举报原因
      */
-    private Boolean status;
+    private String reportReason;
 
     /**
-     * 删除人  0 的情况 两边都进行删除
+     * 举报内容
      */
-    private Long status_pointing;
+    private String reportContent;
 
     /**
      * 是否阅读
      */
-    private Integer isRead;
+    private Integer isSolve;
+
+    private String solveNote;
+
+    /**
+     * 阅读时间
+     */
+    private LocalDateTime solvedTime;
 
     /**
      * 创建时间
      */
     private LocalDateTime createdTime;
-
-    /**
-     * 阅读时间
-     */
-    private LocalDateTime readTime;
 
 }
