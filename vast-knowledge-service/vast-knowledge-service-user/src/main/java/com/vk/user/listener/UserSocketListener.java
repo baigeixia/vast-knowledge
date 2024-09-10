@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.nacos.common.utils.UuidUtils;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
+import com.vk.common.core.constant.DatabaseConstants;
 import com.vk.common.core.constant.UserBehaviourConstants;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.mq.common.MqConstants;
@@ -154,7 +155,9 @@ public class UserSocketListener {
         letter.setSenderId(userMsg.getSenderId());
         letter.setSenderName(userMsg.getSenderName());
         letter.setContent(userMsg.getContent());
+        letter.setStatus(DatabaseConstants.DB_ROW_STATUS_YES);
         letter.setCreatedTime(LocalDateTime.now());
+        letter.setStatus_pointing(0L);
         letter.setIsRead(UserBehaviourConstants.USER_READ_NO);
         apUserLetterMapper.insert(letter);
     }

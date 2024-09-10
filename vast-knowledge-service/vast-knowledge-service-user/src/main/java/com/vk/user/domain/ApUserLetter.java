@@ -60,7 +60,7 @@ public class ApUserLetter implements Serializable {
     /**
      * 是否删除
      */
-    private Boolean status;
+    private Integer status;
 
     /**
      * 删除人  0 的情况 两边都进行删除

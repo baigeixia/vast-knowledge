@@ -65,4 +65,21 @@
         WHERE ml.sender_id = #{userId}
         ORDER BY ml.created_time DESC LIMIT #{page}, #{size}
     </select>
+
+
+    <select id="getMsgList" resultType="com.vk.user.domain.vo.MsgInfo">
+        SELECT id,
+               content                                                                   text,
+               image,
+               `status`                                                                  isCanceled,
+               `created_time`                                                            createdTime,
+               CASE WHEN sender_id = #{localUserId} THEN 'sender' ELSE 'receiver' END AS userType
+        FROM ap_user_letter
+        WHERE ((user_id = #{userId} AND sender_id = #{localUserId}) OR
+               (user_id = #{localUserId} AND sender_id = #{userId}))
+          AND `status` = 0
+          AND (status_pointing = 0 or status_pointing != #{localUserId})
+        ORDER BY created_time DESC LIMIT #{page}, #{size};
+    </select>
+
 </mapper>
