@@ -112,12 +112,14 @@ public class ApUserLetterServiceImpl extends ServiceImpl<ApUserLetterMapper, ApU
     public void delMsg(Long msgId) {
         Long localUserId = RequestContextUtil.getUserId();
         Long statusPointing = mapper.selectUserIdAndMsgId(localUserId, msgId);
-        CustomSimpleThrowUtils.LongIsEmpty(statusPointing, "错误的消息");
+        if(null==statusPointing){
+            throw new LeadNewsException("错误的消息");
+        }
 
         if (statusPointing.equals(0L)) {
             //无状态添加删除用户id
             mapper.deleteMsgId(localUserId, msgId);
-        }else if(statusPointing.equals(1L)){
+        }else if(statusPointing.equals(110L)){
             throw new LeadNewsException("消息已删除");
         }else {
             //对方已经删除消息 改为全部移除
@@ -125,7 +127,7 @@ public class ApUserLetterServiceImpl extends ServiceImpl<ApUserLetterMapper, ApU
         }
     }
 
-    private static final Duration TIME_INTERVAL = Duration.ofMinutes(30); // 30 分钟
+    private static final Duration TIME_INTERVAL = Duration.ofMinutes(10); // 10 分钟
 
     public List<MsgInfo> getMsgListWithTimestamps(List<MsgInfo> infos) {
         // 添加时间戳显示标志

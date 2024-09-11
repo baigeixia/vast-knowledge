@@ -2,6 +2,9 @@ package com.vk.user.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.user.domain.ApUser;
+import com.vk.user.domain.vo.LocalUserInfoVo;
+import com.vk.user.domain.vo.UserInfoVo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * APP用户信息 映射层。
@@ -11,4 +14,8 @@ import com.vk.user.domain.ApUser;
  */
 public interface ApUserMapper extends BaseMapper<ApUser> {
 
+
+    UserInfoVo selectGetInfo(@Param("localUserId") Long localUserId);
+
+    LocalUserInfoVo selectGetLocalInfo(@Param("localUserId") Long userid);
 }

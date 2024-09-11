@@ -5,11 +5,14 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.utils.StringUtils;
+import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.security.annotation.InnerAuth;
 
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.AuthorInfo;
 import com.vk.user.domain.ClientApUser;
+import com.vk.user.domain.vo.LocalUserInfoVo;
+import com.vk.user.domain.vo.UserInfoVo;
 import com.vk.user.model.LoginApUser;
 import com.vk.user.service.ApUserService;
 import org.springframework.beans.BeanUtils;
@@ -66,71 +69,20 @@ public class ApUserController {
     }
 
 
-
-
-    /**
-     * 添加APP用户信息。
-     *
-     * @param apUser APP用户信息
-     * @return {@code true} 添加成功，{@code false} 添加失败
-     */
-    @PostMapping("save")
-    public boolean save(@RequestBody ApUser apUser) {
-        return apUserService.save(apUser);
+    @GetMapping("/getInfo")
+    public AjaxResult getInfo(
+            @RequestParam(name = "id") Long id
+    ){
+        UserInfoVo result=apUserService.getInfo(id);
+        return AjaxResult.success(result);
     }
 
-    /**
-     * 根据主键删除APP用户信息。
-     *
-     * @param id 主键
-     * @return {@code true} 删除成功，{@code false} 删除失败
-     */
-    @DeleteMapping("remove/{id}")
-    public boolean remove(@PathVariable Serializable id) {
-        return apUserService.removeById(id);
+
+    @GetMapping("/getLocalInfo")
+    public AjaxResult getLocalInfo( ){
+        LocalUserInfoVo result=apUserService.getLocalInfo();
+        return AjaxResult.success(result);
     }
 
-    /**
-     * 根据主键更新APP用户信息。
-     *
-     * @param apUser APP用户信息
-     * @return {@code true} 更新成功，{@code false} 更新失败
-     */
-    @PutMapping("update")
-    public boolean update(@RequestBody ApUser apUser) {
-        return apUserService.updateById(apUser);
-    }
-
-    /**
-     * 查询所有APP用户信息。
-     *
-     * @return 所有数据
-     */
-    @GetMapping("list")
-    public List<ApUser> list() {
-        return apUserService.list();
-    }
-
-    /**
-     * 根据APP用户信息主键获取详细信息。
-     *
-     * @param id APP用户信息主键
-     * @return APP用户信息详情
-     */
-    @GetMapping("getInfo/{id}")
-    public ApUser getInfo(@PathVariable(name = "id") Long id) {
-        return apUserService.getById(id);
-    }
-
-    /**
-     * 分页查询APP用户信息。
-     *
-     * @param page 分页对象
-     * @return 分页对象
-     */
-    @GetMapping("page")
-    public Page<ApUser> page(Page<ApUser> page) {
-        return apUserService.page(page);
-    }
 
 }

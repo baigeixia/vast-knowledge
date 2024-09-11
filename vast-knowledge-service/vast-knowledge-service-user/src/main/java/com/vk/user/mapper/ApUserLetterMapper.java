@@ -36,7 +36,7 @@ public interface ApUserLetterMapper extends BaseMapper<ApUserLetter> {
     @Select("select status_pointing  from  ap_user_letter where id=#{msgId} and (sender_id=#{localUserId} or user_id=#{localUserId}) ")
     Long selectUserIdAndMsgId(@Param("localUserId")Long localUserId,@Param("msgId") Long msgId);
 
-    @Update("update ap_user_letter set status_pointing=1 where id=#{msgId} and (sender_id=#{localUserId} or user_id=#{localUserId}) ")
+    @Update("update ap_user_letter set status_pointing=110 where id=#{msgId} and (sender_id=#{localUserId} or user_id=#{localUserId}) ")
     void deleteMsgAll(@Param("localUserId")Long localUserId,@Param("msgId") Long msgId);
 
 }

@@ -1,0 +1,74 @@
+package com.vk.user.domain.vo;
+
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+public class UserInfoVo {
+    /**
+     * userid主键
+     */
+    private Long id;
+    /**
+     * 用户名
+     */
+    private String name;
+
+    /**
+     * 头像
+     */
+    private String image;
+    /**
+     * 职位
+     */
+    private String position;
+    /**
+     * 0:男 1:女 2:未知
+     */
+    private Integer sex;
+    /**
+     * 注册时间
+     */
+    private LocalDateTime createdTime;
+    /**
+     * 公司
+     */
+    private String company;
+
+    /**
+     * 职业
+     */
+    private String occupation;
+
+    /**
+     * 年龄
+     */
+    private Integer age;
+
+    /**
+     * 生日
+     */
+    private LocalDateTime birthday;
+
+    /**
+     * 个人格言
+     */
+    private String introduction;
+
+    /**
+     * 归属地
+     */
+    private String location;
+    /**
+     * 粉丝数量
+     */
+    private Long fans;
+
+    /**
+     * 关注数量
+     */
+    private Long follows;
+
+
+}

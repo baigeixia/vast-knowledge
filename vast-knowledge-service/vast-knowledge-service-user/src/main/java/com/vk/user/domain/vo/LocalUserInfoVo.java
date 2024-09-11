@@ -1,47 +1,43 @@
-package com.vk.user.domain;
+package com.vk.user.domain.vo;
 
-import com.mybatisflex.annotation.Id;
-import com.mybatisflex.annotation.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.mybatisflex.annotation.ColumnMask;
+import com.mybatisflex.core.mask.Masks;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 import java.time.LocalDateTime;
 
-/**
- * APP用户详情信息 实体类。
- *
- * @author 张三
- * @since 2024-05-13
- */
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(value = "ap_user_info")
-public class ApUserInfo implements Serializable {
-
+public class LocalUserInfoVo {
     /**
-     * 主键
+     * userid主键
      */
-    @Id
     private Long id;
-
-    private Long userId;
-
     /**
-     * 真是姓名
+     * 用户名
      */
     private String name;
+    /**
+     * 手机号
+     */
+    @ColumnMask(Masks.MOBILE)
+    private String phone;
 
     /**
-     * 身份证号,aes加密
+     * 头像
      */
-    private String idno;
-
+    private String image;
+    /**
+     * 职位
+     */
+    private String position;
+    /**
+     * 0:男 1:女 2:未知
+     */
+    private Integer sex;
+    /**
+     * 注册时间
+     */
+    private LocalDateTime createdTime;
     /**
      * 公司
      */
@@ -71,7 +67,6 @@ public class ApUserInfo implements Serializable {
      * 归属地
      */
     private String location;
-
     /**
      * 粉丝数量
      */
@@ -101,5 +96,4 @@ public class ApUserInfo implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedTime;
-
 }
