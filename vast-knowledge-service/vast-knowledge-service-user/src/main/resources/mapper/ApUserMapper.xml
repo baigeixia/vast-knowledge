@@ -4,49 +4,4 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.user.mapper.ApUserMapper">
 
-    <select id="selectGetInfo" resultType="com.vk.user.domain.vo.UserInfoVo">
-        SELECT
-            u.id,
-            u.name,
-            u.image,
-            u.sex,
-            u.position,
-            u.created_time as createdTime,
-            i.company,
-            i.occupation,
-            i.age,
-            i.birthday,
-            i.introduction,
-            i.location,
-            i.fans,
-            i.follows,
-            i.is_recommend_friend as isRecommendFriend,
-            i.is_display_image as isDisplayImage,
-            i.updated_time as updatedTime
-        from  ap_user u LEFT JOIN ap_user_info i ON u.id = i.user_id WHERE u.id=#{localUserId}
-    </select>
-
-    <select id="selectGetLocalInfo" resultType="com.vk.user.domain.vo.LocalUserInfoVo">
-        SELECT
-            u.id,
-            u.name,
-            u.phone,
-            u.image,
-            u.sex,
-            u.position,
-            u.created_time as createdTime,
-            i.company,
-            i.occupation,
-            i.age,
-            i.birthday,
-            i.introduction,
-            i.location,
-            i.fans,
-            i.follows,
-            i.is_recommend_friend as isRecommendFriend,
-            i.is_display_image as isDisplayImage,
-            i.updated_time as updatedTime
-        from  ap_user u LEFT JOIN ap_user_info i ON u.id = i.user_id WHERE u.id=#{localUserId}
-
-    </select>
 </mapper>

@@ -4,4 +4,28 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.user.mapper.ApUserInfoMapper">
 
+    <select id="selectGetInfo" resultType="com.vk.user.domain.vo.UserInfoVo">
+        SELECT
+            i.id,
+            u.name,
+            u.phone,
+            u.image,
+            u.sex,
+            u.position,
+            u.created_time as createdTime,
+            i.company,
+            i.occupation,
+            i.age,
+            i.birthday,
+            i.introduction,
+            i.location,
+            i.fans,
+            i.follows,
+            i.is_send_message as isSendMessage,
+            i.is_recommend_friend as isRecommendFriend,
+            i.is_recommend_me as isRecommendMe,
+            i.is_display_image as isDisplayImage,
+            i.updated_time as updatedTime
+        from ap_user u LEFT JOIN ap_user_info i  ON u.id = i.user_id WHERE u.id=#{userId}
+    </select>
 </mapper>

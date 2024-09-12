@@ -19,7 +19,6 @@ public interface ApUserService extends IService<ApUser> {
 
     Map<Long, AuthorInfo> getUserList(Set<Long> userId);
 
-    UserInfoVo getInfo(Long id);
 
-    LocalUserInfoVo getLocalInfo();
+
 }

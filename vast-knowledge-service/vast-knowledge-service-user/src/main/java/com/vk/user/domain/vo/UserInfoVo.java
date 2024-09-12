@@ -14,6 +14,10 @@ public class UserInfoVo {
      * 用户名
      */
     private String name;
+    /**
+     * 手机号
+     */
+    private String phone;
 
     /**
      * 头像
@@ -69,6 +73,32 @@ public class UserInfoVo {
      * 关注数量
      */
     private Long follows;
+
+    /**
+     * 谁可以给我发私信 1所有人 2我关注的人 3互相关注的人  9关闭私信
+     */
+    private Integer isSendMessage;
+
+    /**
+     * 是否允许推荐我给好友
+     */
+    private Integer isRecommendMe;
+
+
+    /**
+     * 是否允许给我推荐好友
+     */
+    private Integer isRecommendFriend;
+
+    /**
+     * 是否分享页面显示头像
+     */
+    private Integer isDisplayImage;
+
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updatedTime;
 
 
 }

@@ -1,7 +1,9 @@
 package com.vk.user.domain;
 
 import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import com.mybatisflex.core.keygen.KeyGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -27,7 +30,7 @@ public class ApUserInfo implements Serializable {
     /**
      * 主键
      */
-    @Id
+    @Id(keyType= KeyType.Generator, value= KeyGenerators.flexId)
     private Long id;
 
     private Long userId;
@@ -60,7 +63,7 @@ public class ApUserInfo implements Serializable {
     /**
      * 生日
      */
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     /**
      * 个人格言
@@ -82,6 +85,11 @@ public class ApUserInfo implements Serializable {
      */
     private Long follows;
 
+
+    /**
+     * 谁可以给我发私信 1所有人 2我关注的人 3互相关注的人  9关闭私信
+     */
+    private Integer isSendMessage;
     /**
      * 是否允许推荐我给好友
      */

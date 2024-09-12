@@ -19,7 +19,6 @@ public class LocalUserInfoVo {
     /**
      * 手机号
      */
-    @ColumnMask(Masks.MOBILE)
     private String phone;
 
     /**
@@ -76,11 +75,16 @@ public class LocalUserInfoVo {
      * 关注数量
      */
     private Long follows;
+    /**
+     * 谁可以给我发私信 1所有人 2我关注的人 3互相关注的人  9关闭私信
+     */
+    private Integer isSendMessage;
 
     /**
      * 是否允许推荐我给好友
      */
     private Integer isRecommendMe;
+
 
     /**
      * 是否允许给我推荐好友

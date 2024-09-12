@@ -1,26 +1,18 @@
 package com.vk.user.controller;
 
-import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.security.annotation.InnerAuth;
-
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.AuthorInfo;
 import com.vk.user.domain.ClientApUser;
-import com.vk.user.domain.vo.LocalUserInfoVo;
-import com.vk.user.domain.vo.UserInfoVo;
 import com.vk.user.model.LoginApUser;
 import com.vk.user.service.ApUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,21 +60,6 @@ public class ApUserController {
         return R.ok(result);
     }
 
-
-    @GetMapping("/getInfo")
-    public AjaxResult getInfo(
-            @RequestParam(name = "id") Long id
-    ){
-        UserInfoVo result=apUserService.getInfo(id);
-        return AjaxResult.success(result);
-    }
-
-
-    @GetMapping("/getLocalInfo")
-    public AjaxResult getLocalInfo( ){
-        LocalUserInfoVo result=apUserService.getLocalInfo();
-        return AjaxResult.success(result);
-    }
 
 
 }

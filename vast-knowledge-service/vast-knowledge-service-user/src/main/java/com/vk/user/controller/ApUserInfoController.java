@@ -1,13 +1,12 @@
 package com.vk.user.controller;
 
-import com.mybatisflex.core.paginate.Page;
-import com.vk.user.domain.ApUserInfo;
+import com.vk.common.core.web.domain.AjaxResult;
+import com.vk.user.domain.dto.UserInfoDto;
+import com.vk.user.domain.vo.LocalUserInfoVo;
+import com.vk.user.domain.vo.UserInfoVo;
 import com.vk.user.service.ApUserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * APP用户详情信息 控制层。
@@ -16,75 +15,43 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/UserInfo")
+@RequestMapping("/info")
 public class ApUserInfoController {
 
     @Autowired
     private ApUserInfoService apUserInfoService;
 
     /**
-     * 添加APP用户详情信息。
      *
-     * @param apUserInfo APP用户详情信息
-     * @return {@code true} 添加成功，{@code false} 添加失败
+     * @param type
+     * @param state 1  isSendMessage   2 isRecommendMe 3 isRecommendFriend 4 isDisplayImage
+     * @return
      */
-    @PostMapping("save")
-    public boolean save(@RequestBody ApUserInfo apUserInfo) {
-        return apUserInfoService.save(apUserInfo);
+    @GetMapping("/userConfig/{type}")
+    public AjaxResult userConfig(
+            @PathVariable(name = "type")Integer type,
+            @RequestParam(name = "state")Integer state
+    ){
+        apUserInfoService.userConfig(state,type);
+        return  AjaxResult.success();
     }
 
-    /**
-     * 根据主键删除APP用户详情信息。
-     *
-     * @param id 主键
-     * @return {@code true} 删除成功，{@code false} 删除失败
-     */
-    @DeleteMapping("remove/{id}")
-    public boolean remove(@PathVariable Serializable id) {
-        return apUserInfoService.removeById(id);
+    @PostMapping("/upInfo")
+    public AjaxResult upInfo(
+            @RequestBody UserInfoDto dto
+    ){
+        apUserInfoService.upInfo(dto);
+        return  AjaxResult.success();
     }
 
-    /**
-     * 根据主键更新APP用户详情信息。
-     *
-     * @param apUserInfo APP用户详情信息
-     * @return {@code true} 更新成功，{@code false} 更新失败
-     */
-    @PutMapping("update")
-    public boolean update(@RequestBody ApUserInfo apUserInfo) {
-        return apUserInfoService.updateById(apUserInfo);
+    @GetMapping("/getInfo")
+    public AjaxResult getInfo(
+            @RequestParam(name = "id",required = false) Long id
+    ){
+        UserInfoVo result=apUserInfoService.getInfo(id);
+        return AjaxResult.success(result);
     }
 
-    /**
-     * 查询所有APP用户详情信息。
-     *
-     * @return 所有数据
-     */
-    @GetMapping("list")
-    public List<ApUserInfo> list() {
-        return apUserInfoService.list();
-    }
 
-    /**
-     * 根据APP用户详情信息主键获取详细信息。
-     *
-     * @param id APP用户详情信息主键
-     * @return APP用户详情信息详情
-     */
-    @GetMapping("getInfo/{id}")
-    public ApUserInfo getInfo(@PathVariable(name = "id") Serializable id) {
-        return apUserInfoService.getById(id);
-    }
-
-    /**
-     * 分页查询APP用户详情信息。
-     *
-     * @param page 分页对象
-     * @return 分页对象
-     */
-    @GetMapping("page")
-    public Page<ApUserInfo> page(Page<ApUserInfo> page) {
-        return apUserInfoService.page(page);
-    }
 
 }

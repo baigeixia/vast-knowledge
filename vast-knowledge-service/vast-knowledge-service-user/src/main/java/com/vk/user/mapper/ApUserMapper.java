@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Param;
 public interface ApUserMapper extends BaseMapper<ApUser> {
 
 
-    UserInfoVo selectGetInfo(@Param("localUserId") Long localUserId);
 
-    LocalUserInfoVo selectGetLocalInfo(@Param("localUserId") Long userid);
+
+
 }
