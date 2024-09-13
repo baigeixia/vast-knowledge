@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * APP点赞行为 控制层。
@@ -37,6 +39,32 @@ public class ApLikesBehaviorController {
         return AjaxResult.success(result);
     }
 
+    /**
+     * 查询当前用户文章点赞行为
+     *
+     * @return 所有数据
+     */
+    @PostMapping("articleLike")
+    public AjaxResult articleLike(
+            @RequestBody Set<Long> ids
+    ) {
+        Map<Long,Integer> result= apLikesBehaviorService.articleLike(ids);
+        return AjaxResult.success(result);
+    }
 
 
+    /**
+     * 查询当前用户文章点赞行为
+     *
+     * @return 所有数据
+     */
+    @PostMapping("commentLike/{artId}")
+    public AjaxResult commentLike(
+            @PathVariable(name = "artId") Long artId,
+            @RequestBody Set<Long> ids
+    ) {
+        Map<Long,Integer> result= apLikesBehaviorService.commentLike(artId,ids);
+        return AjaxResult.success(result);
+    }
 }
+

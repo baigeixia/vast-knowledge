@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * APP点赞行为 映射层。
@@ -23,4 +24,8 @@ public interface ApLikesBehaviorMapper extends BaseMapper<ApLikesBehavior> {
             "SELECT DATE(created_time) AS date from ap_likes_behavior GROUP BY DATE(created_time) ORDER BY DATE(created_time) DESC LIMIT #{page} , #{size}\n" +
             ") b on  DATE(a.created_time) = b.date  WHERE repay_author_id=#{userId} and operation=0 GROUP BY article_id , comment_id,DATE(created_time) ORDER BY DATE(created_time) desc\n")
     List<LikesBehaviorTimeCount> getLikesBehaviorTimeCountList(@Param("userId") Long userId,@Param("page") Long page, @Param("size")Long size);
+
+    List<ApLikesBehavior> selectUserLikes(@Param("userId")Long userId, @Param("ids")Set<Long> ids);
+
+    List<ApLikesBehavior> selectUserCommentLikes(@Param("userId")Long userId,@Param("artId")Long artId, @Param("ids")Set<Long> ids);
 }

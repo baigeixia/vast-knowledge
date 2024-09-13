@@ -140,6 +140,8 @@ public class SocketHandler {
         Long authorId = clientGetUserId(socketIOClient);
         String userName = clientGetUserName(socketIOClient);
 
+        validaParameter(ackRequest,authorId,"未登录");
+        validaParameter(ackRequest,userName,"未登录");
 
         Integer type = dto.getType();
         Long commentId = dto.getCommentId();
@@ -180,14 +182,16 @@ public class SocketHandler {
         int messageType;
         if (StringUtils.isLongEmpty(likesBehavior.getCommentId())) {
             messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE : LIKE_NO;
-        } else {
-            messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO;
+            streamProcessingStandard(
+                    socketIOClient, repayAuthorId, repayAuthorName, articleId, messageType,
+                    UpdateArticleMess.UpdateArticleType.LIKES,
+                    likesBehavior.getOperation() == BASE_LiKE ? 1 : -1
+            );
         }
-        streamProcessingStandard(
-                socketIOClient, repayAuthorId, repayAuthorName, articleId, messageType,
-                UpdateArticleMess.UpdateArticleType.LIKES,
-                likesBehavior.getOperation() == BASE_LiKE ? 1 : -1
-        );
+        // else {
+        //     messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO;
+        // }
+
     }
 
 
@@ -239,6 +243,9 @@ public class SocketHandler {
     public void commentMsg(SocketIOClient socketIOClient, AckRequest ackRequest, CommentMsg dto) {
         log.info("commentMsg 评论 事件 {}", dto);
         Long authorId = clientGetUserId(socketIOClient);
+        validaParameter(ackRequest,authorId,"未登录");
+
+
         Long articleId = dto.getArticleId();
         if (StringUtils.isLongEmpty(articleId)) {
             errorMessage(ackRequest, "文章id不能为空");
@@ -265,6 +272,8 @@ public class SocketHandler {
     public void chatMsg(SocketIOClient socketIOClient, AckRequest ackRequest, ChatMsgDto dto) {
         log.info("chatMsg 私信 事件 {}", dto);
         Long authorId = clientGetUserId(socketIOClient);
+        validaParameter(ackRequest,authorId,"未登录");
+
         Long senderId = dto.getSenderId();
         validaParameter(ackRequest, senderId, "发送人id不能为空");
         String senderName = dto.getSenderName();
@@ -285,6 +294,8 @@ public class SocketHandler {
     public void collect(SocketIOClient socketIOClient, AckRequest ackRequest, CollectMsgDto dto) {
         log.info("collect 收藏事件 {}", dto);
         Long authorId = clientGetUserId(socketIOClient);
+        validaParameter(ackRequest,authorId,"未登录");
+
         Long senderId = dto.getSenderId();
         if (StringUtils.isLongEmpty(senderId)) {
             errorMessage(ackRequest, "发送人id不能为空");
@@ -316,6 +327,7 @@ public class SocketHandler {
         Long articleId = dto.getArticleId();
         validaParameter(ackRequest, articleId, "文章id不能为空");
         Long userId = clientGetUserId(socketIOClient);
+        validaParameter(ackRequest,userId,"未登录");
 
 
         ApReadBehavior readBehavior = apReadBehaviorMapper.selectOneByQuery(
@@ -382,6 +394,13 @@ public class SocketHandler {
     private void conventionalNewUserMsg(Long senderId, String senderName, String content, Integer type, SocketIOClient socketIOClient) {
         Long authorId = clientGetUserId(socketIOClient);
         String userName = clientGetUserName(socketIOClient);
+        if (StringUtils.isLongEmpty(authorId)){
+            throw  new LeadNewsException("用户错误");
+        }
+
+        if (StringUtils.isEmpty(userName)){
+            throw  new LeadNewsException("用户错误");
+        }
 
         NewUserMsg message = new NewUserMsg();
         message.setUserId(authorId);
