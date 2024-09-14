@@ -87,7 +87,7 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
         commentRepay.setCommentRepayId(commentRepayId);
         commentRepay.setContent(content);
         commentRepay.setImage(image);
-        commentRepay.setImage(image);
+        commentRepay.setLikes(0L);
         commentRepay.setCreatedTime(dateTime);
         commentRepay.setUpdatedTime(dateTime);
         commentRepay.setRepayAuthorId(repayAuthorId);

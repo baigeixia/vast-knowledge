@@ -20,4 +20,6 @@ spring:
         # 共享配置
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-
+kafka:
+  hosts: 193.112.60.103:19094
+  group: notify-group

@@ -6,7 +6,7 @@
 
     <select id="selectGetInfo" resultType="com.vk.user.domain.vo.UserInfoVo">
         SELECT
-            i.id,
+            u.id,
             u.name,
             u.phone,
             u.image,

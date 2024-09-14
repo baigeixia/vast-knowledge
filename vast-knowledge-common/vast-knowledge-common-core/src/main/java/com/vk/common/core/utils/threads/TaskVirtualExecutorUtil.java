@@ -29,12 +29,5 @@ public class TaskVirtualExecutorUtil {
             }
         }
     }
-    // public static void executeWith(Runnable task) {
-    //     try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-    //         executor.submit(task);
-    //     } catch (Exception e) {
-    //         log.error("Error executing task: {}", e.getMessage(), e);
-    //     }
-    // }
 
 }

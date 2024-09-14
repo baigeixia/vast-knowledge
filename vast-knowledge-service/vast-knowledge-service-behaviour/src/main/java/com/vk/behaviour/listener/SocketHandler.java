@@ -23,6 +23,7 @@ import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.mq.common.MqConstants;
+import com.vk.common.mq.domain.NewCommentUpMsg;
 import com.vk.common.mq.domain.NewUserMsg;
 import com.vk.common.mq.domain.UpdateArticleMess;
 import com.vk.common.redis.service.RedisService;
@@ -162,6 +163,7 @@ public class SocketHandler {
         QueryWrapper where = QueryWrapper.create().where(AP_LIKES_BEHAVIOR.AUTHOR_ID.eq(authorId)
                 .and(AP_LIKES_BEHAVIOR.COMMENT_ID.eq(commentId, type == LIKE_TYPE_ARTICLE_NO)
                         .and(AP_LIKES_BEHAVIOR.ARTICLE_ID.eq(articleId))));
+
         ApLikesBehavior behavior = apLikesBehaviorMapper.selectOneByQuery(where);
 
         ApLikesBehavior likesBehavior = new ApLikesBehavior();
@@ -172,25 +174,26 @@ public class SocketHandler {
             likesBehavior.setOperation(BASE_LiKE);
             likesBehavior.setAuthorId(authorId);
             likesBehavior.setAuthorName(userName);
-
         } else {
             likesBehavior.setId(behavior.getId());
             likesBehavior.setOperation(behavior.getOperation() == BASE_LiKE ? BASE_LiKE_NO : BASE_LiKE);
         }
         apLikesBehaviorMapper.insertOrUpdate(likesBehavior, true);
 
-        int messageType;
-        if (StringUtils.isLongEmpty(likesBehavior.getCommentId())) {
-            messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE : LIKE_NO;
+
+        int num = likesBehavior.getOperation() == BASE_LiKE ? 1 : -1;
+        if (StringUtils.isLongEmpty(commentId)) {
+            int messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE : LIKE_NO;
             streamProcessingStandard(
                     socketIOClient, repayAuthorId, repayAuthorName, articleId, messageType,
                     UpdateArticleMess.UpdateArticleType.LIKES,
-                    likesBehavior.getOperation() == BASE_LiKE ? 1 : -1
+                    num
             );
+        }else {
+            int messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO;
+            streamProcessingStandard(repayAuthorId, repayAuthorName,messageType, socketIOClient);
+            streamProcessingStandard(commentId, num);
         }
-        // else {
-        //     messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO;
-        // }
 
     }
 
@@ -429,6 +432,21 @@ public class SocketHandler {
         msg.setType(collection);
         kafkaTemplate.send(MqConstants.TopicCS.HOT_ARTICLE_SCORE_TOPIC, JSON.toJSONString(msg));
     }
+
+    /**
+     * 流标准 单独kafka流处理 只做添加  评论添加
+     *
+     * @param commentId  评论id
+     * @param num 添加减少
+     */
+    private void streamProcessingStandard(Long commentId, Integer num) {
+        // 流处理消息 更新文章数据
+        NewCommentUpMsg msg = new NewCommentUpMsg();
+        msg.setCommentId(commentId);
+        msg.setNum(num);
+        kafkaTemplate.send(MqConstants.TopicCS.NEWS_COMMENT_TOPIC, JSON.toJSONString(msg));
+    }
+
 
     private void validaParameter(AckRequest ackRequest, Long par, String msg) {
         if (StringUtils.isLongEmpty(par)) {

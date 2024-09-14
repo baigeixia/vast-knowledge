@@ -22,10 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.vk.behaviour.domain.table.ApLikesBehaviorTableDef.AP_LIKES_BEHAVIOR;
@@ -93,6 +90,7 @@ public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMappe
                         listVo.setNotificationInfoList(entry.getValue());
                         return listVo;
                     })
+                    .sorted(Comparator.comparing(LikeNotificationListVo::getStatisticsTime).reversed())  // Sort by statisticsTime in descending order
                     .toList();
 
         }
