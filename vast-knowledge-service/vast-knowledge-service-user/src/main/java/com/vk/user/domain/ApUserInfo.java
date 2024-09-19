@@ -59,7 +59,14 @@ public class ApUserInfo implements Serializable {
      * 年龄
      */
     private Integer age;
-
+    /**
+     * 性别
+     */
+    private Integer sex;
+    /**
+     * 职位
+     */
+    private Integer position;
     /**
      * 生日
      */

@@ -8,6 +8,7 @@ import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.behaviour.common.utils.ws.SocketConstants;
+import com.vk.behaviour.domain.ApCollectBehavior;
 import com.vk.behaviour.domain.ApFollowBehavior;
 import com.vk.behaviour.domain.ApLikesBehavior;
 import com.vk.behaviour.domain.ApReadBehavior;
@@ -15,6 +16,7 @@ import com.vk.behaviour.domain.dto.ChatMsgDto;
 import com.vk.behaviour.domain.dto.CollectMsgDto;
 import com.vk.behaviour.domain.dto.CommentMsg;
 import com.vk.behaviour.domain.dto.FanMsgDto;
+import com.vk.behaviour.domain.table.ApCollectBehaviorTableDef;
 import com.vk.behaviour.domain.vo.AckDataMsg;
 import com.vk.behaviour.mapper.*;
 import com.vk.behaviour.notifications.PushNotificationsHandler;
@@ -42,6 +44,7 @@ import java.util.UUID;
 
 import static com.vk.behaviour.common.BeCommonConstants.BASE_LiKE;
 import static com.vk.behaviour.common.BeCommonConstants.BASE_LiKE_NO;
+import static com.vk.behaviour.domain.table.ApCollectBehaviorTableDef.AP_COLLECT_BEHAVIOR;
 import static com.vk.behaviour.domain.table.ApFollowBehaviorTableDef.AP_FOLLOW_BEHAVIOR;
 import static com.vk.behaviour.domain.table.ApLikesBehaviorTableDef.AP_LIKES_BEHAVIOR;
 import static com.vk.behaviour.domain.table.ApReadBehaviorTableDef.AP_READ_BEHAVIOR;
@@ -89,6 +92,7 @@ public class SocketHandler {
 
     @Autowired
     private PushNotificationsHandler pushNotificationsHandler;
+
 
 
     /**
@@ -297,6 +301,7 @@ public class SocketHandler {
     public void collect(SocketIOClient socketIOClient, AckRequest ackRequest, CollectMsgDto dto) {
         log.info("collect 收藏事件 {}", dto);
         Long authorId = clientGetUserId(socketIOClient);
+        String userName = clientGetUserName(socketIOClient);
         validaParameter(ackRequest,authorId,"未登录");
 
         Long senderId = dto.getSenderId();
@@ -312,8 +317,24 @@ public class SocketHandler {
             errorMessage(ackRequest, "文章id不能为空");
         }
 
-        excludeYourself(ackRequest,authorId,senderId);
+        ApCollectBehavior collectBehavior = apCollectBehaviorMapper.selectOneByQuery(QueryWrapper.create().where(AP_COLLECT_BEHAVIOR.AUTHOR_ID.eq(authorId).and(
+                AP_COLLECT_BEHAVIOR.ARTICLE_ID.eq(articleId)
+        )));
+        ApCollectBehavior behavior = new ApCollectBehavior();
+        if (null==collectBehavior){
+            behavior.setArticleId(articleId);
+            behavior.setOperation(0);
+            behavior.setAuthorId(authorId);
+            behavior.setCreatedTime(LocalDateTime.now());
+            behavior.setAuthorName(userName);
+        }else {
+            behavior.setId(collectBehavior.getId());
+            behavior.setOperation(1);
+        }
 
+        apCollectBehaviorMapper.insertOrUpdate(behavior);
+
+        excludeYourself(ackRequest,authorId,senderId);
         streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COLLECT, UpdateArticleMess.UpdateArticleType.COLLECTION, 1);
 
     }

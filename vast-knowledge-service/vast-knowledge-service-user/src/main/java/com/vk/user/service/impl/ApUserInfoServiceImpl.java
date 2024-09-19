@@ -113,6 +113,7 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             if (null!=info){
                 throw  new LeadNewsException("缺失参数");
             }
+            upInfo.setSex(2);
             BeanUtils.copyProperties(dto,upInfo);
             upInfo.setUserId(userid);
             upInfo.setFans(0L);
@@ -131,7 +132,9 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             if (!info.getId().equals(id)){
                 throw  new LeadNewsException("没有权限修改");
             }
+
             BeanUtils.copyProperties(dto,upInfo);
+            upInfo.setUpdatedTime(LocalDateTime.now());
             mapper.update(upInfo);
         }
 

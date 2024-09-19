@@ -41,7 +41,6 @@ public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> impleme
                 AuthorInfo info = new AuthorInfo();
                 info.setId(i.getId());
                 info.setUsername(i.getName());
-                info.setPosition(i.getPosition());
                 info.setAvatar(i.getImage());
                 infoMap.put(i.getId(),info);
             }

@@ -55,15 +55,6 @@ public class ApUser implements Serializable {
      * 头像
      */
     private String image;
-    /**
-     * 位置
-     */
-    private String position;
-
-    /**
-     * 0:男 1:女 2:未知
-     */
-    private Integer sex;
 
     /**
      * 是否有证书认证 0:未，1:是

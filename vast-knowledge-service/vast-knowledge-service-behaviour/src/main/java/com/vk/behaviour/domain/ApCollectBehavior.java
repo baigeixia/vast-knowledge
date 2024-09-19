@@ -27,12 +27,12 @@ import java.time.LocalDateTime;
 public class ApCollectBehavior implements Serializable {
 
     @Id(keyType= KeyType.Generator, value= KeyGenerators.flexId)
-    private BigInteger id;
+    private Long id;
 
     /**
      * 用户id
      */
-    private BigInteger authorId;
+    private Long authorId;
 
     /**
      * 用户名称
@@ -42,7 +42,7 @@ public class ApCollectBehavior implements Serializable {
     /**
      * 收藏文章ID
      */
-    private BigInteger articleId;
+    private Long articleId;
 
     /**
      * 被收藏人
