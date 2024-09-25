@@ -3,9 +3,9 @@ package com.vk.article.service;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.dto.HomeArticleListVo;
 import com.vk.article.domain.vo.ArticleListVo;
 
 import java.util.Map;
@@ -30,4 +30,8 @@ public interface ApArticleService extends IService<ApArticle> {
     Page<ArticleListVo> articleListArticle(Long page, Long size, Integer status, String title, Long channelId, String startTime, String endTime);
 
     Map<Long, String> getArticleTitle(Set<Long> ids);
+
+    Map<Long, HomeArticleListVo> getArticleIdList(Set<Long> ids);
+
+    Map<Long, HomeArticleListVo> getBehaviorArticleIdList(Long userId ,Set<Long> ids,Long page);
 }

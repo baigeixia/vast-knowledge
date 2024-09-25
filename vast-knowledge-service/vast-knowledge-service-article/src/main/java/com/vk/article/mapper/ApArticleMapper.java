@@ -2,6 +2,9 @@ package com.vk.article.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.article.domain.ApArticle;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * 已发布的文章信息 映射层。
@@ -11,4 +14,6 @@ import com.vk.article.domain.ApArticle;
  */
 public interface ApArticleMapper extends BaseMapper<ApArticle> {
 
+    @Select("SELECT a.id from  ap_article a LEFT JOIN ap_article_config c ON a.id = c.article_id WHERE a.author_id = #{userId}  and c.is_delete=0 and c.is_delete=0   LIMIT #{page}, 5 order by  created_time desc")
+    List<Long> selectUserIdGetList(Long userId, Long page);
 }

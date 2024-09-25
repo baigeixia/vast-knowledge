@@ -1,4 +1,4 @@
-package com.vk.article.domain.dto;
+package com.vk.article.domain;
 
 import lombok.Data;
 

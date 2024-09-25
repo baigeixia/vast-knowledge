@@ -1,11 +1,10 @@
 package com.vk.article.controller;
 
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.dto.HomeArticleListVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.service.ApArticleService;
 import com.vk.common.core.domain.R;
@@ -108,5 +107,24 @@ public class ApArticleController {
         Map<Long,String> byId = apArticleService.getArticleTitle(ids);
         return R.ok(byId )  ;
     }
+
+    @PostMapping("getArticleIdList")
+    public R<Map<Long, HomeArticleListVo>> getArticleIdList(
+            @RequestBody Set<Long> ids
+    ) {
+        Map<Long, HomeArticleListVo> articleIdList = apArticleService.getArticleIdList(ids);
+        return R.ok(articleIdList)  ;
+    }
+
+    @GetMapping("getBehaviorArticleIdList")
+    R<Map<Long, HomeArticleListVo>> getBehaviorArticleIdList(
+            @RequestParam Long userId,
+            @RequestParam Long page,
+            @RequestParam Set<Long> ids
+    ){
+        Map<Long, HomeArticleListVo> articleIdList = apArticleService.getBehaviorArticleIdList(userId,ids,page);
+        return R.ok(articleIdList)  ;
+    }
+
 
 }

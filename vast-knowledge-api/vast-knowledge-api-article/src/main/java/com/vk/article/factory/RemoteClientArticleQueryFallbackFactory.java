@@ -2,6 +2,7 @@ package com.vk.article.factory;
 
 
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.feign.RemoteClientArticleQueryService;
 import com.vk.common.core.domain.R;
 import org.slf4j.Logger;
@@ -36,6 +37,16 @@ public class RemoteClientArticleQueryFallbackFactory implements FallbackFactory<
             @Override
             public R<Map<Long, String>> getArticleTitle(Set<Long> ids) {
                 return R.fail("获取文章标题失败"+throwable.getMessage());
+            }
+
+            @Override
+            public R<Map<Long, HomeArticleListVo>> getArticleIdList(Set<Long> ids) {
+                return  R.fail("获取文章列表数据失败"+throwable.getMessage());
+            }
+
+            @Override
+            public R<Map<Long, HomeArticleListVo>> getBehaviorArticleIdList(Long userId,  Long page,Set<Long> ids) {
+                return  R.fail("获取用户动态列表数据失败"+throwable.getMessage());
             }
         };
     }

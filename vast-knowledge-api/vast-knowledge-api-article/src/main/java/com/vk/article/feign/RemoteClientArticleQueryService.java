@@ -1,6 +1,7 @@
 package com.vk.article.feign;
 
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.factory.RemoteClientArticleQueryFallbackFactory;
 import com.vk.common.core.constant.ServiceNameConstants;
 import com.vk.common.core.domain.R;
@@ -24,4 +25,16 @@ public interface RemoteClientArticleQueryService {
             @RequestBody Set<Long> ids
     );
 
+
+    @GetMapping("article/getArticleIdList")
+     R<Map<Long, HomeArticleListVo>> getArticleIdList(
+            @RequestBody Set<Long> ids
+    );
+
+    @GetMapping("article/getBehaviorArticleIdList")
+    R<Map<Long, HomeArticleListVo>> getBehaviorArticleIdList(
+            @RequestParam Long userId,
+            @RequestParam Long page,
+            @RequestParam Set<Long> ids
+            );
 }

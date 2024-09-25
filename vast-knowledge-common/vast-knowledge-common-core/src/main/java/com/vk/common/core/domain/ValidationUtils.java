@@ -1,5 +1,6 @@
 package com.vk.common.core.domain;
 
+import com.vk.common.core.constant.Constants;
 import com.vk.common.core.exception.LeadNewsException;
 
 public class ValidationUtils {
@@ -15,5 +16,8 @@ public class ValidationUtils {
         if (result == null || result.getData() == null) {
             throw new LeadNewsException(errMsg);
         }
+    }
+    public static <T> boolean validateRSuccess(R<T> result) {
+        return result != null && result.getCode() == Constants.SUCCESS;
     }
 }

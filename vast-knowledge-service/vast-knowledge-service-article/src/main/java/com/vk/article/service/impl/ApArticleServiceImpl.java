@@ -8,9 +8,9 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
+import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.dto.HomeArticleListVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.mapper.ApArticleConfigMapper;
 import com.vk.article.mapper.ApArticleContentMapper;
@@ -22,7 +22,7 @@ import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.utils.html.EscapeUtil;
+import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.redis.service.RedisService;
 import com.vk.db.domain.article.ArticleMg;
 import com.vk.db.repository.article.ArticleMgRepository;
@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static com.vk.article.domain.table.ApArticleTableDef.AP_ARTICLE;
 import static com.vk.common.redis.constants.BusinessConstants.loadingChannel;
@@ -143,7 +144,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         }
 
         try {
-            Db.tx(()->{
+            Db.tx(() -> {
                 mapper.insertOrUpdateSelective(article);
                 // if (StringUtils.isNotEmpty(insetLabel)){
                 //     apArticleLabelMapper.insertBatch(insetLabel);
@@ -198,13 +199,13 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         article.setImages(dto.getImages());
         article.setTitle(dto.getTitle());
 
-        if (StringUtils.isLongEmpty(articleId)){
+        if (StringUtils.isLongEmpty(articleId)) {
             article.setCreatedTime(dateTime);
-        }else {
+        } else {
             article.setId(articleId);
         }
 
-        if (!StringUtils.isLongEmpty(channelId)){
+        if (!StringUtils.isLongEmpty(channelId)) {
             article.setChannelId(channelId);
             AdChannel cacheList = redisService.getCacheObject(loadingChannel(channelId));
             article.setChannelName(cacheList.getName());
@@ -218,13 +219,15 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         article.setLabels(dto.getLabels());
         article.setUpdateTime(dateTime);
 
-        Db.tx(()->{
+        Db.tx(() -> {
             mapper.insertOrUpdateSelective(article);
 
             ApArticleConfig config = new ApArticleConfig();
             ApArticleConfig dtoConfig = dto.getConfig();
-            BeanUtils.copyProperties(dtoConfig,config);
+            BeanUtils.copyProperties(dtoConfig, config);
             config.setArticleId(article.getId());
+            if (null==dtoConfig.getIsDown()) dtoConfig.setIsDown(false);
+            if (null==dtoConfig.getIsDelete()) dtoConfig.setIsDelete(false);
 
             apArticleConfigMapper.insertOrUpdateSelective(config);
 
@@ -237,23 +240,23 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     @Override
     public Page<HomeArticleListVo> listArticle(Long page, Long size, Integer tag) {
 
-        Page<HomeArticleListVo> listVoPage ;
-       //tag 标签
-        if (tag == 0){
+        Page<HomeArticleListVo> listVoPage;
+        // tag 标签
+        if (tag == 0) {
             QueryWrapper wrapper = QueryWrapper.create();
-            //推荐
+            // 推荐
             listVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
-            getMongoDescription(listVoPage);
+            getMongoDescription(listVoPage.getRecords());
 
             return listVoPage;
         }
 
-        if (tag == 1){
-            //最新
+        if (tag == 1) {
+            // 最新
             QueryWrapper wrapper = QueryWrapper.create();
-            wrapper.select().orderBy(AP_ARTICLE.CREATED_TIME,false);
-            listVoPage = mapper.paginateAs(Page.of(page, size),wrapper, HomeArticleListVo.class);
-            getMongoDescription(listVoPage);
+            wrapper.select().orderBy(AP_ARTICLE.CREATED_TIME, false);
+            listVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
+            getMongoDescription(listVoPage.getRecords());
 
             return listVoPage;
         }
@@ -261,17 +264,18 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
         QueryWrapper where = QueryWrapper.create();
         where.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
-        listVoPage =  mapper.paginateAs(Page.of(page, size), where, HomeArticleListVo.class);
+        listVoPage = mapper.paginateAs(Page.of(page, size), where, HomeArticleListVo.class);
 
-        getMongoDescription(listVoPage);
+        List<HomeArticleListVo> records = listVoPage.getRecords();
+        getMongoDescription(records);
         return listVoPage;
     }
 
-    private void getMongoDescription(Page<HomeArticleListVo> listVoPage) {
-        if (null!= listVoPage.getRecords()){
-            try (var executor=Executors.newVirtualThreadPerTaskExecutor()){
-                executor.submit(()->{
-                    for (HomeArticleListVo record : listVoPage.getRecords()) {
+    private void getMongoDescription(List<HomeArticleListVo> listVoPage) {
+        if (null != listVoPage) {
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                executor.submit(() -> {
+                    for (HomeArticleListVo record : listVoPage) {
                         ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
                         record.setSimpleDescription(articleMg.getSimpleDescription());
                         // record.setSimpleDescription(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0,500) : articleMg.getContent());
@@ -279,7 +283,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                     }
                 });
             } catch (Exception e) {
-               log.error("获取文章描述信息失败 : {}", e.getMessage());
+                log.error("获取文章描述信息失败 : {}", e.getMessage());
             }
         }
     }
@@ -289,31 +293,60 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             Long page, Long size, Integer status, String title, Long channelId, String startTime, String endTime
     ) {
         Long userId = RequestContextUtil.getUserId();
-        if (StringUtils.isLongEmpty(userId)){
-           throw new LeadNewsException(401,"未登录");
+        if (StringUtils.isLongEmpty(userId)) {
+            throw new LeadNewsException(401, "未登录");
         }
 
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where(AP_ARTICLE.AUTHOR_ID.eq(userId))
-                .and(AP_ARTICLE.TITLE.like(title,StringUtils.isNotEmpty(title)))
-                .and(AP_ARTICLE.CHANNEL_ID.eq(channelId,!StringUtils.isLongEmpty(channelId)))
-                .and(AP_ARTICLE.CREATED_TIME.between(startTime,endTime,!ObjectUtils.isEmpty(startTime) &&!ObjectUtils.isEmpty(endTime)));
+                .and(AP_ARTICLE.TITLE.like(title, StringUtils.isNotEmpty(title)))
+                .and(AP_ARTICLE.CHANNEL_ID.eq(channelId, !StringUtils.isLongEmpty(channelId)))
+                .and(AP_ARTICLE.CREATED_TIME.between(startTime, endTime, !ObjectUtils.isEmpty(startTime) && !ObjectUtils.isEmpty(endTime)));
 
         return mapper.paginateAs(Page.of(page, size), wrapper, ArticleListVo.class);
     }
 
     @Override
     public Map<Long, String> getArticleTitle(Set<Long> ids) {
-        if (!ObjectUtils.isEmpty(ids)){
+        if (!ObjectUtils.isEmpty(ids)) {
             Map<Long, String> map = new HashMap<>();
             List<ApArticle> apArticles = mapper.selectListByIds(ids);
             for (ApArticle apArticle : apArticles) {
                 String title = apArticle.getTitle();
-                map.put(apArticle.getId(),title);
+                map.put(apArticle.getId(), title);
             }
 
             return map;
         }
         return null;
+    }
+
+    @Override
+    public Map<Long, HomeArticleListVo> getArticleIdList(Set<Long> ids) {
+        Map<Long, HomeArticleListVo> listVoMap = new HashMap<>();
+        if (!ObjectUtils.isEmpty(ids)) {
+            listVoMap = TaskVirtualExecutorUtil.executeWith(() -> {
+                List<ApArticle> apArticles = mapper.selectListByIds(ids);
+
+                return apArticles.stream().map(i -> {
+                    HomeArticleListVo listVo = new HomeArticleListVo();
+                    BeanUtils.copyProperties(i, listVo);
+                    ArticleMg articleMg = articleMgRepository.findByArticleId(i.getId());
+                    listVo.setSimpleDescription(articleMg.getSimpleDescription());
+                    return listVo;
+                }).collect(Collectors.toMap(HomeArticleListVo::getId, listVo -> listVo, (existingValue, newValue) -> newValue));
+            });
+        }
+
+        return listVoMap;
+    }
+
+    @Override
+    public Map<Long, HomeArticleListVo> getBehaviorArticleIdList(Long userId,Set<Long> ids,Long page) {
+        if (!StringUtils.isLongEmpty(userId)){
+           List<Long> articleIds= mapper.selectUserIdGetList(userId,page);
+            ids.addAll(articleIds);
+        }
+        return getArticleIdList(ids);
     }
 }
