@@ -2,6 +2,7 @@ package com.vk.article.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.article.domain.ApArticle;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -14,6 +15,6 @@ import java.util.List;
  */
 public interface ApArticleMapper extends BaseMapper<ApArticle> {
 
-    @Select("SELECT a.id from  ap_article a LEFT JOIN ap_article_config c ON a.id = c.article_id WHERE a.author_id = #{userId}  and c.is_delete=0 and c.is_delete=0   LIMIT #{page}, 5 order by  created_time desc")
-    List<Long> selectUserIdGetList(Long userId, Long page);
+    @Select("SELECT a.id from  ap_article a LEFT JOIN ap_article_config c ON a.id = c.article_id WHERE a.author_id = #{userId}  and c.is_down=0 and c.is_delete=0    ORDER BY  created_time DESC LIMIT #{page},5")
+    List<Long> selectUserIdGetList(@Param("userId") Long userId, @Param("page")Long page);
 }

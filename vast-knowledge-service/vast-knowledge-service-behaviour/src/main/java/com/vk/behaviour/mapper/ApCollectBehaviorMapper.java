@@ -2,6 +2,7 @@ package com.vk.behaviour.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.behaviour.domain.ApCollectBehavior;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -14,6 +15,6 @@ import java.util.List;
  */
 public interface ApCollectBehaviorMapper extends BaseMapper<ApCollectBehavior> {
 
-    @Select("select article_id articleId ,repay_author_id repayAuthorId , created_time createdTime from ap_collect_behavior where author_id=#{userId} and operation=0  LIMIT #{page}, #{size} order by  created_time desc")
-    List<ApCollectBehavior> getcollectBehaviorsList(Long userId, Long page, Long size);
+    @Select("select article_id articleId ,repay_author_id repayAuthorId , created_time createdTime from ap_collect_behavior where author_id=#{userId} and operation=0  ORDER BY  created_time DESC LIMIT #{page},#{size}")
+    List<ApCollectBehavior> getcollectBehaviorsList(@Param("userId")Long userId, @Param("page") Long page, @Param("size")Long size);
 }

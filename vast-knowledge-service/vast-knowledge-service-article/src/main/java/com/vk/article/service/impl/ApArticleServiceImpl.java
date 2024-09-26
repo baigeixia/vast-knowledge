@@ -10,6 +10,9 @@ import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
+import com.vk.article.domain.table.ApArticleConfigTableDef;
+import com.vk.article.domain.table.ApArticleContentTableDef;
+import com.vk.article.domain.table.ApArticleTableDef;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.mapper.ApArticleConfigMapper;
@@ -33,13 +36,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import static com.vk.article.domain.table.ApArticleConfigTableDef.AP_ARTICLE_CONFIG;
 import static com.vk.article.domain.table.ApArticleTableDef.AP_ARTICLE;
 import static com.vk.common.redis.constants.BusinessConstants.loadingChannel;
 
@@ -348,5 +349,25 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             ids.addAll(articleIds);
         }
         return getArticleIdList(ids);
+    }
+
+    @Override
+    public Page<HomeArticleListVo> userArticleList(Long page, Long size, Long userId) {
+        if (StringUtils.isLongEmpty(userId)) {
+            userId = RequestContextUtil.getUserId();
+        }
+        QueryWrapper wrapper = QueryWrapper.create();
+        wrapper.
+                select(AP_ARTICLE.DEFAULT_COLUMNS).from(AP_ARTICLE)
+                .leftJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(AP_ARTICLE.ID))
+                .where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0)).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0))
+                .orderBy(AP_ARTICLE.CREATED_TIME,false);
+
+        Page<HomeArticleListVo> homeArticleListVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
+        for (HomeArticleListVo record : homeArticleListVoPage.getRecords()) {
+            ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
+            record.setSimpleDescription(articleMg.getSimpleDescription());
+        }
+        return homeArticleListVoPage;
     }
 }

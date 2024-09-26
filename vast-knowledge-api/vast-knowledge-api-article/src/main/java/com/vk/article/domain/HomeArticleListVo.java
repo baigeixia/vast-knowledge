@@ -2,6 +2,8 @@ package com.vk.article.domain;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class HomeArticleListVo {
 
@@ -88,4 +90,8 @@ public class HomeArticleListVo {
      * 是否已删除
      */
     private Integer isDelete;
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createdTime;
 }

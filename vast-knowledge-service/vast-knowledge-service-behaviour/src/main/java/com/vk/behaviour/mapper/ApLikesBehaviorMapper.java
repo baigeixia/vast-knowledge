@@ -29,6 +29,6 @@ public interface ApLikesBehaviorMapper extends BaseMapper<ApLikesBehavior> {
 
     List<ApLikesBehavior> selectUserCommentLikes(@Param("userId")Long userId,@Param("artId")Long artId, @Param("ids")Set<Long> ids);
 
-    @Select("select article_id articleId ,repay_author_id repayAuthorId , created_time createdTime from ap_likes_behavior where author_id=#{userId} and type=1 and operation=0  LIMIT #{page}, #{size} order by  created_time desc")
-    List<ApLikesBehavior> getLikesList(Long userId, Long page, Long size);
+    @Select("select article_id articleId ,repay_author_id repayAuthorId , created_time createdTime from ap_likes_behavior where author_id=#{userId} and type=1 and operation=0 ORDER BY  created_time DESC LIMIT #{page},#{size}")
+    List<ApLikesBehavior> getLikesList(@Param("userId")Long userId,@Param("page") Long page, @Param("size")Long size);
 }

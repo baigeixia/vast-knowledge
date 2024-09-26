@@ -15,7 +15,6 @@ import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class ApBehaviorEntryServiceImpl extends ServiceImpl<ApBehaviorEntryMappe
     private ApCollectBehaviorMapper apCollectBehaviorMapper;
 
     @Autowired
-    private RemoteClientArticleQueryService  remoteClientArticleQueryService;
+    private RemoteClientArticleQueryService remoteClientArticleQueryService;
 
     @Autowired
     private RemoteClientUserService remoteClientUserService;
@@ -67,13 +66,13 @@ public class ApBehaviorEntryServiceImpl extends ServiceImpl<ApBehaviorEntryMappe
 
         for (ApLikesBehavior like : likesList) {
             // likeIds.add(like.getArticleId());
-            likeInfo.put(like.getArticleId(),like.getCreatedTime());
+            likeInfo.put(like.getArticleId(), like.getCreatedTime());
             // repayAuthorIdS.add(like.getRepayAuthorId());
         }
 
         for (ApCollectBehavior collect : collectBehaviors) {
             // collectIds.add(collect.getArticleId());
-            collectInfo.put(collect.getArticleId(),collect.getCreatedTime());
+            collectInfo.put(collect.getArticleId(), collect.getCreatedTime());
             // repayAuthorIdS.add(collect.getRepayAuthorId());
         }
         Set<Long> likeIdset = likeInfo.keySet();
@@ -81,29 +80,29 @@ public class ApBehaviorEntryServiceImpl extends ServiceImpl<ApBehaviorEntryMappe
         articleIds.addAll(likeIdset);
         articleIds.addAll(collectIdset);
 
-        R<Map<Long, HomeArticleListVo>> idList = remoteClientArticleQueryService.getBehaviorArticleIdList(userId, page,articleIds );
+        R<Map<Long, HomeArticleListVo>> idList = remoteClientArticleQueryService.getBehaviorArticleIdList(userId, page, articleIds);
         Map<Long, HomeArticleListVo> idListData = idList.getData();
-        if (ValidationUtils.validateRSuccess(idList) && null!= idListData){
-            // R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(repayAuthorIdS);
-            // Map<Long, AuthorInfo> userListData = userList.getData();
-            // if (ValidationUtils.validateRSuccess(userList) && null!= userListData){
-            // }
+        if (ValidationUtils.validateRSuccess(idList) && null != idListData) {
 
-           return idListData.values().stream().map(i->{
-                BehaviorListVo vo = new BehaviorListVo();
-                Long id = i.getId();
-                if (likeIdset.contains(id)){
-                    vo.setActionText("赞同了文章");
-                    vo.setCreatedTime(likeInfo.get(id));
-                }
+            return idListData.values().stream().map(i -> {
+                        BehaviorListVo vo = new BehaviorListVo();
+                        Long id = i.getId();
+                        if (likeIdset.contains(id)) {
+                            vo.setActionText("赞同了文章");
+                            vo.setCreatedTime(likeInfo.get(id));
+                        } else if (collectIdset.contains(id)) {
+                            vo.setActionText("收藏了文章");
+                            vo.setCreatedTime(collectInfo.get(id));
+                        } else {
+                            vo.setActionText("发布了文章");
+                            vo.setCreatedTime(i.getCreatedTime());
+                        }
 
-               if (collectIdset.contains(id)){
-                   vo.setActionText("收藏了文章");
-                   vo.setCreatedTime(collectInfo.get(id));
-               }
-               vo.setTarget(i);
-                return vo;
-            }).toList();
+                        vo.setTarget(i);
+                        return vo;
+                    })
+                    .sorted((vo1, vo2) -> vo2.getCreatedTime().compareTo(vo1.getCreatedTime())) // 根据 createdTime 排序
+                    .toList();
         }
 
         return vos;

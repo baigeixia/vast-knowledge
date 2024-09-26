@@ -81,6 +81,22 @@ public class ApArticleController {
 
 
     /**
+     * 查询 当前用户文章列表
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("posts")
+    public AjaxResult userArticleList(
+            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
+            @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size ,
+            @RequestParam(name = "userId" ,required = false) Long userId
+    ) {
+        Page<HomeArticleListVo> resultInfo=apArticleService.userArticleList(page,size,userId);
+        return AjaxResult.success(resultInfo) ;
+    }
+
+    /**
      * 是否存在  true 存在 false  不存在
      * @param id
      * @return
@@ -118,9 +134,9 @@ public class ApArticleController {
 
     @GetMapping("getBehaviorArticleIdList")
     R<Map<Long, HomeArticleListVo>> getBehaviorArticleIdList(
-            @RequestParam Long userId,
-            @RequestParam Long page,
-            @RequestParam Set<Long> ids
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "page") Long page,
+            @RequestParam(name = "ids") Set<Long> ids
     ){
         Map<Long, HomeArticleListVo> articleIdList = apArticleService.getBehaviorArticleIdList(userId,ids,page);
         return R.ok(articleIdList)  ;

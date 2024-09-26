@@ -34,4 +34,6 @@ public interface ApArticleService extends IService<ApArticle> {
     Map<Long, HomeArticleListVo> getArticleIdList(Set<Long> ids);
 
     Map<Long, HomeArticleListVo> getBehaviorArticleIdList(Long userId ,Set<Long> ids,Long page);
+
+    Page<HomeArticleListVo> userArticleList(Long page, Long size, Long userId);
 }

@@ -33,8 +33,8 @@ public interface RemoteClientArticleQueryService {
 
     @GetMapping("article/getBehaviorArticleIdList")
     R<Map<Long, HomeArticleListVo>> getBehaviorArticleIdList(
-            @RequestParam Long userId,
-            @RequestParam Long page,
-            @RequestParam Set<Long> ids
-            );
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "page") Long page,
+            @RequestParam(name = "ids") Set<Long> ids
+    );
 }
