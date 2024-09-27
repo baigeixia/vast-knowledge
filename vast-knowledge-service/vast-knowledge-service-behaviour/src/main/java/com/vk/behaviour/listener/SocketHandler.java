@@ -325,14 +325,15 @@ public class SocketHandler {
             behavior.setArticleId(articleId);
             behavior.setOperation(0);
             behavior.setAuthorId(authorId);
+            behavior.setRepayAuthorId(senderId);
             behavior.setCreatedTime(LocalDateTime.now());
             behavior.setAuthorName(userName);
         }else {
             behavior.setId(collectBehavior.getId());
-            behavior.setOperation(1);
+            behavior.setOperation(collectBehavior.getOperation()==0? 1 : 0);
         }
 
-        apCollectBehaviorMapper.insertOrUpdate(behavior);
+        apCollectBehaviorMapper.insertOrUpdateSelective(behavior);
 
         excludeYourself(ackRequest,authorId,senderId);
         streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COLLECT, UpdateArticleMess.UpdateArticleType.COLLECTION, 1);

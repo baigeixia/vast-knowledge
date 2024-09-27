@@ -90,9 +90,10 @@ public class ApArticleController {
     public AjaxResult userArticleList(
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size ,
+            @RequestParam(name = "type" ,defaultValue = "1",required = false) Integer type ,
             @RequestParam(name = "userId" ,required = false) Long userId
     ) {
-        Page<HomeArticleListVo> resultInfo=apArticleService.userArticleList(page,size,userId);
+        Page<HomeArticleListVo> resultInfo=apArticleService.userArticleList(page,size,type,userId);
         return AjaxResult.success(resultInfo) ;
     }
 

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * APP收藏行为 映射层。
@@ -17,4 +18,7 @@ public interface ApCollectBehaviorMapper extends BaseMapper<ApCollectBehavior> {
 
     @Select("select article_id articleId ,repay_author_id repayAuthorId , created_time createdTime from ap_collect_behavior where author_id=#{userId} and operation=0  ORDER BY  created_time DESC LIMIT #{page},#{size}")
     List<ApCollectBehavior> getcollectBehaviorsList(@Param("userId")Long userId, @Param("page") Long page, @Param("size")Long size);
+
+    @Select("select article_id  from ap_collect_behavior where  author_id=#{userId} and operation=0 ORDER BY created_time DESC LIMIT #{page},#{size}")
+    Set<Long> selectUserCollectIdS(@Param("userId")Long userId, @Param("page") Long page, @Param("size")Long size);
 }

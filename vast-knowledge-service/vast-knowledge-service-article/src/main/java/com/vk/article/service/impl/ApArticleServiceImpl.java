@@ -352,7 +352,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     }
 
     @Override
-    public Page<HomeArticleListVo> userArticleList(Long page, Long size, Long userId) {
+    public Page<HomeArticleListVo> userArticleList(Long page, Long size,Integer type, Long userId) {
         if (StringUtils.isLongEmpty(userId)) {
             userId = RequestContextUtil.getUserId();
         }
@@ -360,8 +360,16 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         wrapper.
                 select(AP_ARTICLE.DEFAULT_COLUMNS).from(AP_ARTICLE)
                 .leftJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(AP_ARTICLE.ID))
-                .where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0)).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0))
-                .orderBy(AP_ARTICLE.CREATED_TIME,false);
+                .where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0))
+                .and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0));
+
+        if (type==1){
+            wrapper.orderBy(AP_ARTICLE.CREATED_TIME,false);
+        }else if (type==2){
+            wrapper.orderBy(AP_ARTICLE.LIKES,false);
+        }else {
+            throw new LeadNewsException("错误的参数");
+        }
 
         Page<HomeArticleListVo> homeArticleListVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
         for (HomeArticleListVo record : homeArticleListVoPage.getRecords()) {
