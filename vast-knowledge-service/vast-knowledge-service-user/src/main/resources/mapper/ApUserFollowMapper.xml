@@ -4,4 +4,22 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.user.mapper.ApUserFollowMapper">
 
+    <select id="getList" resultType="com.vk.user.domain.vo.FollowListVo">
+        SELECT
+            fw.follow_id AS id,
+            fw.follow_name AS username,
+            i.introduction AS introduction,
+            u.image AS avatar,
+            CASE
+                WHEN f.fans_id IS NOT NULL THEN 1 ELSE 0 END AS concerned
+        FROM
+            ap_user_follow fw
+                LEFT JOIN ap_user_info i ON i.user_id = fw.follow_id
+                LEFT JOIN ap_user u ON u.id = fw.follow_id
+                LEFT JOIN ap_user_fan f ON fw.follow_id = f.fans_id AND f.user_id = #{localID}
+        WHERE
+            fw.user_id = #{userId}
+        ORDER BY
+            fw.created_time DESC LIMIT #{page},#{size}
+    </select>
 </mapper>
