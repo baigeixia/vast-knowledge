@@ -81,8 +81,8 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
 
     @Override
     public UserInfoVo getInfo(Long id) {
+        Long  userid = RequestContextUtil.getUserId();
         if (StringUtils.isLongEmpty(id)){
-            Long  userid = RequestContextUtil.getUserId();
             return userInfoIdOne(userid);
         }else {
             return userInfoIdOne(id);

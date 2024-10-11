@@ -53,6 +53,7 @@ public class ApFollowBehaviorServiceImpl extends ServiceImpl<ApFollowBehaviorMap
                 .collect(Collectors.groupingBy(FollowBehaviorTimeCount::getDateTime));
 
         return groupedByDateTime.entrySet().stream()
+                .sorted(Map.Entry.<String, List<FollowBehaviorTimeCount>>comparingByKey().reversed()) // 按键倒序排列
                 .map(entry -> {
                     String dateTime = entry.getKey();
                     List<FollowBehaviorTimeCount> counts = entry.getValue();
@@ -67,7 +68,8 @@ public class ApFollowBehaviorServiceImpl extends ServiceImpl<ApFollowBehaviorMap
                     FollowNotificationInfo notificationInfo = new FollowNotificationInfo(
                             "关注了您",
                             countMap.get(dateTime),
-                            counts.getFirst().getFollowEndTime().toLocalTime().toString(),
+                            // counts.getFirst().getFollowEndTime().toLocalTime().toString(),
+                            counts.get(0).getFollowEndTime().toLocalTime().toString(),
                             followActors
                     );
                     return new FollowNotificationListVo(dateTime, Collections.singletonList(notificationInfo));

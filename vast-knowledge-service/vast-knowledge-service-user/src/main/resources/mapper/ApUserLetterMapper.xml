@@ -12,58 +12,177 @@
     </resultMap>
 
 
+<!--    <select id="getRecentList" resultMap="MsgUserListMap">-->
+<!--        SELECT-->
+<!--            m.user_id ,-->
+<!--            m.content ,-->
+<!--            m.created_time ,-->
+<!--            m.is_read-->
+<!--        FROM ap_user_letter m-->
+<!--                 JOIN (-->
+<!--            SELECT user_id, MAX(created_time) AS latest_time-->
+<!--            FROM ap_user_letter-->
+<!--            WHERE sender_id = #{userId} and status_pointing != 110 and status_pointing!=#{userId}-->
+<!--            GROUP BY user_id-->
+<!--        ) l ON m.user_id = l.user_id AND m.created_time = l.latest_time-->
+<!--        WHERE m.sender_id = #{userId} ORDER BY m.created_time DESC LIMIT #{page} , #{size}-->
+<!--    </select>-->
+
     <select id="getRecentList" resultMap="MsgUserListMap">
-        SELECT
-            m.user_id ,
-            m.content ,
-            m.created_time ,
-            m.is_read
-        FROM ap_user_letter m
-                 JOIN (
-            SELECT user_id, MAX(created_time) AS latest_time
-            FROM ap_user_letter
-            WHERE sender_id = #{userId} and status_pointing != 110 and status_pointing!=#{userId}
-            GROUP BY user_id
-        ) l ON m.user_id = l.user_id AND m.created_time = l.latest_time
-        WHERE m.sender_id = #{userId} ORDER BY m.created_time DESC LIMIT #{page} , #{size}
+        SELECT contact.contact_id        AS user_id,
+               last_message.content      AS content,
+               last_message.created_time AS created_time,
+               last_message.is_read      AS is_read
+        FROM (SELECT CASE
+                         WHEN ul.sender_id = #{userId} THEN ul.user_id
+                         ELSE ul.sender_id
+                         END              AS contact_id,
+                     MAX(ul.created_time) AS last_time
+              FROM ap_user_letter ul
+              WHERE (ul.user_id = #{userId} OR ul.sender_id = #{userId})
+                AND ul.status = 0                                                                            -- 过滤已删除的消息
+                AND (ul.status_pointing IS NULL OR ul.status_pointing != 110 and status_pointing!=#{userId}) -- 过滤双方删除
+              GROUP BY contact_id) AS contact
+                 JOIN (SELECT CASE
+                                  WHEN ul.sender_id = #{userId} THEN ul.user_id
+                                  ELSE ul.sender_id
+                                  END              AS contact_id,
+                              ul.content,
+                              ul.created_time,
+                              CASE WHEN ul.user_id = #{userId} THEN 1 ELSE ul.is_read END AS is_read
+                       FROM ap_user_letter ul
+                       WHERE ul.status = 0 and (ul.user_id = #{userId} OR ul.sender_id = #{userId})
+                         AND (ul.status_pointing IS NULL OR ul.status_pointing != 110 and status_pointing!=#{userId})) AS last_message
+                      ON contact.contact_id = last_message.contact_id
+                          AND last_message.created_time = contact.last_time
+        ORDER BY last_message.is_read ASC,
+                 last_message.created_time DESC LIMIT #{page}, #{size};
     </select>
+
+
+
+<!--    <select id="getStrangerList" resultMap="MsgUserListMap">-->
+<!--        SELECT-->
+<!--            m.user_id ,-->
+<!--            m.content ,-->
+<!--            m.created_time ,-->
+<!--            m.is_read-->
+<!--        FROM ap_user_letter m-->
+<!--                 JOIN (-->
+<!--            SELECT user_id, MAX(created_time) AS latest_time-->
+<!--            FROM ap_user_letter-->
+<!--            WHERE sender_id = #{userId} and status_pointing != 110 and status_pointing!=#{userId}-->
+<!--            GROUP BY user_id-->
+<!--            HAVING COUNT(*) = 1-->
+<!--        ) l ON m.user_id = l.user_id AND m.created_time = l.latest_time-->
+<!--        WHERE m.sender_id = #{userId} ORDER BY m.created_time DESC LIMIT #{page} , #{size}-->
+<!--    </select>-->
+
+<!--    <select id="getStrangerList" resultMap="MsgUserListMap">-->
+<!--        SELECT-->
+<!--            m.user_id ,-->
+<!--            m.content ,-->
+<!--            m.created_time ,-->
+<!--            m.is_read-->
+<!--        FROM ap_user_letter m-->
+<!--                 JOIN (-->
+<!--            SELECT user_id, MAX(created_time) AS latest_time-->
+<!--            FROM ap_user_letter-->
+<!--            WHERE sender_id = #{userId} and status_pointing != 110 and status_pointing!=#{userId}-->
+<!--            GROUP BY user_id-->
+<!--            HAVING COUNT(*) = 1-->
+<!--        ) l ON m.user_id = l.user_id AND m.created_time = l.latest_time-->
+<!--        WHERE m.sender_id = #{userId} ORDER BY m.created_time DESC LIMIT #{page} , #{size}-->
+<!--    </select>-->
 
     <select id="getStrangerList" resultMap="MsgUserListMap">
-        SELECT
-            m.user_id ,
-            m.content ,
-            m.created_time ,
-            m.is_read
-        FROM ap_user_letter m
-                 JOIN (
-            SELECT user_id, MAX(created_time) AS latest_time
-            FROM ap_user_letter
-            WHERE sender_id = #{userId} and status_pointing != 110 and status_pointing!=#{userId}
-            GROUP BY user_id
-            HAVING COUNT(*) = 1
-        ) l ON m.user_id = l.user_id AND m.created_time = l.latest_time
-        WHERE m.sender_id = #{userId} ORDER BY m.created_time DESC LIMIT #{page} , #{size}
+        SELECT contact.contact_id        AS user_id,
+               last_message.content      AS content,
+               last_message.created_time AS created_time,
+               last_message.is_read      AS is_read
+        FROM (SELECT CASE
+                         WHEN ul.sender_id = #{userId} THEN ul.user_id
+                         ELSE ul.sender_id
+                         END              AS contact_id,
+                     MAX(ul.created_time) AS last_time
+              FROM ap_user_letter ul
+              WHERE (ul.user_id = #{userId} OR ul.sender_id = #{userId})
+                AND ul.status = 0                                                                            -- 过滤已删除的消息
+                AND (ul.status_pointing IS NULL OR ul.status_pointing != 110 and status_pointing!=#{userId}) -- 过滤双方删除
+              GROUP BY contact_id HAVING COUNT(*) = 1 ) AS contact
+                 JOIN (SELECT CASE
+                                  WHEN ul.sender_id = #{userId} THEN ul.user_id
+                                  ELSE ul.sender_id
+                                  END              AS contact_id,
+                              ul.content,
+                              ul.created_time,
+                              CASE WHEN ul.user_id = #{userId} THEN 1 ELSE ul.is_read END AS is_read
+                       FROM ap_user_letter ul
+                       WHERE ul.status = 0 and (ul.user_id = #{userId} OR ul.sender_id = #{userId})
+                         AND (ul.status_pointing IS NULL OR ul.status_pointing != 110 and status_pointing!=#{userId})) AS last_message
+                      ON contact.contact_id = last_message.contact_id
+                          AND last_message.created_time = contact.last_time
+        ORDER BY last_message.is_read ASC,
+                 last_message.created_time DESC LIMIT #{page}, #{size};
     </select>
 
 
+<!--    <select id="getMutualConcernList" resultMap="MsgUserListMap">-->
+<!--        SELECT ml.user_id,-->
+<!--               ml.content,-->
+<!--               ml.created_time,-->
+<!--               ml.is_read-->
+<!--        FROM ap_user_letter ml-->
+<!--                 JOIN(SELECT m.user_id userid, MAX(m.created_time) latest_time-->
+<!--                      FROM ap_user_letter m-->
+<!--                               JOIN (SELECT f1.follow_id AS id-->
+<!--                                     FROM ap_user_follow f1-->
+<!--                                              JOIN ap_user_follow f2-->
+<!--                                                   ON f1.user_id = f2.follow_id-->
+<!--                                                       AND f1.follow_id = f2.user_id-->
+<!--                                     WHERE f1.user_id = #{userId}) l ON m.user_id = l.id-->
+<!--                      WHERE m.sender_id = #{userId} and m.status_pointing != 110 and m.status_pointing!=#{userId}-->
+<!--                      GROUP BY m.user_id) lm ON ml.user_id = lm.userid AND ml.created_time = lm.latest_time-->
+<!--        WHERE ml.sender_id = #{userId}-->
+<!--        ORDER BY ml.created_time DESC LIMIT #{page}, #{size}-->
+<!--    </select>-->
+
     <select id="getMutualConcernList" resultMap="MsgUserListMap">
-        SELECT ml.user_id,
-               ml.content,
-               ml.created_time,
-               ml.is_read
-        FROM ap_user_letter ml
-                 JOIN(SELECT m.user_id userid, MAX(m.created_time) latest_time
-                      FROM ap_user_letter m
-                               JOIN (SELECT f1.follow_id AS id
-                                     FROM ap_user_follow f1
-                                              JOIN ap_user_follow f2
-                                                   ON f1.user_id = f2.follow_id
-                                                       AND f1.follow_id = f2.user_id
-                                     WHERE f1.user_id = #{userId}) l ON m.user_id = l.id
-                      WHERE m.sender_id = #{userId} and m.status_pointing != 110 and m.status_pointing!=#{userId}
-                      GROUP BY m.user_id) lm ON ml.user_id = lm.userid AND ml.created_time = lm.latest_time
-        WHERE ml.sender_id = #{userId}
-        ORDER BY ml.created_time DESC LIMIT #{page}, #{size}
+        SELECT contact.contact_id        AS user_id,
+               last_message.content      AS content,
+               last_message.created_time AS created_time,
+               last_message.is_read      AS is_read
+        FROM (SELECT CASE
+                         WHEN ul.sender_id = #{userId} THEN ul.user_id
+                         ELSE ul.sender_id
+                         END              AS contact_id,
+                     MAX(ul.created_time) AS last_time
+              FROM ap_user_letter ul
+              WHERE (ul.user_id = #{userId} OR ul.sender_id = #{userId})
+                AND ul.status = 0
+                AND (ul.status_pointing IS NULL OR ul.status_pointing != 110 and status_pointing!=#{userId})
+              GROUP BY contact_id) AS contact
+                 JOIN (SELECT
+                           CASE
+                               WHEN ul.sender_id = #{userId} THEN ul.user_id
+                               ELSE ul.sender_id
+                               END              AS contact_id,
+                              ul.content,
+                              ul.created_time,
+                              CASE  WHEN ul.user_id = #{userId} THEN 1  ELSE ul.is_read  END  AS is_read
+                       FROM ap_user_letter ul
+                       WHERE ul.status = 0 and (ul.user_id = #{userId} OR ul.sender_id = #{userId})
+                         AND (ul.status_pointing IS NULL OR ul.status_pointing != 110 and status_pointing!=#{userId})) AS last_message
+                      ON contact.contact_id = last_message.contact_id
+                          AND last_message.created_time = contact.last_time
+                 JOIN(SELECT f1.follow_id AS id
+                      FROM ap_user_follow f1
+                               JOIN ap_user_follow f2
+                                    ON f1.user_id = f2.follow_id
+                                        AND f1.follow_id = f2.user_id
+                      WHERE f1.user_id = #{userId}) l ON contact.contact_id = l.id
+        ORDER BY last_message.is_read ASC,
+                 last_message.created_time DESC LIMIT #{page}, #{size};
     </select>
 
 

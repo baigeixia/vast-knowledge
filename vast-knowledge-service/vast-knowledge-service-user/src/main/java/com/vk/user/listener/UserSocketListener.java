@@ -65,7 +65,8 @@ public class UserSocketListener {
                     TaskVirtualExecutorUtil.executeWith(() -> {
                         log.info("FOLLOW 关注 mark:{}", uuid);
                         followOrFanAdd(userMsg);
-                        userLetterAdd(userMsg);
+                        userMessageAdd(userMsg);
+                        // userLetterAdd(userMsg);
                     });
                     break;
                 case FOLLOW_NO:
