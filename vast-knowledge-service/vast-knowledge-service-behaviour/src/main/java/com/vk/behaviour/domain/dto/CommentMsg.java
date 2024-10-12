@@ -18,6 +18,10 @@ public class CommentMsg extends  BaseMsgDto{
      * 发送人ID
      */
     private  Long senderId;
+    // /**
+    //  * 文章作者
+    //  */
+    // private  Long articleAuthor;
     /**
      * 发送人名称
      */

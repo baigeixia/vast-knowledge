@@ -1,5 +1,6 @@
 package com.vk.behaviour.controller;
 
+import com.vk.behaviour.domain.vo.ArticleAndCommentLikeVo;
 import com.vk.behaviour.domain.vo.notification.like.LikeNotificationListVo;
 import com.vk.behaviour.service.ApLikesBehaviorService;
 import com.vk.common.core.web.domain.AjaxResult;
@@ -63,7 +64,7 @@ public class ApLikesBehaviorController {
             @PathVariable(name = "artId") Long artId,
             @RequestBody Set<Long> ids
     ) {
-        Map<Long,Integer> result= apLikesBehaviorService.commentLike(artId,ids);
+        ArticleAndCommentLikeVo result= apLikesBehaviorService.commentLike(artId,ids);
         return AjaxResult.success(result);
     }
 }

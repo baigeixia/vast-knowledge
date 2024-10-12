@@ -1,5 +1,6 @@
 package com.vk.user.service.impl;
 
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.common.core.exception.CustomSimpleThrowUtils;
 import com.vk.common.core.exception.LeadNewsException;
@@ -9,8 +10,11 @@ import com.vk.common.redis.service.RedisService;
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.dto.UserInfoDto;
+import com.vk.user.domain.table.ApUserFollowTableDef;
+import com.vk.user.domain.vo.InfoRelationVo;
 import com.vk.user.domain.vo.LocalUserInfoVo;
 import com.vk.user.domain.vo.UserInfoVo;
+import com.vk.user.mapper.ApUserFollowMapper;
 import com.vk.user.mapper.ApUserInfoMapper;
 import com.vk.user.mapper.ApUserMapper;
 import com.vk.user.service.ApUserInfoService;
@@ -23,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 
 import static com.vk.user.common.constant.UserConstants.redisUserInfoKey;
+import static com.vk.user.domain.table.ApUserFollowTableDef.AP_USER_FOLLOW;
 
 /**
  * APP用户详情信息 服务层实现。
@@ -37,6 +42,9 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
     private RedisService redisService;
     @Autowired
     private ApUserMapper apUserMapper;
+
+    @Autowired
+    private ApUserFollowMapper apUserFollowMapper;
     @Override
     public void userConfig(Integer state, Integer type) {
         if (state.equals(1)) {
@@ -139,6 +147,25 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
         }
 
         redisService.deleteObject(redisUserInfoKey(userid));
+    }
+
+    @Override
+    public InfoRelationVo InfoRelation(Long id) {
+        Long userid = RequestContextUtil.getUserId();
+        if (StringUtils.isLongEmpty(id)){
+            id=userid;
+        }
+
+        if (id.equals(userid)){
+            return new InfoRelationVo(false);
+        }
+
+        long countByQuery = apUserFollowMapper.selectCountByQuery(QueryWrapper.create().where(AP_USER_FOLLOW.USER_ID.eq(userid).and(AP_USER_FOLLOW.FOLLOW_ID.eq(id))));
+        if (countByQuery>0){
+            return new InfoRelationVo(true);
+        }
+
+        return new InfoRelationVo(false);
     }
 
     private UserInfoVo userInfoIdOne(Long id){

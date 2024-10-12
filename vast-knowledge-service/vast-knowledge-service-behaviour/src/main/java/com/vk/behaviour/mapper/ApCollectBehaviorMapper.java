@@ -21,4 +21,7 @@ public interface ApCollectBehaviorMapper extends BaseMapper<ApCollectBehavior> {
 
     @Select("select article_id  from ap_collect_behavior where  author_id=#{userId} and operation=0 ORDER BY created_time DESC LIMIT #{page},#{size}")
     Set<Long> selectUserCollectIdS(@Param("userId")Long userId, @Param("page") Long page, @Param("size")Long size);
+
+    @Select("SELECT operation  FROM ap_collect_behavior  WHERE author_id = #{userId} AND article_id =#{artId}   LIMIT 1")
+    Integer getArticleCollectOne(@Param("userId") Long userId, @Param("artId")Long artId);
 }

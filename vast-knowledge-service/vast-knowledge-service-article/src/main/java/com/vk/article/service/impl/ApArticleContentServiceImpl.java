@@ -1,23 +1,17 @@
 package com.vk.article.service.impl;
 
-import com.alibaba.nacos.common.utils.UuidUtils;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleContent;
 import com.vk.article.domain.dto.SaveArticleContentDto;
-import com.vk.article.domain.table.ApArticleContentTableDef;
 import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.mapper.ApArticleMapper;
 import com.vk.article.service.ApArticleContentService;
-import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
-import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.utils.html.EscapeUtil;
-import com.vk.common.core.utils.uuid.UUID;
 import com.vk.db.domain.article.ArticleMg;
 import com.vk.db.repository.article.ArticleMgRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.vk.article.domain.table.ApArticleContentTableDef.AP_ARTICLE_CONTENT;
 
@@ -57,21 +50,21 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
 
 
         if (ObjectUtils.isEmpty(articleId)) {
-            //第一次 保存
+            // 第一次 保存
             initContentInset(dto);
             return dto.getArticleId();
         }
 
         ArticleMg articleMg = articleMgRepository.findByArticleId(articleId);
         if (null == articleMg) {
-            //MongoDB 没数据 看下数据库中是否有
+            // MongoDB 没数据 看下数据库中是否有
             ApArticleContent articleContent = mapper.selectOneByQuery(
                     QueryWrapper.create()
-                    .where(AP_ARTICLE_CONTENT.ARTICLE_ID.eq(articleId)));
-            if (null == articleContent){
-                //数据库中也没有 走第一次保存
+                            .where(AP_ARTICLE_CONTENT.ARTICLE_ID.eq(articleId)));
+            if (null == articleContent) {
+                // 数据库中也没有 走第一次保存
                 initContentInset(dto);
-            }else {
+            } else {
                 ArticleMg sevenMg = new ArticleMg();
                 BeanUtils.copyProperties(dto, sevenMg);
 
@@ -85,40 +78,38 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
             try {
                 articleMgRepository.save(sevenMg);
             } catch (Exception e) {
-                log.error("更新 MongoDB 失败 文章详情id ： {} error ：{}", dto.getId(),e.getMessage());
+                log.error("更新 MongoDB 失败 文章详情id ： {} error ：{}", dto.getId(), e.getMessage());
             }
         }
 
-        return  dto.getArticleId();
+        return dto.getArticleId();
     }
-
 
 
     @Override
-    public ApArticleContent getInfoContent(Long id) {
+    public ApArticleContent getInfoContent(Long articleId) {
 
-        if (StringUtils.isLongEmpty(id)){
+        if (StringUtils.isLongEmpty(articleId)) {
             throw new LeadNewsException("id不能为空");
         }
+        ApArticleContent articleContent = new ApArticleContent();
 
-        ArticleMg articleMg = articleMgRepository.findByArticleId(id);
-        if (null!= articleMg){
-            ApArticleContent articleContent = new ApArticleContent();
-            BeanUtils.copyProperties(articleMg,articleContent);
+        ArticleMg articleMg = articleMgRepository.findByArticleId(articleId);
+        if (null != articleMg) {
+            BeanUtils.copyProperties(articleMg, articleContent);
             return articleContent;
         }
 
-        return mapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .where(AP_ARTICLE_CONTENT.ARTICLE_ID.eq(id)));
+
+        return mapper.selectOneByQuery(QueryWrapper.create().where(AP_ARTICLE_CONTENT.ARTICLE_ID.eq(articleId)));
     }
 
-    private  void  initContentInset(ApArticleContent  insetContent  ){
+    private void initContentInset(ApArticleContent insetContent) {
         Long userId = RequestContextUtil.getUserId();
         String userName = RequestContextUtil.getUserName();
         LocalDateTime dateTime = LocalDateTime.now();
-        Db.tx(()->{
-            //文章表初始化
+        Db.tx(() -> {
+            // 文章表初始化
             ApArticle article = new ApArticle();
             article.setAuthorId(userId);
             article.setAuthorName(userName);
@@ -129,18 +120,18 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
             insetContent.setArticleId(article.getId());
             mapper.insertSelective(insetContent);
 
-            return  true;
+            return true;
         });
 
-        //初始化MongoDB
-            ArticleMg sevenMg = new ArticleMg();
-            BeanUtils.copyProperties(insetContent, sevenMg);
+        // 初始化MongoDB
+        ArticleMg sevenMg = new ArticleMg();
+        BeanUtils.copyProperties(insetContent, sevenMg);
 
         try {
-                articleMgRepository.insert(sevenMg);
-            } catch (Exception e) {
-                log.error("更新 MongoDB 失败 文章详情id ： {} error ：{}",insetContent.getId(),e.getMessage());
-            }
+            articleMgRepository.insert(sevenMg);
+        } catch (Exception e) {
+            log.error("更新 MongoDB 失败 文章详情id ： {} error ：{}", insetContent.getId(), e.getMessage());
+        }
 
     }
 }

@@ -2,6 +2,7 @@ package com.vk.user.controller;
 
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.user.domain.dto.UserInfoDto;
+import com.vk.user.domain.vo.InfoRelationVo;
 import com.vk.user.domain.vo.LocalUserInfoVo;
 import com.vk.user.domain.vo.UserInfoVo;
 import com.vk.user.service.ApUserInfoService;
@@ -51,6 +52,20 @@ public class ApUserInfoController {
         UserInfoVo result=apUserInfoService.getInfo(id);
         return AjaxResult.success(result);
     }
+
+    /**
+     * 与用户关系查询
+     * @param id
+     * @return
+     */
+    @GetMapping("/InfoRelation")
+    public AjaxResult InfoRelation(
+            @RequestParam(name = "id") Long id
+    ){
+        InfoRelationVo result=apUserInfoService.InfoRelation(id);
+        return AjaxResult.success(result);
+    }
+
 
 
 

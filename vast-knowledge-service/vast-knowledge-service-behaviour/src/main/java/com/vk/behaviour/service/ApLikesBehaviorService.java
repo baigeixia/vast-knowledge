@@ -2,6 +2,7 @@ package com.vk.behaviour.service;
 
 import com.mybatisflex.core.service.IService;
 import com.vk.behaviour.domain.ApLikesBehavior;
+import com.vk.behaviour.domain.vo.ArticleAndCommentLikeVo;
 import com.vk.behaviour.domain.vo.notification.like.LikeNotificationListVo;
 
 import java.util.List;
@@ -23,5 +24,5 @@ public interface ApLikesBehaviorService extends IService<ApLikesBehavior> {
 
     Map<Long, Integer> articleLike(Set<Long> ids);
 
-    Map<Long, Integer> commentLike(Long artId,Set<Long> ids);
+    ArticleAndCommentLikeVo commentLike(Long artId, Set<Long> ids);
 }

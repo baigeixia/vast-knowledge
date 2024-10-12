@@ -3,6 +3,7 @@ package com.vk.user.service;
 import com.mybatisflex.core.service.IService;
 import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.dto.UserInfoDto;
+import com.vk.user.domain.vo.InfoRelationVo;
 import com.vk.user.domain.vo.LocalUserInfoVo;
 import com.vk.user.domain.vo.UserInfoVo;
 
@@ -21,4 +22,6 @@ public interface ApUserInfoService extends IService<ApUserInfo> {
     UserInfoVo getInfo(Long id);
 
     void upInfo(UserInfoDto dto);
+
+    InfoRelationVo InfoRelation(Long id);
 }

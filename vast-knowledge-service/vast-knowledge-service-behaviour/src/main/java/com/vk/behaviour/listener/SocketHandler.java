@@ -266,7 +266,7 @@ public class SocketHandler {
             errorMessage(ackRequest, "发送人名称不能为空");
         }
 
-        excludeYourself(ackRequest,authorId,senderId);
+        // excludeYourself(ackRequest,authorId,senderId);
 
         // 流标准 通知类型 与 kafka 流处理
         streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COMMENT, UpdateArticleMess.UpdateArticleType.COMMENT, 1);

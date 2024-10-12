@@ -3,18 +3,20 @@ package com.vk.behaviour.service.impl;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.feign.RemoteClientArticleQueryService;
+import com.vk.behaviour.domain.ApCollectBehavior;
 import com.vk.behaviour.domain.ApLikesBehavior;
 import com.vk.behaviour.domain.entity.LikesBehaviorTimeCount;
+import com.vk.behaviour.domain.vo.ArticleAndCommentLikeVo;
 import com.vk.behaviour.domain.vo.notification.like.AttachInfo;
 import com.vk.behaviour.domain.vo.notification.like.LikeActors;
 import com.vk.behaviour.domain.vo.notification.like.LikeNotificationInfo;
 import com.vk.behaviour.domain.vo.notification.like.LikeNotificationListVo;
+import com.vk.behaviour.mapper.ApCollectBehaviorMapper;
 import com.vk.behaviour.mapper.ApLikesBehaviorMapper;
 import com.vk.behaviour.service.ApLikesBehaviorService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.CustomSimpleThrowUtils;
-import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.vk.behaviour.domain.table.ApCollectBehaviorTableDef.AP_COLLECT_BEHAVIOR;
 import static com.vk.behaviour.domain.table.ApLikesBehaviorTableDef.AP_LIKES_BEHAVIOR;
 
 /**
@@ -39,6 +42,9 @@ public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMappe
 
     @Autowired
     private RemoteClientArticleQueryService remoteClientArticleQueryService;
+
+    @Autowired
+    private ApCollectBehaviorMapper apCollectBehaviorMapper;
 
     @Override
     public List<LikeNotificationListVo> likeList(Long page, Long size) {
@@ -113,13 +119,29 @@ public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMappe
     }
 
     @Override
-    public Map<Long, Integer> commentLike(Long artId,Set<Long> ids) {
+    public ArticleAndCommentLikeVo commentLike(Long artId, Set<Long> ids) {
         CustomSimpleThrowUtils.ObjectIsEmpty(ids, "参数错误");
         CustomSimpleThrowUtils.LongIsEmpty(artId, "id错误");
         Long userId = RequestContextUtil.getUserId();
-        List<ApLikesBehavior> userLikes = mapper.selectUserCommentLikes(userId, artId,ids);
 
-        return userLikes.stream().collect(Collectors.toMap(ApLikesBehavior::getCommentId, ApLikesBehavior::getOperation, (existingValue, newValue) -> newValue));
+        ArticleAndCommentLikeVo vo = new ArticleAndCommentLikeVo();
+
+        //文章点赞
+        Integer isLike= mapper.getArticleLikeOne(userId,artId);
+        // ApLikesBehavior isLike = mapper.selectOneByQuery(QueryWrapper.create().select(AP_LIKES_BEHAVIOR.OPERATION.as(ArticleAndCommentLikeVo::getArticleLike)).where(AP_LIKES_BEHAVIOR.AUTHOR_ID.eq(userId)).and(AP_LIKES_BEHAVIOR.ARTICLE_ID.eq(artId)).and(AP_LIKES_BEHAVIOR.TYPE.eq(0)));
+        vo.setArticleLike(null==isLike ? 1 : isLike);
+
+        //收藏
+        Integer isCollect= apCollectBehaviorMapper.getArticleCollectOne(userId,artId);
+        // ApCollectBehavior collectBehavior = apCollectBehaviorMapper.selectOneByQuery(QueryWrapper.create().select(AP_COLLECT_BEHAVIOR.OPERATION.as(ArticleAndCommentLikeVo::getArticleCollect)).where(AP_COLLECT_BEHAVIOR.AUTHOR_ID.eq(userId).and(AP_COLLECT_BEHAVIOR.ARTICLE_ID.eq(artId))));
+        vo.setArticleCollect(null != isCollect && (isCollect == 0));
+
+        //子评论查询
+        List<ApLikesBehavior> userLikes = mapper.selectUserCommentLikes(userId, artId,ids);
+        Map<Long, Integer> collections = userLikes.stream().collect(Collectors.toMap(ApLikesBehavior::getCommentId, ApLikesBehavior::getOperation, (existingValue, newValue) -> newValue));
+        vo.setCommentLike(collections);
+
+        return vo;
 
     }
 }
