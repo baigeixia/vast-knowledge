@@ -66,7 +66,7 @@ public class ApUserInfo implements Serializable {
     /**
      * 职位
      */
-    private Integer position;
+    private String position;
     /**
      * 生日
      */
