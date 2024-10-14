@@ -17,6 +17,7 @@ import com.vk.comment.repository.CommentRepayDocumentRepository;
 import com.vk.comment.service.ApCommentRepayService;
 import com.vk.common.core.constant.DatabaseConstants;
 import com.vk.common.core.domain.R;
+import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
@@ -131,9 +132,8 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
         longHashSet.add(authorIdRe);
 
         R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(longHashSet);
-        if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
-            throw new LeadNewsException("错误的用户");
-        }
+        ValidationUtils.validateR(userList,"错误的用户");
+
 
         Map<Long, AuthorInfo> data = userList.getData();
 
@@ -192,9 +192,7 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
 
         authorId.addAll(longSet);
         R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(authorId);
-        if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
-            throw new LeadNewsException("错误的用户");
-        }
+        ValidationUtils.validateR(userList,"错误的用户");
 
         Map<Long, AuthorInfo> userMapData = userList.getData();
 

@@ -106,13 +106,13 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
 
     private void initContentInset(ApArticleContent insetContent) {
         Long userId = RequestContextUtil.getUserId();
-        String userName = RequestContextUtil.getUserName();
+        // String userName = RequestContextUtil.getUserName();
         LocalDateTime dateTime = LocalDateTime.now();
         Db.tx(() -> {
             // 文章表初始化
             ApArticle article = new ApArticle();
             article.setAuthorId(userId);
-            article.setAuthorName(userName);
+            // article.setAuthorName(userName);
             article.setUpdateTime(dateTime);
             article.setCreatedTime(dateTime);
             apArticleMapper.insertSelective(article);

@@ -4,4 +4,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.user.mapper.ApUserMapper">
 
+    <select id="selectListOrInfo" resultType="com.vk.user.domain.AuthorInfo">
+        SELECT u.id as id, i.name as username, u.image as avatar,i.position as position
+        from ap_user u
+                 JOIN ap_user_info i on u.id = i.user_id
+        WHERE
+         u.id in
+            <foreach collection="ids" item="id" separator="," open="(" close=")" >
+             #{id}
+            </foreach>
+    </select>
 </mapper>

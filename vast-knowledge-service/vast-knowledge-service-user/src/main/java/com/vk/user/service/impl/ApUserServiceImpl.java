@@ -36,13 +36,14 @@ public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> impleme
         Map<Long, AuthorInfo> infoMap = new HashMap<>();
 
         if (!ObjectUtils.isEmpty(userId)){
-            List<ApUser> users = mapper.selectListByIds(userId);
-            for (ApUser i : users) {
-                AuthorInfo info = new AuthorInfo();
-                info.setId(i.getId());
-                info.setUsername(i.getName());
-                info.setAvatar(i.getImage());
-                infoMap.put(i.getId(),info);
+            // List<ApUser> users = mapper.selectListByIds(userId);
+            List<AuthorInfo> users = mapper.selectListOrInfo(userId);
+            for (AuthorInfo i : users) {
+                // AuthorInfo info = new AuthorInfo();
+                // info.setId(i.getId());
+                // info.setUsername(i.getName());
+                // info.setAvatar(i.getImage());
+                infoMap.put(i.getId(),i);
             }
         }
 

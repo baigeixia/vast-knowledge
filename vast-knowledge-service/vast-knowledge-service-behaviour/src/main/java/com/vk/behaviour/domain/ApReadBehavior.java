@@ -50,6 +50,7 @@ public class ApReadBehavior implements Serializable {
      * 阅读百分比
      */
     private Integer percentage;
+    private Integer maxPosition;
 
     /**
      * 文章加载时间

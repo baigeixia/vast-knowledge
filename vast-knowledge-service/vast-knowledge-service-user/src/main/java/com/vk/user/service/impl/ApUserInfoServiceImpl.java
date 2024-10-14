@@ -1,6 +1,7 @@
 package com.vk.user.service.impl;
 
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.row.Db;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.common.core.exception.CustomSimpleThrowUtils;
 import com.vk.common.core.exception.LeadNewsException;
@@ -100,10 +101,16 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
     @Override
     public void upInfo(UserInfoDto dto) {
         CustomSimpleThrowUtils.ObjectIsEmpty(dto, "错误的参数");
+
+        Long id = dto.getId();
+        if (null==id){
+            throw  new LeadNewsException("缺失参数");
+        }
+
         String name = dto.getName();
         CustomSimpleThrowUtils.StringIsEmpty(name,"名称不能为空");
-        LocalDate birthday = dto.getBirthday();
 
+        LocalDate birthday = dto.getBirthday();
         ApUserInfo upInfo = new ApUserInfo();
         LocalDate now = LocalDate.now();
         if (null!=birthday){
@@ -112,15 +119,15 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             upInfo.setAge(years);
         }
 
-        Long id = dto.getId();
+        // ApUser apUser = apUserMapper.selectOneById(id);
+        // if (null==apUser){
+        //     throw  new LeadNewsException("错误的用户");
+        // }
 
         Long userid = RequestContextUtil.getUserId();
-        ApUserInfo info = mapper.selectOneByUserId(userid);
+        ApUserInfo info = mapper.selectOneByUserId(id);
 
-        if (StringUtils.isLongEmpty(id)){
-            if (null!=info){
-                throw  new LeadNewsException("缺失参数");
-            }
+        if (null==info){
             upInfo.setSex(2);
             BeanUtils.copyProperties(dto,upInfo);
             upInfo.setUserId(userid);
@@ -133,10 +140,6 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             upInfo.setUpdatedTime(LocalDateTime.now());
             mapper.insert(upInfo);
         }else {
-            if (null==info){
-                throw  new LeadNewsException("缺失参数");
-            }
-
             if (!info.getId().equals(id)){
                 throw  new LeadNewsException("没有权限修改");
             }
@@ -144,6 +147,7 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             BeanUtils.copyProperties(dto,upInfo);
             upInfo.setUpdatedTime(LocalDateTime.now());
             mapper.update(upInfo);
+
         }
 
         redisService.deleteObject(redisUserInfoKey(userid));
@@ -177,6 +181,7 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             }
             UserInfoVo userInfoVo = mapper.selectGetInfo(id);
             userInfoVo.setPhone(maskPhoneNumber(userInfoVo.getPhone()));
+
 
             redisService.setCacheObject(redisUserInfoKey(id), userInfoVo);
             return userInfoVo;

@@ -22,6 +22,7 @@ import com.vk.article.mapper.ApArticleMapper;
 import com.vk.article.service.ApArticleService;
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.domain.R;
+import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
@@ -29,6 +30,8 @@ import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.redis.service.RedisService;
 import com.vk.db.domain.article.ArticleMg;
 import com.vk.db.repository.article.ArticleMgRepository;
+import com.vk.user.domain.AuthorInfo;
+import com.vk.user.feign.RemoteClientUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,14 +77,17 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private RemoteClientUserService remoteClientUserService;
+
     @Override
     public Long saveArticle(ApArticle article) {
         Long userId = SecurityContextHolder.getUserId();
         if (null == userId || userId == 0L) {
             throw new LeadNewsException(401, "未登录");
         }
-        String userName = SecurityContextHolder.getUserName();
-        article.setAuthorName(userName);
+        // String userName = SecurityContextHolder.getUserName();
+        // article.setAuthorName(userName);
 
         Long id = article.getId();
         String title = article.getTitle();
@@ -112,31 +118,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         }
 
 
-        // List <ApArticleLabel> insetLabel=new ArrayList<>();
         if (!ObjectUtils.isEmpty(labels)) {
-            // List<String> labelID = List.of(labels.split(","));
-            // 将字符串数组转换为 Long 类型的 List
-            // List<Long> labelID = Arrays.stream(labels.split(","))
-            //         .map(Long::valueOf)
-            //         .toList();
-            //
-            // String labelNames = labelID.stream()
-            //         .map(i -> {
-            //             AdChannel cacheList = redisService.getCacheObject(loadingLabel(i), AdChannel.class);
-            //             if (!ObjectUtils.isEmpty(cacheList)) {
-            //                 ApArticleLabel articleLabel = new ApArticleLabel();
-            //                 articleLabel.setArticleId(i);
-            //                 articleLabel.setLabelId(cacheList.getId());
-            //                 insetLabel.add(articleLabel);
-            //                 // 返回标签名称
-            //                 return cacheList.getName();
-            //             } else {
-            //                 return ""; // 或者返回其他默认值，视情况而定
-            //             }
-            //         })
-            //         .collect(Collectors.joining(", "));
-            //
-            // article.setLabels(labelNames);
             article.setLabels(labels);
         }
         // image 图片处理 查上传库 是否有对应的封面图片
@@ -170,12 +152,12 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         ArticleInfoVo articleInfoVo = new ArticleInfoVo();
         if (article != null) {
             BeanUtils.copyProperties(article, articleInfoVo);
-            // articleInfoVo.setId(article.getId());
-            // articleInfoVo.setTitle(article.getTitle());
-            // articleInfoVo.setChannelId(article.getChannelId());
-            // articleInfoVo.setChannelName(article.getChannelName());
-            // articleInfoVo.setLabels(article.getLabels());
-            // articleInfoVo.setImages(article.getImages());
+            Long authorId = article.getAuthorId();
+            R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(Set.of(authorId));
+            ValidationUtils.validateR(userList,"错误的用户");
+            Map<Long, AuthorInfo> data = userList.getData();
+
+            if (null!=data)     articleInfoVo.setAuthorName(data.get(authorId).getUsername());
 
             ApArticleConfig config = apArticleConfigMapper.selectOneById(articleId);
             if (config != null) {
@@ -214,8 +196,8 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
         Long userId = RequestContextUtil.getUserId();
         article.setAuthorId(userId);
-        String userName = RequestContextUtil.getUserName();
-        article.setAuthorName(userName);
+        // String userName = RequestContextUtil.getUserName();
+        // article.setAuthorName(userName);
 
         article.setLabels(dto.getLabels());
         article.setUpdateTime(dateTime);
@@ -269,6 +251,9 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
         List<HomeArticleListVo> records = listVoPage.getRecords();
         getMongoDescription(records);
+
+
+
         return listVoPage;
     }
 
@@ -276,9 +261,18 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         if (null != listVoPage) {
             try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
                 executor.submit(() -> {
+                    Set<Long> authorIds = listVoPage.stream().map(HomeArticleListVo::getAuthorId).collect(Collectors.toSet());
+                    R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(authorIds);
+                    ValidationUtils.validateR(userList,"错误的用户");
+
                     for (HomeArticleListVo record : listVoPage) {
                         ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
                         record.setSimpleDescription(articleMg.getSimpleDescription());
+                        Map<Long, AuthorInfo> infoMap = userList.getData();
+                        if (!ObjectUtils.isEmpty(infoMap)){
+                            record.setAuthorName(infoMap.get(record.getAuthorId()).getUsername());
+                        }
+
                         // record.setSimpleDescription(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0,500) : articleMg.getContent());
                         // record.setSimpleDescription( EscapeUtil.clean(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0,500) : articleMg.getContent()));
                     }

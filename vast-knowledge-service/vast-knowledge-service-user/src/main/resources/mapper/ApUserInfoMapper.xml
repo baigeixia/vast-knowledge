@@ -7,7 +7,7 @@
     <select id="selectGetInfo" resultType="com.vk.user.domain.vo.UserInfoVo">
         SELECT
             u.id,
-            u.name,
+            i.name,
             u.phone,
             u.image,
             u.created_time as createdTime,

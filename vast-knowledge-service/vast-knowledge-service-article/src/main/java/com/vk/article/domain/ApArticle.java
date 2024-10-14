@@ -40,10 +40,10 @@ public class ApArticle implements Serializable {
      */
     private Long authorId;
 
-    /**
-     * 作者昵称
-     */
-    private String authorName;
+    // /**
+    //  * 作者昵称
+    //  */
+    // private String authorName;
 
     // /**
     //  * 文章内容id

@@ -16,6 +16,7 @@ import lombok.EqualsAndHashCode;
 @Data
 public class ArticleInfoVo extends ApArticle {
 
+   private  String authorName;
    private ApArticleConfig config;
 
 }

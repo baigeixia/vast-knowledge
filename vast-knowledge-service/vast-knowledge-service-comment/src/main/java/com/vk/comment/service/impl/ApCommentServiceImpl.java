@@ -22,6 +22,7 @@ import com.vk.comment.service.ApCommentService;
 import com.vk.common.core.constant.DatabaseConstants;
 import com.vk.common.core.constant.HttpStatus;
 import com.vk.common.core.domain.R;
+import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
@@ -130,9 +131,8 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         list.setAuthorId(userId);
 
         R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(Set.of(userId));
-        if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
-            throw new LeadNewsException("错误的用户");
-        }
+        ValidationUtils.validateR(userList,"错误的用户");
+
         Map<Long, AuthorInfo> data = userList.getData();
         list.setAuthor(data.get(userId));
 
@@ -353,9 +353,8 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
 
 
         R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(authorIdSet);
-        if (StringUtils.isNull(userList) || StringUtils.isNull(userList.getData())) {
-            throw new LeadNewsException("错误的用户");
-        }
+        ValidationUtils.validateR(userList,"错误的用户");
+
         Map<Long, AuthorInfo> userMap = userList.getData();
         for (CommentList comment : comments) {
             comment.setAuthor(userMap.get(comment.getAuthorId()));

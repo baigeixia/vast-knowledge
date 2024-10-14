@@ -16,7 +16,6 @@ import com.vk.behaviour.domain.dto.ChatMsgDto;
 import com.vk.behaviour.domain.dto.CollectMsgDto;
 import com.vk.behaviour.domain.dto.CommentMsg;
 import com.vk.behaviour.domain.dto.FanMsgDto;
-import com.vk.behaviour.domain.table.ApCollectBehaviorTableDef;
 import com.vk.behaviour.domain.vo.AckDataMsg;
 import com.vk.behaviour.mapper.*;
 import com.vk.behaviour.notifications.PushNotificationsHandler;
@@ -94,7 +93,6 @@ public class SocketHandler {
     private PushNotificationsHandler pushNotificationsHandler;
 
 
-
     /**
      * 当客户端发起连接时调用
      */
@@ -145,8 +143,8 @@ public class SocketHandler {
         Long authorId = clientGetUserId(socketIOClient);
         String userName = clientGetUserName(socketIOClient);
 
-        validaParameter(ackRequest,authorId,"未登录");
-        validaParameter(ackRequest,userName,"未登录");
+        validaParameter(ackRequest, authorId, "未登录");
+        validaParameter(ackRequest, userName, "未登录");
 
         Integer type = dto.getType();
         Long commentId = dto.getCommentId();
@@ -160,8 +158,8 @@ public class SocketHandler {
             validaParameter(ackRequest, commentId, "评论id不能为空");
         }
 
-        //不能与自己互动
-        excludeYourself(ackRequest,authorId,repayAuthorId);
+        // 不能与自己互动
+        excludeYourself(ackRequest, authorId, repayAuthorId);
 
 
         QueryWrapper where = QueryWrapper.create().where(AP_LIKES_BEHAVIOR.AUTHOR_ID.eq(authorId)
@@ -193,9 +191,9 @@ public class SocketHandler {
                     UpdateArticleMess.UpdateArticleType.LIKES,
                     num
             );
-        }else {
+        } else {
             int messageType = likesBehavior.getOperation() == BASE_LiKE ? LIKE_COMMENT : LIKE_COMMENT_NO;
-            streamProcessingStandard(repayAuthorId, repayAuthorName,messageType, socketIOClient);
+            streamProcessingStandard(repayAuthorId, repayAuthorName, messageType, socketIOClient);
             streamProcessingStandard(commentId, num);
         }
 
@@ -213,11 +211,11 @@ public class SocketHandler {
         String userName = clientGetUserName(socketIOClient);
         Long followId = dto.getFollowId();
         String followName = dto.getFollowName();
-        validaParameter(ackRequest,authorId,"粉丝错误");
-        validaParameter(ackRequest,followName,"粉丝名称不能为空");
-        validaParameter(ackRequest,followId,"被关注人不能为空");
+        validaParameter(ackRequest, authorId, "粉丝错误");
+        validaParameter(ackRequest, followName, "粉丝名称不能为空");
+        validaParameter(ackRequest, followId, "被关注人不能为空");
 
-        excludeYourself(ackRequest,authorId,followId);
+        excludeYourself(ackRequest, authorId, followId);
 
         ApFollowBehavior followBehavior = apFollowBehaviorMapper.selectOneByQuery(
                 QueryWrapper.create()
@@ -233,13 +231,13 @@ public class SocketHandler {
             behavior.setFollowId(followId);
             behavior.setCreatedTime(LocalDateTime.now());
             apFollowBehaviorMapper.insert(behavior);
-            messageType=FOLLOW;
+            messageType = FOLLOW;
         } else {
             apFollowBehaviorMapper.deleteById(followBehavior.getId());
-            messageType=FOLLOW_NO;
+            messageType = FOLLOW_NO;
         }
 
-        streamProcessingStandard(followId, followName,messageType, socketIOClient);
+        streamProcessingStandard(followId, followName, messageType, socketIOClient);
 
     }
 
@@ -250,8 +248,7 @@ public class SocketHandler {
     public void commentMsg(SocketIOClient socketIOClient, AckRequest ackRequest, CommentMsg dto) {
         log.info("commentMsg 评论 事件 {}", dto);
         Long authorId = clientGetUserId(socketIOClient);
-        validaParameter(ackRequest,authorId,"未登录");
-
+        validaParameter(ackRequest, authorId, "未登录");
 
         Long articleId = dto.getArticleId();
         if (StringUtils.isLongEmpty(articleId)) {
@@ -267,9 +264,14 @@ public class SocketHandler {
         }
 
         // excludeYourself(ackRequest,authorId,senderId);
+        if (senderId.equals(authorId)) {
+            // 本人只更新评论数据
+            streamProcessingStandard(articleId, UpdateArticleMess.UpdateArticleType.COMMENT, 1);
+        } else {
+            // 流标准 通知类型 与 kafka 流处理
+            streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COMMENT, UpdateArticleMess.UpdateArticleType.COMMENT, 1);
+        }
 
-        // 流标准 通知类型 与 kafka 流处理
-        streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COMMENT, UpdateArticleMess.UpdateArticleType.COMMENT, 1);
     }
 
     /**
@@ -279,7 +281,7 @@ public class SocketHandler {
     public void chatMsg(SocketIOClient socketIOClient, AckRequest ackRequest, ChatMsgDto dto) {
         log.info("chatMsg 私信 事件 {}", dto);
         Long authorId = clientGetUserId(socketIOClient);
-        validaParameter(ackRequest,authorId,"未登录");
+        validaParameter(ackRequest, authorId, "未登录");
 
         Long senderId = dto.getSenderId();
         validaParameter(ackRequest, senderId, "发送人id不能为空");
@@ -288,7 +290,7 @@ public class SocketHandler {
         String content = dto.getContent();
         validaParameter(ackRequest, content.trim(), "内容不能为空");
 
-        excludeYourself(ackRequest,authorId,senderId);
+        excludeYourself(ackRequest, authorId, senderId);
 
         // 流标准 通知类型处理 不包括kafka  提供 私信使用
         streamProcessingStandard(senderId, senderName, content, socketIOClient);
@@ -302,7 +304,7 @@ public class SocketHandler {
         log.info("collect 收藏事件 {}", dto);
         Long authorId = clientGetUserId(socketIOClient);
         String userName = clientGetUserName(socketIOClient);
-        validaParameter(ackRequest,authorId,"未登录");
+        validaParameter(ackRequest, authorId, "未登录");
 
         Long senderId = dto.getSenderId();
         if (StringUtils.isLongEmpty(senderId)) {
@@ -321,21 +323,21 @@ public class SocketHandler {
                 AP_COLLECT_BEHAVIOR.ARTICLE_ID.eq(articleId)
         )));
         ApCollectBehavior behavior = new ApCollectBehavior();
-        if (null==collectBehavior){
+        if (null == collectBehavior) {
             behavior.setArticleId(articleId);
             behavior.setOperation(0);
             behavior.setAuthorId(authorId);
             behavior.setRepayAuthorId(senderId);
             behavior.setCreatedTime(LocalDateTime.now());
             behavior.setAuthorName(userName);
-        }else {
+        } else {
             behavior.setId(collectBehavior.getId());
-            behavior.setOperation(collectBehavior.getOperation()==0? 1 : 0);
+            behavior.setOperation(collectBehavior.getOperation() == 0 ? 1 : 0);
         }
 
         apCollectBehaviorMapper.insertOrUpdateSelective(behavior);
 
-        excludeYourself(ackRequest,authorId,senderId);
+        excludeYourself(ackRequest, authorId, senderId);
         streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COLLECT, UpdateArticleMess.UpdateArticleType.COLLECTION, 1);
 
     }
@@ -352,7 +354,7 @@ public class SocketHandler {
         Long articleId = dto.getArticleId();
         validaParameter(ackRequest, articleId, "文章id不能为空");
         Long userId = clientGetUserId(socketIOClient);
-        validaParameter(ackRequest,userId,"未登录");
+        validaParameter(ackRequest, userId, "未登录");
 
 
         ApReadBehavior readBehavior = apReadBehaviorMapper.selectOneByQuery(
@@ -370,11 +372,12 @@ public class SocketHandler {
     }
 
 
-    private void  excludeYourself(AckRequest ackRequest,Long senderId,Long localId){
-        if (Objects.equals(senderId, localId)){
-            errorMessage(ackRequest,"不能与自己互动",400);
+    private void excludeYourself(AckRequest ackRequest, Long senderId, Long localId) {
+        if (Objects.equals(senderId, localId)) {
+            errorMessage(ackRequest, "不能与自己互动", 400);
         }
     }
+
     /**
      * 流标准 通知类型 与 kafka 流处理
      *
@@ -419,12 +422,12 @@ public class SocketHandler {
     private void conventionalNewUserMsg(Long senderId, String senderName, String content, Integer type, SocketIOClient socketIOClient) {
         Long authorId = clientGetUserId(socketIOClient);
         String userName = clientGetUserName(socketIOClient);
-        if (StringUtils.isLongEmpty(authorId)){
-            throw  new LeadNewsException("用户错误");
+        if (StringUtils.isLongEmpty(authorId)) {
+            throw new LeadNewsException("用户错误");
         }
 
-        if (StringUtils.isEmpty(userName)){
-            throw  new LeadNewsException("用户错误");
+        if (StringUtils.isEmpty(userName)) {
+            throw new LeadNewsException("用户错误");
         }
 
         NewUserMsg message = new NewUserMsg();
@@ -458,8 +461,8 @@ public class SocketHandler {
     /**
      * 流标准 单独kafka流处理 只做添加  评论添加
      *
-     * @param commentId  评论id
-     * @param num 添加减少
+     * @param commentId 评论id
+     * @param num       添加减少
      */
     private void streamProcessingStandard(Long commentId, Integer num) {
         // 流处理消息 更新文章数据
@@ -472,7 +475,7 @@ public class SocketHandler {
 
     private void validaParameter(AckRequest ackRequest, Long par, String msg) {
         if (StringUtils.isLongEmpty(par)) {
-            errorMessage(ackRequest,msg);
+            errorMessage(ackRequest, msg);
         }
     }
 
@@ -483,13 +486,12 @@ public class SocketHandler {
     }
 
 
-
-    private void errorMessage(AckRequest ackRequest, String msg,Integer code) {
-        errorMessage(ackRequest,AckDataMsg.setAckDataMsg(msg,code));
+    private void errorMessage(AckRequest ackRequest, String msg, Integer code) {
+        errorMessage(ackRequest, AckDataMsg.setAckDataMsg(msg, code));
     }
 
     private void errorMessage(AckRequest ackRequest, String msg) {
-        errorMessage(ackRequest,AckDataMsg.setAckDataMsg(msg));
+        errorMessage(ackRequest, AckDataMsg.setAckDataMsg(msg));
     }
 
     private void errorMessage(AckRequest ackRequest, AckDataMsg msg) {

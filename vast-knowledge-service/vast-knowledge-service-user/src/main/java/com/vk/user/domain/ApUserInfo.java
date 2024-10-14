@@ -34,9 +34,8 @@ public class ApUserInfo implements Serializable {
     private Long id;
 
     private Long userId;
-
     /**
-     * 真是姓名
+     * 名称
      */
     private String name;
 
