@@ -359,14 +359,26 @@ public class SocketHandler {
 
         ApReadBehavior readBehavior = apReadBehaviorMapper.selectOneByQuery(
                 QueryWrapper.create().where(
-                        AP_READ_BEHAVIOR.ENTRY_ID.eq(userId).and(AP_READ_BEHAVIOR.ARTICLE_ID.eq(articleId))
+                        AP_READ_BEHAVIOR.ENTRY_ID.eq(userId)
+                                .and(AP_READ_BEHAVIOR.ARTICLE_ID.eq(articleId))
                 )
         );
 
+        LocalDateTime dateTime = LocalDateTime.now();
         if (null == readBehavior) {
-            apReadBehaviorMapper.insert(dto);
+            dto.setCount(1);
+            dto.setMaxPosition(dto.getPercentage());
+            dto.setCreatedTime(dateTime);
+            dto.setUpdatedTime(dateTime);
+            apReadBehaviorMapper.insertSelective(dto);
             streamProcessingStandard(articleId, UpdateArticleMess.UpdateArticleType.VIEWS, 1);
         } else {
+            dto.setId(readBehavior.getId());
+            dto.setMaxPosition(dto.getPercentage() > readBehavior.getMaxPosition() ? dto.getPercentage() : readBehavior.getMaxPosition());
+            // dto.setMaxPosition(dto.getPercentage() > readBehavior.getPercentage() ? dto.getPercentage() : readBehavior.getPercentage());
+            dto.setCount(readBehavior.getCount() + 1);
+            dto.setReadDuration(readBehavior.getReadDuration().add(dto.getReadDuration()));
+            dto.setUpdatedTime(dateTime);
             apReadBehaviorMapper.update(dto, true);
         }
     }

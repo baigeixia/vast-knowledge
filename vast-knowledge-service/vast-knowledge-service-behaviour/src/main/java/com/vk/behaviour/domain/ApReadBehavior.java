@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -44,18 +45,21 @@ public class ApReadBehavior implements Serializable {
     /**
      * 阅读时间单位秒
      */
-    private Long readDuration;
+    private BigDecimal readDuration;
 
     /**
      * 阅读百分比
      */
     private Integer percentage;
+    /**
+     * 最大阅读位置
+     */
     private Integer maxPosition;
 
     /**
-     * 文章加载时间
+     * 文章加载时间 秒
      */
-    private Long loadDuration;
+    private BigDecimal loadDuration;
 
     /**
      * 登录时间

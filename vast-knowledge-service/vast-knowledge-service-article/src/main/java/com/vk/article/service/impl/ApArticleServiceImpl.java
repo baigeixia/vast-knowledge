@@ -253,7 +253,6 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         getMongoDescription(records);
 
 
-
         return listVoPage;
     }
 
@@ -323,13 +322,15 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             listVoMap = TaskVirtualExecutorUtil.executeWith(() -> {
                 List<ApArticle> apArticles = mapper.selectListByIds(ids);
 
-                return apArticles.stream().map(i -> {
+                List<HomeArticleListVo> homeArticleListVos = apArticles.stream().map(i -> {
                     HomeArticleListVo listVo = new HomeArticleListVo();
                     BeanUtils.copyProperties(i, listVo);
-                    ArticleMg articleMg = articleMgRepository.findByArticleId(i.getId());
-                    listVo.setSimpleDescription(articleMg.getSimpleDescription());
                     return listVo;
-                }).collect(Collectors.toMap(HomeArticleListVo::getId, listVo -> listVo, (existingValue, newValue) -> newValue));
+                }).toList();
+
+                getMongoDescription(homeArticleListVos);
+
+                return homeArticleListVos.stream().collect(Collectors.toMap(HomeArticleListVo::getId, listVo -> listVo, (existingValue, newValue) -> newValue));
             });
         }
 
@@ -366,10 +367,11 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         }
 
         Page<HomeArticleListVo> homeArticleListVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
-        for (HomeArticleListVo record : homeArticleListVoPage.getRecords()) {
-            ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
-            record.setSimpleDescription(articleMg.getSimpleDescription());
-        }
+        getMongoDescription(homeArticleListVoPage.getRecords());
+        // for (HomeArticleListVo record : homeArticleListVoPage.getRecords()) {
+        //     ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
+        //     record.setSimpleDescription(articleMg.getSimpleDescription());
+        // }
         return homeArticleListVoPage;
     }
 }

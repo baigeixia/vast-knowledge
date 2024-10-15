@@ -2,7 +2,9 @@ package com.vk.behaviour.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import com.vk.behaviour.domain.ApReadBehavior;
+import com.vk.behaviour.domain.vo.UserFootMarkListVo;
 import com.vk.behaviour.service.ApReadBehaviorService;
+import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,34 +18,29 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/ReadBehavior")
+@RequestMapping("/read")
 public class ApReadBehaviorController {
 
     @Autowired
     private ApReadBehaviorService apReadBehaviorService;
 
 
-    /**
-     * 根据主键删除APP阅读行为。
-     *
-     * @param id 主键
-     * @return {@code true} 删除成功，{@code false} 删除失败
-     */
-    @DeleteMapping("remove/{id}")
-    public boolean remove(@PathVariable Serializable id) {
-        return apReadBehaviorService.removeById(id);
-    }
+   @GetMapping("/userFootMark")
+    public AjaxResult getUserFootMark(
+           @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
+           @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size
+   ){
+       List<UserFootMarkListVo> result= apReadBehaviorService.getUserFootMark(page,size);
+       return AjaxResult.success(result);
+   }
 
 
-
-    /**
-     * 查询所有APP阅读行为。
-     *
-     * @return 所有数据
-     */
-    @GetMapping("list")
-    public List<ApReadBehavior> list() {
-        return apReadBehaviorService.list();
+    @GetMapping("/article")
+    public AjaxResult getArticleInfo(
+            @RequestParam(name = "id") Long id
+    ){
+        ApReadBehavior result= apReadBehaviorService.getArticleInfo(id);
+        return AjaxResult.success(result);
     }
 
 
