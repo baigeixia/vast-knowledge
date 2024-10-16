@@ -319,6 +319,8 @@ public class SocketHandler {
             errorMessage(ackRequest, "文章id不能为空");
         }
 
+        excludeYourself(ackRequest, authorId, senderId);
+
         ApCollectBehavior collectBehavior = apCollectBehaviorMapper.selectOneByQuery(QueryWrapper.create().where(AP_COLLECT_BEHAVIOR.AUTHOR_ID.eq(authorId).and(
                 AP_COLLECT_BEHAVIOR.ARTICLE_ID.eq(articleId)
         )));
@@ -337,8 +339,8 @@ public class SocketHandler {
 
         apCollectBehaviorMapper.insertOrUpdateSelective(behavior);
 
-        excludeYourself(ackRequest, authorId, senderId);
-        streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COLLECT, UpdateArticleMess.UpdateArticleType.COLLECTION, 1);
+        int num = behavior.getOperation() == 1 ? -1 : 1;
+        streamProcessingStandard(socketIOClient, senderId, senderName, articleId, COLLECT, UpdateArticleMess.UpdateArticleType.COLLECTION, num);
 
     }
 
