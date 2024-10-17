@@ -17,4 +17,5 @@ public interface ApReadBehaviorService extends IService<ApReadBehavior> {
     List<UserFootMarkListVo> getUserFootMark(Long page, Long size);
 
     ApReadBehavior getArticleInfo(Long id);
+
 }

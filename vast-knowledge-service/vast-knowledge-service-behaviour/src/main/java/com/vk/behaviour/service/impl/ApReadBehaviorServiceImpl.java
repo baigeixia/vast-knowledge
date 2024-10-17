@@ -11,12 +11,15 @@ import com.vk.behaviour.domain.vo.notification.like.AttachInfo;
 import com.vk.behaviour.domain.vo.notification.like.LikeActors;
 import com.vk.behaviour.domain.vo.notification.like.LikeNotificationInfo;
 import com.vk.behaviour.domain.vo.notification.like.LikeNotificationListVo;
+import com.vk.behaviour.listener.SocketHandler;
 import com.vk.behaviour.mapper.ApReadBehaviorMapper;
 import com.vk.behaviour.service.ApReadBehaviorService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
+import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
+import com.vk.common.mq.domain.UpdateArticleMess;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,4 +82,6 @@ public class ApReadBehaviorServiceImpl extends ServiceImpl<ApReadBehaviorMapper,
         wrapper.where(AP_READ_BEHAVIOR.ARTICLE_ID.eq(id).and(AP_READ_BEHAVIOR.ENTRY_ID.eq(userId)));
         return mapper.selectOneByQuery(wrapper);
     }
+
+
 }

@@ -25,7 +25,7 @@ public interface ApArticleService extends IService<ApArticle> {
 
     Long saveOrUpArticle(ArticleAndConfigDto dto);
 
-    Page<HomeArticleListVo> listArticle(Long page, Long size, Integer tag);
+    Page<HomeArticleListVo> listArticle(Long page, Long size, Integer tag,Integer type);
 
     Page<ArticleListVo> articleListArticle(Long page, Long size, Integer status, String title, Long channelId, String startTime, String endTime);
 

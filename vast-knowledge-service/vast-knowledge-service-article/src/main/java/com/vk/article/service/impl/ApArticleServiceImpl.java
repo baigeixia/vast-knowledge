@@ -10,9 +10,6 @@ import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
-import com.vk.article.domain.table.ApArticleConfigTableDef;
-import com.vk.article.domain.table.ApArticleContentTableDef;
-import com.vk.article.domain.table.ApArticleTableDef;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.mapper.ApArticleConfigMapper;
@@ -39,7 +36,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -154,10 +154,10 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             BeanUtils.copyProperties(article, articleInfoVo);
             Long authorId = article.getAuthorId();
             R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(Set.of(authorId));
-            ValidationUtils.validateR(userList,"错误的用户");
+            ValidationUtils.validateR(userList, "错误的用户");
             Map<Long, AuthorInfo> data = userList.getData();
 
-            if (null!=data)     articleInfoVo.setAuthorName(data.get(authorId).getUsername());
+            if (null != data) articleInfoVo.setAuthorName(data.get(authorId).getUsername());
 
             ApArticleConfig config = apArticleConfigMapper.selectOneById(articleId);
             if (config != null) {
@@ -209,8 +209,8 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             ApArticleConfig dtoConfig = dto.getConfig();
             BeanUtils.copyProperties(dtoConfig, config);
             config.setArticleId(article.getId());
-            if (null==dtoConfig.getIsDown()) dtoConfig.setIsDown(false);
-            if (null==dtoConfig.getIsDelete()) dtoConfig.setIsDelete(false);
+            if (null == dtoConfig.getIsDown()) dtoConfig.setIsDown(false);
+            if (null == dtoConfig.getIsDelete()) dtoConfig.setIsDelete(false);
 
             apArticleConfigMapper.insertOrUpdateSelective(config);
 
@@ -221,38 +221,29 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     }
 
     @Override
-    public Page<HomeArticleListVo> listArticle(Long page, Long size, Integer tag) {
+    public Page<HomeArticleListVo> listArticle(Long page, Long size, Integer tag, Integer type) {
 
         Page<HomeArticleListVo> listVoPage;
-        // tag 标签
-        if (tag == 0) {
-            QueryWrapper wrapper = QueryWrapper.create();
+
+        QueryWrapper wrapper = QueryWrapper.create();
+        if (null != tag && tag != 0) {
+            wrapper.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
+        }
+        // type 排序
+        if (type == 0) {
             // 推荐
-            listVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
-            getMongoDescription(listVoPage.getRecords());
-
-            return listVoPage;
+            wrapper.select().orderBy(AP_ARTICLE.LIKES, false);
         }
 
-        if (tag == 1) {
+        if (type == 1) {
             // 最新
-            QueryWrapper wrapper = QueryWrapper.create();
             wrapper.select().orderBy(AP_ARTICLE.CREATED_TIME, false);
-            listVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
-            getMongoDescription(listVoPage.getRecords());
-
-            return listVoPage;
         }
 
-
-        QueryWrapper where = QueryWrapper.create();
-        where.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
-        listVoPage = mapper.paginateAs(Page.of(page, size), where, HomeArticleListVo.class);
+        listVoPage = mapper.paginateAs(Page.of(page, size), wrapper, HomeArticleListVo.class);
 
         List<HomeArticleListVo> records = listVoPage.getRecords();
         getMongoDescription(records);
-
-
         return listVoPage;
     }
 
@@ -262,16 +253,15 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 executor.submit(() -> {
                     Set<Long> authorIds = listVoPage.stream().map(HomeArticleListVo::getAuthorId).collect(Collectors.toSet());
                     R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(authorIds);
-                    ValidationUtils.validateR(userList,"错误的用户");
+                    ValidationUtils.validateR(userList, "错误的用户");
 
                     for (HomeArticleListVo record : listVoPage) {
                         ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
                         record.setSimpleDescription(articleMg.getSimpleDescription());
                         Map<Long, AuthorInfo> infoMap = userList.getData();
-                        if (!ObjectUtils.isEmpty(infoMap)){
+                        if (!ObjectUtils.isEmpty(infoMap)) {
                             record.setAuthorName(infoMap.get(record.getAuthorId()).getUsername());
                         }
-
                         // record.setSimpleDescription(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0,500) : articleMg.getContent());
                         // record.setSimpleDescription( EscapeUtil.clean(articleMg.getContent().length() > 500 ? articleMg.getContent().substring(0,500) : articleMg.getContent()));
                     }
@@ -338,16 +328,16 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     }
 
     @Override
-    public Map<Long, HomeArticleListVo> getBehaviorArticleIdList(Long userId,Set<Long> ids,Long page) {
-        if (!StringUtils.isLongEmpty(userId)){
-           List<Long> articleIds= mapper.selectUserIdGetList(userId,page);
+    public Map<Long, HomeArticleListVo> getBehaviorArticleIdList(Long userId, Set<Long> ids, Long page) {
+        if (!StringUtils.isLongEmpty(userId)) {
+            List<Long> articleIds = mapper.selectUserIdGetList(userId, page);
             ids.addAll(articleIds);
         }
         return getArticleIdList(ids);
     }
 
     @Override
-    public Page<HomeArticleListVo> userArticleList(Long page, Long size,Integer type, Long userId) {
+    public Page<HomeArticleListVo> userArticleList(Long page, Long size, Integer type, Long userId) {
         if (StringUtils.isLongEmpty(userId)) {
             userId = RequestContextUtil.getUserId();
         }
@@ -358,11 +348,11 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 .where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0))
                 .and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0));
 
-        if (type==1){
-            wrapper.orderBy(AP_ARTICLE.CREATED_TIME,false);
-        }else if (type==2){
-            wrapper.orderBy(AP_ARTICLE.LIKES,false);
-        }else {
+        if (type == 1) {
+            wrapper.orderBy(AP_ARTICLE.CREATED_TIME, false);
+        } else if (type == 2) {
+            wrapper.orderBy(AP_ARTICLE.LIKES, false);
+        } else {
             throw new LeadNewsException("错误的参数");
         }
 

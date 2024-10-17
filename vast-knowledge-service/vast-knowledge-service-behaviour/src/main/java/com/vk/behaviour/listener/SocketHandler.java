@@ -359,6 +359,10 @@ public class SocketHandler {
         validaParameter(ackRequest, userId, "未登录");
 
 
+        readUnloadLog(dto, userId, articleId);
+    }
+
+    public void readUnloadLog(ApReadBehavior dto, Long userId, Long articleId) {
         ApReadBehavior readBehavior = apReadBehaviorMapper.selectOneByQuery(
                 QueryWrapper.create().where(
                         AP_READ_BEHAVIOR.ENTRY_ID.eq(userId)

@@ -52,9 +52,10 @@ public class ApArticleController {
     public AjaxResult listArticle(
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size ,
-            @RequestParam(name = "tag",defaultValue = "1",required = false) Integer tag
+            @RequestParam(name = "tag",defaultValue = "1",required = false) Integer tag,
+            @RequestParam(name = "type",defaultValue = "0",required = false) Integer type
     ) {
-        Page<HomeArticleListVo> resultInfo=apArticleService.listArticle(page,size,tag);
+        Page<HomeArticleListVo> resultInfo=apArticleService.listArticle(page,size,tag,type);
         return AjaxResult.success(resultInfo) ;
     }
 
