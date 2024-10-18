@@ -2,9 +2,11 @@ package com.vk.search.service.impl;
 
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.domain.HomeArticleListVo;
+import com.vk.article.feign.RemoteClientArticleQueryService;
 import com.vk.search.domain.ApUserSearch;
 import com.vk.search.mapper.ApUserSearchMapper;
 import com.vk.search.service.ApUserSearchService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.List;
 @Service
 public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApUserSearch> implements ApUserSearchService {
 
+    @Autowired
+    private RemoteClientArticleQueryService remoteClientArticleQueryService;
     /**
      * @param query  搜索内容
      * @param type   头部标题 0 综合     1 文章  3 标签 4 用户

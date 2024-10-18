@@ -42,9 +42,11 @@
         <jakarta.servlet.version>6.1.0-M2</jakarta.servlet.version>
         <mybatis-flex.version>1.8.8</mybatis-flex.version>
         <netty-socketio.version>2.0.11</netty-socketio.version>
+        <xxl-job.version>2.4.1</xxl-job.version>
     </properties>
 
     <dependencies>
+
         <!-- bootstrap 启动器 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -183,6 +185,13 @@
                 <version>${netty-socketio.version}</version>
             </dependency>
 
+            <!-- vk Common Log -->
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxl-job.version}</version>
+            </dependency>
+
             <!-- 核心模块 -->
             <dependency>
                 <groupId>com.vk</groupId>
@@ -313,6 +322,7 @@
                 <artifactId>vast-knowledge-common-log</artifactId>
                 <version>${vk.version}</version>
             </dependency>
+
 
         </dependencies>
     </dependencyManagement>

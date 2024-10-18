@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,6 +48,11 @@ public class RemoteClientArticleQueryFallbackFactory implements FallbackFactory<
             @Override
             public R<Map<Long, HomeArticleListVo>> getBehaviorArticleIdList(Long userId,  Long page,Set<Long> ids) {
                 return  R.fail("获取用户动态列表数据失败"+throwable.getMessage());
+            }
+
+            @Override
+            public R<List<HomeArticleListVo>> getSearchArticleList(String query, Integer type, Integer sort, Integer period, Long page, Long size) {
+                return  R.fail("获取用户搜索列表数据失败"+throwable.getMessage());
             }
         };
     }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,5 +37,16 @@ public interface RemoteClientArticleQueryService {
             @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "page") Long page,
             @RequestParam(name = "ids") Set<Long> ids
+    );
+
+
+    @GetMapping("article/getSearchArticleList")
+    R<List< HomeArticleListVo>> getSearchArticleList(
+            @RequestParam(name = "query") String query,
+            @RequestParam(name = "type", defaultValue = "0", required = false) Integer type,
+            @RequestParam(name = "sort", defaultValue = "0", required = false) Integer sort,
+            @RequestParam(name = "period", defaultValue = "1", required = false) Integer period,
+            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
+            @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size
     );
 }

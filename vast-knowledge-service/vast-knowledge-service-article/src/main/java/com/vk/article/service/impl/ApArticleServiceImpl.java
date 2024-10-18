@@ -10,6 +10,7 @@ import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
+import com.vk.article.domain.table.ApArticleConfigTableDef;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.mapper.ApArticleConfigMapper;
@@ -202,12 +203,18 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         article.setLabels(dto.getLabels());
         article.setUpdateTime(dateTime);
 
+        ApArticleConfig dbConfig = apArticleConfigMapper.selectOneByQuery(QueryWrapper.create().where(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(articleId)));
+
         Db.tx(() -> {
             mapper.insertOrUpdateSelective(article);
+
 
             ApArticleConfig config = new ApArticleConfig();
             ApArticleConfig dtoConfig = dto.getConfig();
             BeanUtils.copyProperties(dtoConfig, config);
+            if (null!=dbConfig){
+                config.setId(dbConfig.getId());
+            }
             config.setArticleId(article.getId());
             if (null == dtoConfig.getIsDown()) dtoConfig.setIsDown(false);
             if (null == dtoConfig.getIsDelete()) dtoConfig.setIsDelete(false);
@@ -363,5 +370,11 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         //     record.setSimpleDescription(articleMg.getSimpleDescription());
         // }
         return homeArticleListVoPage;
+    }
+
+    @Override
+    public List<HomeArticleListVo> getSearchArticleList(String query, Integer type, Integer sort, Integer period, Long page, Long size) {
+
+        return null;
     }
 }

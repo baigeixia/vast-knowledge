@@ -8,6 +8,7 @@ import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,4 +37,6 @@ public interface ApArticleService extends IService<ApArticle> {
     Map<Long, HomeArticleListVo> getBehaviorArticleIdList(Long userId ,Set<Long> ids,Long page);
 
     Page<HomeArticleListVo> userArticleList(Long page, Long size,Integer type, Long userId);
+
+    List<HomeArticleListVo> getSearchArticleList(String query, Integer type, Integer sort, Integer period, Long page, Long size);
 }

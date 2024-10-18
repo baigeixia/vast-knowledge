@@ -35,12 +35,12 @@ public class ApUserSearchController {
      */
     @GetMapping("/searchInfo")
     public AjaxResult searchInfo(
-            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
-            @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size ,
             @RequestParam(name = "query") String query,
             @RequestParam(name = "type", defaultValue = "0", required = false) Integer type,
             @RequestParam(name = "sort", defaultValue = "0", required = false) Integer sort,
-            @RequestParam(name = "period", defaultValue = "1", required = false) Integer period
+            @RequestParam(name = "period", defaultValue = "1", required = false) Integer period,
+            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
+            @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size
     ) {
 
         List<HomeArticleListVo> result=apUserSearchService.searchInfo(query,type,sort,period,page,size);

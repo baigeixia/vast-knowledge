@@ -12,6 +12,7 @@ import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -141,6 +142,21 @@ public class ApArticleController {
             @RequestParam(name = "ids") Set<Long> ids
     ){
         Map<Long, HomeArticleListVo> articleIdList = apArticleService.getBehaviorArticleIdList(userId,ids,page);
+        return R.ok(articleIdList)  ;
+    }
+
+    @GetMapping("article/getSearchArticleList")
+    R<List< HomeArticleListVo>> getSearchArticleList(
+            @RequestParam(name = "query") String query,
+            @RequestParam(name = "type", defaultValue = "0", required = false) Integer type,
+            @RequestParam(name = "sort", defaultValue = "0", required = false) Integer sort,
+            @RequestParam(name = "period", defaultValue = "1", required = false) Integer period,
+            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
+            @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size
+    ){
+
+        List< HomeArticleListVo> articleIdList = apArticleService.getSearchArticleList(query,type,sort,period,page,size);
+
         return R.ok(articleIdList)  ;
     }
 
