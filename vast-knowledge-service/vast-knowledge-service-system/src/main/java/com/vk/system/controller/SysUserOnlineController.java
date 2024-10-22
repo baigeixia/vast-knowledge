@@ -39,7 +39,7 @@ public class SysUserOnlineController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(String ipaddr, String userName)
     {
-        Collection<String> keys = redisService.keys(CacheConstants.LOGIN_TOKEN_KEY + "*");
+        Collection<String> keys = redisService.keys(CacheConstants.LOGIN_CLIENT_TOKEN_KEY + "*");
         List<SysUserOnline> userOnlineList = new ArrayList<SysUserOnline>();
         for (String key : keys)
         {
@@ -74,7 +74,7 @@ public class SysUserOnlineController extends BaseController
     @DeleteMapping("/{tokenId}")
     public AjaxResult forceLogout(@PathVariable(name = "tokenId") String tokenId)
     {
-        redisService.deleteObject(CacheConstants.LOGIN_TOKEN_KEY + tokenId);
+        redisService.deleteObject(CacheConstants.LOGIN_CLIENT_TOKEN_KEY + tokenId);
         return success();
     }
 }

@@ -3,6 +3,7 @@ package com.vk.common.datascope.aspect;
 
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.text.Convert;
+import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.domain.BaseEntity;
 import com.vk.common.datascope.annotation.DataScope;
@@ -72,7 +73,7 @@ public class DataScopeAspect
         {
             SysUser currentUser = loginUser.getSysUser();
             // 如果是超级管理员，则不过滤数据
-            if (StringUtils.isNotNull(currentUser) && !currentUser.isAdmin())
+            if (StringUtils.isNotNull(currentUser) && !AdminCheck.isAdmin(currentUser.getUserId()) )
             {
                 String permission = StringUtils.defaultIfEmpty(controllerDataScope.permission(), SecurityContextHolder.getPermission());
                 dataScopeFilter(joinPoint, currentUser, controllerDataScope.deptAlias(),

@@ -1,6 +1,7 @@
 package com.vk.system.controller;
 
 import com.vk.common.core.domain.R;
+import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.StringUtils;
 
 import com.vk.common.core.web.controller.BaseController;
@@ -114,7 +115,7 @@ public class SysUserController extends BaseController
         Set<String> permissions = permissionService.getMenuPermission(sysUser);
         LoginUser sysUserVo = new LoginUser();
         sysUserVo.setSysUser(sysUser);
-        sysUserVo.setRoles(roles);
+        sysUserVo.setRolesLocal(roles);
         sysUserVo.setPermissions(permissions);
         return R.ok(sysUserVo);
     }
@@ -169,7 +170,7 @@ public class SysUserController extends BaseController
         userService.checkUserDataScope(userId);
         AjaxResult ajax = AjaxResult.success();
         List<SysRole> roles = roleService.selectRoleAll();
-        ajax.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
+        ajax.put("roles", AdminCheck.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
         ajax.put("posts", postService.selectPostAll());
         if (StringUtils.isNotNull(userId))
         {
@@ -287,7 +288,7 @@ public class SysUserController extends BaseController
         SysUser user = userService.selectUserById(userId);
         List<SysRole> roles = roleService.selectRolesByUserId(userId);
         ajax.put("user", user);
-        ajax.put("roles", SysUser.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
+        ajax.put("roles", AdminCheck.isAdmin(userId) ? roles : roles.stream().filter(r -> !r.isAdmin()).collect(Collectors.toList()));
         return ajax;
     }
 

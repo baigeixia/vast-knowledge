@@ -2,6 +2,7 @@ package com.vk.system.service.impl;
 
 import com.vk.common.core.constant.UserConstants;
 import com.vk.common.core.exception.ServiceException;
+import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.SpringUtils;
 import com.vk.common.core.utils.StringUtils;
 
@@ -218,7 +219,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public void checkUserAllowed(SysUser user)
     {
-        if (StringUtils.isNotNull(user.getUserId()) && user.isAdmin())
+        if (StringUtils.isNotNull(user.getUserId()) && AdminCheck.isAdmin(user.getUserId()))
         {
             throw new ServiceException("不允许操作超级管理员用户");
         }
@@ -232,7 +233,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public void checkUserDataScope(Long userId)
     {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId()))
+        if (!AdminCheck.isAdmin(userId))
         {
             SysUser user = new SysUser();
             user.setUserId(userId);

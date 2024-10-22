@@ -39,7 +39,8 @@ public class TokenService
 
     private final static long expireTime = CacheConstants.EXPIRATION;
 
-    private final static String ACCESS_TOKEN = CacheConstants.LOGIN_TOKEN_KEY;
+    // private final static String ACCESS_TOKEN = CacheConstants.LOGIN_TOKEN_KEY;
+    private final static String ACCESS_TOKEN = CacheConstants.LOGIN_CLIENT_TOKEN_KEY;
 
     private final static Long MILLIS_MINUTE_TEN = CacheConstants.REFRESH_TIME * MILLIS_MINUTE;
 

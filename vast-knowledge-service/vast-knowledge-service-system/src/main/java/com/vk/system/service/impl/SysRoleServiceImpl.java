@@ -2,6 +2,7 @@ package com.vk.system.service.impl;
 
 import com.vk.common.core.constant.UserConstants;
 import com.vk.common.core.exception.ServiceException;
+import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.SpringUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.datascope.annotation.DataScope;
@@ -194,7 +195,7 @@ public class SysRoleServiceImpl implements ISysRoleService
     @Override
     public void checkRoleDataScope(Long roleId)
     {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId()))
+        if (!AdminCheck.isAdmin(SecurityUtils.getUserId()))
         {
             SysRole role = new SysRole();
             role.setRoleId(roleId);

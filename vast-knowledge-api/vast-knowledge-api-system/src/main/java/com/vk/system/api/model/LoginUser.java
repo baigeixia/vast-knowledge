@@ -53,7 +53,7 @@ public class LoginUser implements Serializable
     /**
      * 角色列表
      */
-    private Set<String> roles;
+    private Set<String> rolesLocal;
 
     /**
      * 用户信息
@@ -130,14 +130,14 @@ public class LoginUser implements Serializable
         this.permissions = permissions;
     }
 
-    public Set<String> getRoles()
+    public Set<String> getRolesLocal()
     {
-        return roles;
+        return rolesLocal;
     }
 
-    public void setRoles(Set<String> roles)
+    public void setRolesLocal(Set<String> rolesLocal)
     {
-        this.roles = roles;
+        this.rolesLocal = rolesLocal;
     }
 
     public SysUser getSysUser()

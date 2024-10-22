@@ -2,6 +2,7 @@ package com.vk.system.service.impl;
 
 import com.vk.common.core.constant.Constants;
 import com.vk.common.core.constant.UserConstants;
+import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.api.domain.SysRole;
@@ -62,7 +63,7 @@ public class SysMenuServiceImpl implements ISysMenuService
     {
         List<SysMenu> menuList = null;
         // 管理员显示所有菜单信息
-        if (SysUser.isAdmin(userId))
+        if (AdminCheck.isAdmin(userId))
         {
             menuList = menuMapper.selectMenuList(menu);
         }

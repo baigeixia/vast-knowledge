@@ -321,7 +321,7 @@ public class AuthLogic
         try
         {
             LoginUser loginUser = getLoginUser();
-            return loginUser.getRoles();
+            return loginUser.getRolesLocal();
         }
         catch (Exception e)
         {

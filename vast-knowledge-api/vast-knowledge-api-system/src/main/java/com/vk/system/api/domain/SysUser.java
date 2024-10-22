@@ -8,6 +8,8 @@ import com.vk.common.core.xss.Xss;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -19,6 +21,8 @@ import java.util.List;
  * 
  * @author vk
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class SysUser extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -111,16 +115,6 @@ public class SysUser extends BaseEntity
         this.userId = userId;
     }
 
-    public boolean isAdmin()
-    {
-        return isAdmin(this.userId);
-    }
-
-    public static boolean isAdmin(Long userId)
-    {
-        return userId != null && 1L == userId;
-    }
-
     public Long getDeptId()
     {
         return deptId;
@@ -174,130 +168,7 @@ public class SysUser extends BaseEntity
         return phonenumber;
     }
 
-    public void setPhonenumber(String phonenumber)
-    {
-        this.phonenumber = phonenumber;
-    }
 
-    public String getSex()
-    {
-        return sex;
-    }
-
-    public void setSex(String sex)
-    {
-        this.sex = sex;
-    }
-
-    public String getAvatar()
-    {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar)
-    {
-        this.avatar = avatar;
-    }
-
-    public String getPassword()
-    {
-        return password;
-    }
-
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
-
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getDelFlag()
-    {
-        return delFlag;
-    }
-
-    public void setDelFlag(String delFlag)
-    {
-        this.delFlag = delFlag;
-    }
-
-    public String getLoginIp()
-    {
-        return loginIp;
-    }
-
-    public void setLoginIp(String loginIp)
-    {
-        this.loginIp = loginIp;
-    }
-
-    public Date getLoginDate()
-    {
-        return loginDate;
-    }
-
-    public void setLoginDate(Date loginDate)
-    {
-        this.loginDate = loginDate;
-    }
-
-    public SysDept getDept()
-    {
-        return dept;
-    }
-
-    public void setDept(SysDept dept)
-    {
-        this.dept = dept;
-    }
-
-    public List<SysRole> getRoles()
-    {
-        return roles;
-    }
-
-    public void setRoles(List<SysRole> roles)
-    {
-        this.roles = roles;
-    }
-
-    public Long[] getRoleIds()
-    {
-        return roleIds;
-    }
-
-    public void setRoleIds(Long[] roleIds)
-    {
-        this.roleIds = roleIds;
-    }
-
-    public Long[] getPostIds()
-    {
-        return postIds;
-    }
-
-    public void setPostIds(Long[] postIds)
-    {
-        this.postIds = postIds;
-    }
-
-    public Long getRoleId()
-    {
-        return roleId;
-    }
-
-    public void setRoleId(Long roleId)
-    {
-        this.roleId = roleId;
-    }
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)

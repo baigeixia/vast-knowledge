@@ -1,5 +1,6 @@
 package com.vk.system.service.impl;
 
+import com.vk.common.core.utils.AdminCheck;
 import com.vk.system.api.domain.SysRole;
 import com.vk.system.api.domain.SysUser;
 import com.vk.system.service.ISysMenuService;
@@ -37,7 +38,7 @@ public class SysPermissionServiceImpl implements ISysPermissionService
     {
         Set<String> roles = new HashSet<String>();
         // 管理员拥有所有权限
-        if (user.isAdmin())
+        if (AdminCheck.isAdmin(user.getUserId()))
         {
             roles.add("admin");
         }
@@ -59,7 +60,7 @@ public class SysPermissionServiceImpl implements ISysPermissionService
     {
         Set<String> perms = new HashSet<String>();
         // 管理员拥有所有权限
-        if (user.isAdmin())
+        if (AdminCheck.isAdmin(user.getUserId()))
         {
             perms.add("*:*:*");
         }

@@ -1,11 +1,13 @@
 package com.vk.system.api.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.vk.common.core.annotation.Excel;
 import com.vk.common.core.web.domain.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -17,6 +19,8 @@ import java.util.Set;
  * 
  * @author vk
  */
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SysRole extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -103,10 +107,6 @@ public class SysRole extends BaseEntity
         return roleName;
     }
 
-    public void setRoleName(String roleName)
-    {
-        this.roleName = roleName;
-    }
 
     @NotBlank(message = "权限字符不能为空")
     @Size(min = 0, max = 100, message = "权限字符长度不能超过100个字符")
@@ -115,10 +115,6 @@ public class SysRole extends BaseEntity
         return roleKey;
     }
 
-    public void setRoleKey(String roleKey)
-    {
-        this.roleKey = roleKey;
-    }
 
     @NotNull(message = "显示顺序不能为空")
     public Integer getRoleSort()
@@ -126,100 +122,6 @@ public class SysRole extends BaseEntity
         return roleSort;
     }
 
-    public void setRoleSort(Integer roleSort)
-    {
-        this.roleSort = roleSort;
-    }
-
-    public String getDataScope()
-    {
-        return dataScope;
-    }
-
-    public void setDataScope(String dataScope)
-    {
-        this.dataScope = dataScope;
-    }
-
-    public boolean isMenuCheckStrictly()
-    {
-        return menuCheckStrictly;
-    }
-
-    public void setMenuCheckStrictly(boolean menuCheckStrictly)
-    {
-        this.menuCheckStrictly = menuCheckStrictly;
-    }
-
-    public boolean isDeptCheckStrictly()
-    {
-        return deptCheckStrictly;
-    }
-
-    public void setDeptCheckStrictly(boolean deptCheckStrictly)
-    {
-        this.deptCheckStrictly = deptCheckStrictly;
-    }
-
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(String status)
-    {
-        this.status = status;
-    }
-
-    public String getDelFlag()
-    {
-        return delFlag;
-    }
-
-    public void setDelFlag(String delFlag)
-    {
-        this.delFlag = delFlag;
-    }
-
-    public boolean isFlag()
-    {
-        return flag;
-    }
-
-    public void setFlag(boolean flag)
-    {
-        this.flag = flag;
-    }
-
-    public Long[] getMenuIds()
-    {
-        return menuIds;
-    }
-
-    public void setMenuIds(Long[] menuIds)
-    {
-        this.menuIds = menuIds;
-    }
-
-    public Long[] getDeptIds()
-    {
-        return deptIds;
-    }
-
-    public void setDeptIds(Long[] deptIds)
-    {
-        this.deptIds = deptIds;
-    }
-
-    public Set<String> getPermissions()
-    {
-        return permissions;
-    }
-
-    public void setPermissions(Set<String> permissions)
-    {
-        this.permissions = permissions;
-    }
 
     @Override
     public String toString() {

@@ -3,6 +3,7 @@ package com.vk.system.service.impl;
 import com.vk.common.core.constant.UserConstants;
 import com.vk.common.core.exception.ServiceException;
 import com.vk.common.core.text.Convert;
+import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.SpringUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.datascope.annotation.DataScope;
@@ -191,7 +192,7 @@ public class SysDeptServiceImpl implements ISysDeptService
     @Override
     public void checkDeptDataScope(Long deptId)
     {
-        if (!SysUser.isAdmin(SecurityUtils.getUserId()))
+        if (!AdminCheck.isAdmin(SecurityUtils.getUserId()))
         {
             SysDept dept = new SysDept();
             dept.setDeptId(deptId);

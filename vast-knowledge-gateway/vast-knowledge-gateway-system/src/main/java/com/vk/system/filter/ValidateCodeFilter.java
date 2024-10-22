@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Component
 public class ValidateCodeFilter implements GlobalFilter, Ordered {
-    private final static String[] VALIDATE_URL = new String[]{"/auth/login", "/auth/register"};
+    private final static String[] VALIDATE_URL = new String[]{"/dev-system/auth/login", "/dev-system/auth/register"};
 
     @Autowired
     private ValidateCodeService validateCodeService;
