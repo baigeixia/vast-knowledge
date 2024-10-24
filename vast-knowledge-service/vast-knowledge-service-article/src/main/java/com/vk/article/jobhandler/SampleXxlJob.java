@@ -1,4 +1,4 @@
-package com.vk.auth.service.jobhandler;
+package com.vk.article.jobhandler;
 
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;

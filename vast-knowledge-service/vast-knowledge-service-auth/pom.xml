@@ -16,11 +16,7 @@
     </description>
 
     <dependencies>
-        <!-- xxl-job core -->
-        <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
-        </dependency>
+
 
         <!-- SpringCloud Alibaba Nacos -->
         <dependency>

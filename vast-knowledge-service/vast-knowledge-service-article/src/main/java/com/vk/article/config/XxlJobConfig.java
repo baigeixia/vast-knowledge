@@ -1,4 +1,4 @@
-package com.vk.auth.core.config;
+package com.vk.article.config;
 
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import org.slf4j.Logger;

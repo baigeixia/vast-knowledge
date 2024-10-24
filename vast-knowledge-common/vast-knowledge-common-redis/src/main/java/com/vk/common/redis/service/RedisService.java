@@ -25,6 +25,17 @@ public class RedisService
 
     /**
      * 缓存基本的对象，Integer、String、实体类等
+     * 返回是否成功
+     * @param key 缓存的键值
+     * @param value 缓存的值
+     */
+    public boolean cacheObjectIfAbsent(String key, Object value) {
+        Boolean flag = redisTemplate.opsForValue().setIfAbsent(key, value);
+        return flag != null && flag; // 返回是否成功设置
+    }
+
+    /**
+     * 缓存基本的对象，Integer、String、实体类等
      *
      * @param key 缓存的键值
      * @param value 缓存的值

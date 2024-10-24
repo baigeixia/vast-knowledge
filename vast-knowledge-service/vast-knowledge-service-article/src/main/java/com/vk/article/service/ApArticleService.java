@@ -8,9 +8,11 @@ import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * 已发布的文章信息 服务层。
@@ -39,4 +41,8 @@ public interface ApArticleService extends IService<ApArticle> {
     Page<HomeArticleListVo> userArticleList(Long page, Long size,Integer type, Long userId);
 
     List<HomeArticleListVo> getSearchArticleList(String query, Integer type, Integer sort, Integer period, Long page, Long size);
+
+    Long selectCount(LocalDateTime now);
+
+    void importAll(long page, Long size, CountDownLatch countDownLatch, LocalDateTime now);
 }

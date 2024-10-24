@@ -8,6 +8,7 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
+import com.vk.article.domain.ArticleInfoDocument;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.table.ApArticleConfigTableDef;
@@ -17,6 +18,7 @@ import com.vk.article.mapper.ApArticleConfigMapper;
 import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.mapper.ApArticleLabelMapper;
 import com.vk.article.mapper.ApArticleMapper;
+import com.vk.article.repository.ArticleDocumentRepository;
 import com.vk.article.service.ApArticleService;
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.domain.R;
@@ -33,6 +35,7 @@ import com.vk.user.feign.RemoteClientUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -41,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -73,6 +77,10 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     @Autowired
     private ApArticleLabelMapper apArticleLabelMapper;
+
+    @Autowired
+    private ArticleDocumentRepository articleDocumentRepository;
+
 
 
     @Autowired
@@ -376,5 +384,31 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     public List<HomeArticleListVo> getSearchArticleList(String query, Integer type, Integer sort, Integer period, Long page, Long size) {
 
         return null;
+    }
+
+    @Override
+    public Long selectCount(LocalDateTime now) {
+        return mapper.selectCount(now);
+    }
+
+    @Override
+    @Async("asyncTaskExecutor")
+    public void importAll(long page, Long size, CountDownLatch countDownLatch, LocalDateTime now) {
+        String threadName = Thread.currentThread().getName();
+        log.info("{} start: page={},size={}", threadName,page,size);
+        //1分页查询到数据
+        List<ArticleInfoDocument> articleList = mapper.selectByPage((page - 1) * size, size,now);
+        log.info("{} start: page={},size={}, actualSize={} found", threadName,page,size,articleList.size());
+        //2.分批导入到ES中
+        try {
+            articleDocumentRepository.saveAll(articleList);
+            log.info("{} end: page={},size={}, actualSize={} found", threadName,page,size,articleList.size());
+        } catch (Exception e) {
+            log.error("{} error: page={},size={}, actualSize={} found", threadName,page,size,articleList.size(),e);
+        } finally {
+            //减掉数量
+            countDownLatch.countDown();
+        }
+
     }
 }
