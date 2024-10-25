@@ -1,9 +1,8 @@
 package com.vk.article.jobhandler;
 
-import com.vk.article.domain.ArticleInfoDocument;
+import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.article.mapper.ApArticleMapper;
-import com.vk.article.repository.ArticleDocumentRepository;
-import com.vk.article.service.ApArticleService;
+import com.vk.common.es.repository.ArticleDocumentRepository;
 import com.vk.article.util.SyncUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.redis.service.RedisService;
@@ -15,11 +14,9 @@ import org.springframework.stereotype.Component;
 
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-@Component
+// @Component
 @Slf4j(topic="EsArticleSynChXxlJob")
 public class EsArticleSynChXxlJob {
 
@@ -34,7 +31,7 @@ public class EsArticleSynChXxlJob {
     /**
      * 1、简单任务示例（Bean模式）
      */
-    @XxlJob("EsArticleSync")
+    // @XxlJob("EsArticleSync")
     public void demoJobHandler() {
         String recordTime = redisService.getCacheObject("recordTime");
         if (StringUtils.isEmpty(recordTime)) {

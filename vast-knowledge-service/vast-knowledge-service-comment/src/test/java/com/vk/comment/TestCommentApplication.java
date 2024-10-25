@@ -343,7 +343,7 @@ public class TestCommentApplication {
             // 打印高亮字段
             hit.getHighlightFields().forEach((fieldName, highlight) -> {
                 System.out.println("Field: " + fieldName);
-                // System.out.println("Highlights: " + String.join(", ", highlight.fragments()));
+                System.out.println("Highlights: " + String.join(", ", highlight));
             });
         });
 

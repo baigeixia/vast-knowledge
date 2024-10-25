@@ -5,7 +5,7 @@
 <mapper namespace="com.vk.article.mapper.ApArticleMapper">
 
 
-    <resultMap id="articleDocumentResultMap" type="com.vk.article.domain.ArticleInfoDocument">
+    <resultMap id="articleDocumentResultMap" type="com.vk.common.es.domain.ArticleInfoDocument">
         <result property="id" column="id"/>
         <result property="title" column="title"/>
         <result property="authorId" column="author_id"/>

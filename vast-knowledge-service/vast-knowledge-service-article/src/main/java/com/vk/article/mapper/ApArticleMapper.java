@@ -2,7 +2,7 @@ package com.vk.article.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.article.domain.ApArticle;
-import com.vk.article.domain.ArticleInfoDocument;
+import com.vk.common.es.domain.ArticleInfoDocument;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 

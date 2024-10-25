@@ -16,7 +16,20 @@
         搜素模块
     </description>
 
+
+
+
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-es</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-api-article</artifactId>

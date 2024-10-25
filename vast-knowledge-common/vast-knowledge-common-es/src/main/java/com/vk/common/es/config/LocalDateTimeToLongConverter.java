@@ -1,5 +1,6 @@
 package com.vk.common.es.config;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.unit.DataUnit;
 
@@ -9,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 
+@Configuration
 public class LocalDateTimeToLongConverter implements Converter<Date, LocalDateTime> {
     @Override
     public LocalDateTime convert(Date source) {

@@ -1,7 +1,8 @@
-package com.vk.article.domain;
+package com.vk.common.es.domain;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 public class ArticleInfoDocument implements Serializable {
 
     @Id
-    private String id;
+    private Long id;
 
     @Field(type = FieldType.Text,analyzer = "ik_smart")
     private String title;
@@ -45,8 +46,10 @@ public class ArticleInfoDocument implements Serializable {
 
     private Integer views;
 
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime createdTime;
 
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime publishTime;
 
     private Integer isDown;
