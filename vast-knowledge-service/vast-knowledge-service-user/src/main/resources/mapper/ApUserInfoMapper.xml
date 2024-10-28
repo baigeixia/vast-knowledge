@@ -28,4 +28,59 @@
             i.updated_time as updatedTime
         from ap_user u LEFT JOIN ap_user_info i  ON u.id = i.user_id WHERE u.id=#{userId}
     </select>
+
+    <select id="selectByPage" resultType="com.vk.common.es.domain.UserInfoDocument">
+        select
+            u.id,
+            i.name,
+            u.phone,
+            u.image,
+            u.created_time as createdTime,
+            i.sex,
+            i.position,
+            i.company,
+            i.occupation,
+            i.age,
+            i.birthday,
+            i.introduction,
+            i.location,
+            i.fans,
+            i.follows,
+            i.is_send_message as isSendMessage,
+            i.is_recommend_friend as isRecommendFriend,
+            i.is_recommend_me as isRecommendMe,
+            i.is_display_image as isDisplayImage,
+            i.updated_time as updatedTime
+        from ap_user u
+                 inner join ap_user_info i ON u.id = i.user_id
+        where u.status=0 and u.created_time &lt;= #{now}  limit #{start}, #{size}
+    </select>
+
+    <select id="selectForCondition" resultType="com.vk.common.es.domain.UserInfoDocument">
+        select
+            u.id,
+            i.name,
+            u.phone,
+            u.image,
+            u.created_time as createdTime,
+            i.sex,
+            i.position,
+            i.company,
+            i.occupation,
+            i.age,
+            i.birthday,
+            i.introduction,
+            i.location,
+            i.fans,
+            i.follows,
+            i.is_send_message as isSendMessage,
+            i.is_recommend_friend as isRecommendFriend,
+            i.is_recommend_me as isRecommendMe,
+            i.is_display_image as isDisplayImage,
+            i.updated_time as
+        from ap_user u
+            inner join ap_user_info i ON u.id = i.user_id
+        where u.status=0 and u.created_time > #{redisTime}
+          and u.created_time &lt;= #{nowTime}
+    </select>
 </mapper>

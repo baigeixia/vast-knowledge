@@ -7,6 +7,7 @@ import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.es.domain.ArticleInfoDocument;
+import com.vk.common.es.domain.UserInfoDocument;
 import com.vk.common.es.repository.ArticleDocumentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,8 +78,8 @@ public class SearchApplicationTests {
         var page = 1;
         var size = 10;
         var type = 1;
-        var sort = 2;
-        var period = 2;
+        var sort = 0;
+        var period = 1;
         String fieldValue = "是";
         if (type == 1) {
             String pre = "<span style='color:red'>";
@@ -147,8 +148,8 @@ public class SearchApplicationTests {
                                     ), String.class)
                     )
                     .withPageable(PageRequest.of(page - 1, size))
-                    .withSort(Sort.sort(ArticleInfoDocument.class).by(ArticleInfoDocument::getLikes).descending())
-                    .withSourceFilter(new FetchSourceFilter(new String[]{"title", "id"}, null))  // 控制显示的字段
+                    // .withSort(Sort.sort(ArticleInfoDocument.class).by(ArticleInfoDocument::getLikes).descending())
+                    // .withSourceFilter(new FetchSourceFilter(new String[]{"title", "id"}, null))  // 控制显示的字段
                     .build();
 
             if (sort == 0) {
@@ -180,20 +181,87 @@ public class SearchApplicationTests {
                 });
             });
 
-            Set<Long> ids = highlightMap.keySet();
-            R<Map<Long, HomeArticleListVo>> idList = remoteClientArticleQueryService.getArticleIdList(ids);
-            ValidationUtils.validateR(idList, "文章查询失败");
-            Map<Long, HomeArticleListVo> longHomeArticleListVoMap = idList.getData();
-            longHomeArticleListVoMap.values().forEach(i -> i.setTitle(highlightMap.get(i.getId())));
-            System.out.println("longHomeArticleListVoMap :" + longHomeArticleListVoMap);
+            // Set<Long> ids = highlightMap.keySet();
+            // R<Map<Long, HomeArticleListVo>> idList = remoteClientArticleQueryService.getArticleIdList(ids);
+            // ValidationUtils.validateR(idList, "文章查询失败");
+            // Map<Long, HomeArticleListVo> longHomeArticleListVoMap = idList.getData();
+            // longHomeArticleListVoMap.values().forEach(i -> i.setTitle(highlightMap.get(i.getId())));
+            // System.out.println("longHomeArticleListVoMap :" + longHomeArticleListVoMap);
         }
 
 
     }
 
     @Test
-    void testSearchReactive() {
+    void testSearchUser() {
+        String pre = "<span style='color:red'>";
+        String post = "</span>";
+        String query = "张";
+        Integer page = 0;
+        Integer size = 10;
+        Integer sort = 0;
+        Integer period = 1;
 
+        LocalDateTime now = LocalDateTime.now();
+
+        Query nativeQueryquery = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> {
+                            b.should(s -> s.match(m -> m.field("name").query(query)));
+                            //时间排序控制
+                            // switch (period) {
+                            //     case 1:
+                            //         break;
+                            //     case 2:
+                            //         String oneDayAgoStr = now.minusDays(1).atZone(ZoneId.systemDefault()).toInstant().toString();
+                            //         b.filter(f -> f.range(r -> r.field("createdTime").gte(JsonData.of(oneDayAgoStr))));
+                            //         break;
+                            //     case 3:
+                            //         String oneWeekAgoStr = now.minusWeeks(1).atZone(ZoneId.systemDefault()).toInstant().toString();
+                            //         b.filter(f -> f.range(r -> r.field("createdTime").gte(JsonData.of(oneWeekAgoStr))));
+                            //         break;
+                            //     case 4:
+                            //         String oneMonthAgoStr = now.minusMonths(1).atZone(ZoneId.systemDefault()).toInstant().toString();
+                            //         b.filter(f -> f.range(r -> r.field("createdTime").gte(JsonData.of(oneMonthAgoStr))));
+                            //         break;
+                            //     default:
+                            //         throw new LeadNewsException("错误的时间排序");
+                            // }
+                            return b;
+                        })
+                )
+                // 指定要高亮的字段将其加上头尾标签
+                .withHighlightQuery(
+                        new HighlightQuery(
+                                new Highlight(
+                                        HighlightParameters.builder().withPreTags(pre).withPostTags(post).build(),
+                                        List.of(new HighlightField("name"))
+                                ), String.class)
+                )
+                // .withPageable(PageRequest.of(page.intValue(), size.intValue()))
+                .build();
+
+        //排序控制 粉丝最多排序  默认
+        // if (sort == 0 || sort == 2) {
+        //     nativeQueryquery.addSort(Sort.sort(UserInfoDocument.class).by(UserInfoDocument::getFans).descending());
+        // }else  if (sort == 1) {
+        //     nativeQueryquery.addSort(Sort.sort(UserInfoDocument.class).by(UserInfoDocument::getCreatedTime).descending());
+        // }  else {
+        //     throw new LeadNewsException("错误的排序");
+        // }
+
+        SearchHits<UserInfoDocument> search = elasticsearchOperations.search(nativeQueryquery, UserInfoDocument.class);
+        search.forEach(hit -> {
+            // 打印原始文档内容
+            UserInfoDocument content = hit.getContent();
+            System.out.println("content:"+content);
+            // 打印高亮字段
+            hit.getHighlightFields().forEach((fieldName, highlight) -> {
+                String highlightTitle = String.join(", ", highlight);
+                System.out.println("highlightTitle:"+highlightTitle);
+                content.setName(highlightTitle);
+            });
+        });
     }
 
 }

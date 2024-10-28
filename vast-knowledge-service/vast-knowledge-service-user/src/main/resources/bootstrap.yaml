@@ -3,6 +3,9 @@ spring:
     active: dev
   application:
     name: vk-service-user
+  elasticsearch:
+    uris: http://101.126.43.197:19200
+    socket-timeout: 10s
   cloud:
     nacos:
       username: nacos

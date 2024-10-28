@@ -1,10 +1,14 @@
 package com.vk.user.mapper;
 
 import com.mybatisflex.core.BaseMapper;
+import com.vk.common.es.domain.UserInfoDocument;
 import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.vo.UserInfoVo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * APP用户详情信息 映射层。
@@ -19,4 +23,10 @@ public interface ApUserInfoMapper extends BaseMapper<ApUserInfo> {
 
     UserInfoVo selectGetInfo(@Param("userId")Long id);
 
+    @Select(value="SELECT count(1) from  ap_user u INNER JOIN ap_user_info i on u.id=i.user_id WHERE u.status=0 and u.created_time <= #{now}")
+    Long selectCount(LocalDateTime now);
+
+    List<UserInfoDocument> selectByPage(@Param(value = "start") Long start, @Param(value="size") Long size, @Param(value="now") LocalDateTime now);
+
+    List<UserInfoDocument> selectForCondition(@Param(value="redisTime") LocalDateTime publishTime,@Param(value="nowTime") LocalDateTime nowTime);
 }

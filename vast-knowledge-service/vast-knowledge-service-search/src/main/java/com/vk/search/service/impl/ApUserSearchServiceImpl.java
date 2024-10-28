@@ -48,8 +48,8 @@ public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApU
     private ElasticsearchOperations elasticsearchOperations;
 
     /**
-     * @param query  搜索内容
-     * @param type   头部标题 0 综合     1 文章  3 标签 4 用户
+     * @param query  搜索内容  3 标签
+     * @param type   头部标题 0 综合     1 文章   4 用户
      * @param sort   排序    0 综合排序  1 最新  2 最热
      * @param period 时间    1 不限      2 最新一天  3 最近一周  4最近一月
      * @param page   页数
@@ -58,13 +58,12 @@ public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApU
      */
     @Override
     public List<HomeArticleListVo> searchInfo(String query, Integer type, Integer sort, Integer period, Long page, Long size) {
-        page = (page - 1);
-
         if (type == 1 || type == 0) {
+            page = (page - 1);
             return EsQueryTitle(query, sort, period, page, size);
+        }else {
+            throw  new LeadNewsException("错误的类型");
         }
-
-        return null;
     }
 
     private List<HomeArticleListVo> EsQueryTitle(String query, Integer sort, Integer period, Long page, Long size) {
