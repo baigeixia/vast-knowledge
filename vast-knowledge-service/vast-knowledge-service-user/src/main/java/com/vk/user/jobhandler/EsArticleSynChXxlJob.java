@@ -29,29 +29,29 @@ public class EsArticleSynChXxlJob {
     /**
      * 1、简单任务示例（Bean模式）
      */
-    // @XxlJob("EsUserInfoSync")
-    public void demoJobHandler() {
+    // @XxlJob("esUserInfoSync")
+    public void esUserInfoSync() {
         String recordTime = redisService.getCacheObject("recordTime");
         if (StringUtils.isEmpty(recordTime)) {
-            log.info("执行定时任务taskExecutor: 全量同步未执行,此次不执行");
-            XxlJobHelper.log("执行定时任务taskExecutor: 全量同步未执行,此次不执行");
+            log.info("执行定时任务EsUserInfoSync: 全量同步未执行,此次不执行");
+            XxlJobHelper.log("执行定时任务EsUserInfoSync: 全量同步未执行,此次不执行");
             return;
         }
         if(SyncUtil.sync_status){
-            log.info("执行定时任务taskExecutor: 全量同步已执行,但未完成，此次不执行");
-            XxlJobHelper.log("执行定时任务taskExecutor: 全量同步已执行,但未完成，此次不执行");
+            log.info("执行定时任务EsUserInfoSync: 全量同步已执行,但未完成，此次不执行");
+            XxlJobHelper.log("执行定时任务EsUserInfoSync: 全量同步已执行,但未完成，此次不执行");
             return;
         }
-        log.info("执行定时任务taskExecutor:: 执行时间" + LocalDateTime.now());
-        XxlJobHelper.log("执行定时任务taskExecutor:: 执行时间" + LocalDateTime.now());
+        log.info("执行定时任务EsUserInfoSync:: 执行时间" + LocalDateTime.now());
+        XxlJobHelper.log("执行定时任务EsUserInfoSync:: 执行时间" + LocalDateTime.now());
         //格式化数据
         // LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         LocalDateTime now = LocalDateTime.now();
         redisService.setCacheObject("recordUserTime",now.format(SyncUtil.FORMATTER_YMDHMS));
         LocalDateTime redisTime = LocalDateTime.parse(recordTime, SyncUtil.FORMATTER_YMDHMS);
         List<UserInfoDocument> userInfoDocuments = apUserInfoMapper.selectForCondition(redisTime, now);
-        log.info("执行定时任务taskExecutor:: 需要同步的文章size={}, from={},to={}", userInfoDocuments ==null?0: userInfoDocuments.size(),redisTime,now);
-        XxlJobHelper.log("执行定时任务taskExecutor:: 需要同步的文章size={}, from={},to={}", userInfoDocuments ==null?0: userInfoDocuments.size(),redisTime,now);
+        log.info("执行定时任务EsUserInfoSync:: 需要同步的文章size={}, from={},to={}", userInfoDocuments ==null?0: userInfoDocuments.size(),redisTime,now);
+        XxlJobHelper.log("执行定时任务EsUserInfoSync:: 需要同步的文章size={}, from={},to={}", userInfoDocuments ==null?0: userInfoDocuments.size(),redisTime,now);
         if (userInfoDocuments != null && !userInfoDocuments.isEmpty()) {
             userInfoDocumentRepository.saveAll(userInfoDocuments);
         }

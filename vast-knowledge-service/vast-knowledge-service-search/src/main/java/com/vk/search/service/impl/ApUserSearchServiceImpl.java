@@ -11,6 +11,7 @@ import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.search.domain.ApUserSearch;
 import com.vk.search.mapper.ApUserSearchMapper;
 import com.vk.search.service.ApUserSearchService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -27,10 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * APP用户搜索信息 服务层实现。
@@ -108,7 +106,7 @@ public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApU
                                 ), String.class)
                 )
                 .withPageable(PageRequest.of(page.intValue(), size.intValue()))
-                .withSort(Sort.sort(ArticleInfoDocument.class).by(ArticleInfoDocument::getLikes).descending())
+                // .withSort(Sort.sort(ArticleInfoDocument.class).by(ArticleInfoDocument::getLikes).descending())
                 .withSourceFilter(new FetchSourceFilter(new String[]{"title", "id"}, null))  // 控制显示的字段
                 .build();
 
@@ -132,12 +130,13 @@ public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApU
         SearchHits<ArticleInfoDocument> search = elasticsearchOperations.search(nativeQueryquery, ArticleInfoDocument.class);
 
         //添加高光  文章id 与 高光标题  转map 做替换准备
-        Map<Long, String> highlightMap = new HashMap<>();
+        Map<Long, String> highlightMap = new LinkedHashMap<>();
         search.forEach(hit -> {
             Long id = hit.getContent().getId();
             hit.getHighlightFields().forEach((fieldName, highlight) -> {
                 String highlightTitle = String.join(", ", highlight);
-                highlightMap.put(id, highlightTitle);
+                // highlightMap.put(id, highlightTitle);
+                highlightMap.merge(id, highlightTitle, (existing, newTitle) -> existing + ", " + newTitle);
             });
         });
 
@@ -147,8 +146,20 @@ public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApU
         ValidationUtils.validateR(idList, "文章查询失败");
         Map<Long, HomeArticleListVo> longHomeArticleListVoMap = idList.getData();
 
-        return longHomeArticleListVoMap.values().stream()
-                .peek(i -> i.setTitle(highlightMap.get(i.getId())))
+        List<HomeArticleListVo> list = ids.stream()
+                .map(id -> {
+                    HomeArticleListVo listVo = longHomeArticleListVoMap.get(id);
+                    if (listVo != null) {
+                        HomeArticleListVo newListVo = new HomeArticleListVo();
+                        BeanUtils.copyProperties(listVo, newListVo);
+                        newListVo.setTitle(highlightMap.get(id));
+                        return newListVo;
+                    }
+                    return null; // 处理找不到的情况
+                })
+                .filter(Objects::nonNull) // 过滤掉 null 值
                 .toList();
+
+        return list;
     }
 }
