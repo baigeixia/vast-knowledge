@@ -74,7 +74,7 @@ public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApU
         Query nativeQueryquery = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> {
-                            b.should(s -> s.matchPhrase(m -> m.field(field).query(query)));
+                            b.should(s -> s.match(m -> m.field(field).query(query)));
                             //时间排序控制
                             switch (period) {
                                 case 1:
