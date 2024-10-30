@@ -29,4 +29,6 @@ public interface ApUserInfoMapper extends BaseMapper<ApUserInfo> {
     List<UserInfoDocument> selectByPage(@Param(value = "start") Long start, @Param(value="size") Long size, @Param(value="now") LocalDateTime now);
 
     List<UserInfoDocument> selectForCondition(@Param(value="redisTime") LocalDateTime publishTime,@Param(value="nowTime") LocalDateTime nowTime);
+
+    List<Long> getFollowedUserIds(@Param(value = "localId") Long localUserId, @Param(value = "userIds")List<Long> userIds);
 }

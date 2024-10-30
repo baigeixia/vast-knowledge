@@ -21,6 +21,14 @@ public class RequestContextUtil {
         }
         return Long.parseLong(header);
     }
+    /**
+     * 获取登录的用户的ID 可以是自媒体账号 也可以是 平台账号 也可以是app账号
+     * @return
+     */
+    public static Long getUserIdNotLogin(){
+        String header = RequestContextUtil.getHeader(SecurityConstants.DETAILS_USER_ID);
+        return StringUtils.isEmpty(header) ? null: Long.parseLong(header);
+    }
 
     /**
      * 是否为匿名登录

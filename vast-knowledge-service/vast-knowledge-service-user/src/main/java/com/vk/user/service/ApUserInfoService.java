@@ -1,11 +1,10 @@
 package com.vk.user.service;
 
 import com.mybatisflex.core.service.IService;
-import com.vk.common.es.domain.UserInfoDocument;
 import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.dto.UserInfoDto;
 import com.vk.user.domain.vo.InfoRelationVo;
-import com.vk.user.domain.vo.LocalUserInfoVo;
+import com.vk.user.domain.vo.SearchUserInfoVo;
 import com.vk.user.domain.vo.UserInfoVo;
 
 import java.time.LocalDateTime;
@@ -34,5 +33,5 @@ public interface ApUserInfoService extends IService<ApUserInfo> {
 
     void importAll(long page, Long size, CountDownLatch countDownLatch, LocalDateTime now);
 
-    List<UserInfoDocument> searchUser(String query, Integer type, Integer sort, Integer period, Long page, Long size);
+    List<SearchUserInfoVo> searchUser(String query, Integer type, Integer sort, Integer period, Long page, Long size);
 }

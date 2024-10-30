@@ -43,6 +43,16 @@ public class ApReadBehaviorController {
         return AjaxResult.success(result);
     }
 
+    @GetMapping("/search")
+    public AjaxResult searchRead(
+            @RequestParam(name = "query") String query,
+            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
+            @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size
+    ){
+        List<UserFootMarkListVo> result= apReadBehaviorService.searchRead(query,page,size);
+        return AjaxResult.success(result);
+    }
+
 
 
 

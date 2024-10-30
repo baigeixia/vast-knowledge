@@ -3,5 +3,25 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.behaviour.mapper.ApReadBehaviorMapper">
+    
+    <sql id="readColumns">
+            id,
+            entry_id as entryId,
+            article_id as articleId,
+            updated_time as updatedTime
+    </sql>
 
+    <select id="selectByPage" resultType="com.vk.common.es.domain.UserReadDocument">
+        select
+            <include refid="readColumns"></include>
+        from ap_read_behavior
+        where updated_time &lt;= #{now} limit #{start}, #{size}
+    </select>
+
+    <select id="selectForCondition" resultType="com.vk.common.es.domain.UserReadDocument">
+        select
+            <include refid="readColumns"></include>
+        from ap_read_behavior
+        where updated_time > #{redisTime} and updated_time &lt;= #{nowTime}
+    </select>
 </mapper>

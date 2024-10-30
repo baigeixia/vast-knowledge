@@ -5,6 +5,7 @@ import com.vk.common.es.domain.UserInfoDocument;
 import com.vk.user.domain.dto.UserInfoDto;
 import com.vk.user.domain.vo.InfoRelationVo;
 import com.vk.user.domain.vo.LocalUserInfoVo;
+import com.vk.user.domain.vo.SearchUserInfoVo;
 import com.vk.user.domain.vo.UserInfoVo;
 import com.vk.user.service.ApUserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,7 @@ public class ApUserInfoController {
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size
     ){
-       List<UserInfoDocument> result= apUserInfoService.searchUser(query,type,sort,period,page,size);
+       List<SearchUserInfoVo> result= apUserInfoService.searchUser(query,type,sort,period,page,size);
         return AjaxResult.success(result);
     }
 

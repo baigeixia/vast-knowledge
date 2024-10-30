@@ -2,22 +2,19 @@ package com.vk.user.service.impl;
 
 import co.elastic.clients.json.JsonData;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.mybatisflex.core.row.Db;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.common.core.exception.CustomSimpleThrowUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.common.es.domain.UserInfoDocument;
 import com.vk.common.es.repository.UserInfoDocumentRepository;
 import com.vk.common.redis.service.RedisService;
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.dto.UserInfoDto;
-import com.vk.user.domain.table.ApUserFollowTableDef;
 import com.vk.user.domain.vo.InfoRelationVo;
-import com.vk.user.domain.vo.LocalUserInfoVo;
+import com.vk.user.domain.vo.SearchUserInfoVo;
 import com.vk.user.domain.vo.UserInfoVo;
 import com.vk.user.mapper.ApUserFollowMapper;
 import com.vk.user.mapper.ApUserInfoMapper;
@@ -31,7 +28,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
 import org.springframework.data.elasticsearch.core.query.HighlightQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
@@ -44,10 +40,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 import static com.vk.user.common.constant.UserConstants.redisUserInfoKey;
 import static com.vk.user.domain.table.ApUserFollowTableDef.AP_USER_FOLLOW;
@@ -229,8 +225,8 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
 
 
     /**
-     * @param page 页数
-     * @param size 长度
+     * @param page   页数
+     * @param size   长度
      * @param query  搜索内容
      * @param type   头部标题 4 用户
      * @param sort   排序    0 综合排序  1 最新  2 最热
@@ -238,7 +234,7 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
      * @return
      */
     @Override
-    public List<UserInfoDocument> searchUser(String query, Integer type, Integer sort, Integer period, Long page, Long size) {
+    public List<SearchUserInfoVo> searchUser(String query, Integer type, Integer sort, Integer period, Long page, Long size) {
         if (StringUtils.isEmpty(query)){
             throw new LeadNewsException("搜索内容不能为空");
         }
@@ -247,7 +243,37 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
         }
         page = (page - 1);
 
-        return EsQueryUser(query,sort,period,page,size);
+        List<UserInfoDocument> userInfoDocuments = EsQueryUser(query, sort, period, page, size);
+        Long localUserId = RequestContextUtil.getUserIdNotLogin();
+
+        List<SearchUserInfoVo> searchUserInfoVos = new ArrayList<>();
+
+        if (null==localUserId){
+            //未登录
+            for (UserInfoDocument infoDocument : userInfoDocuments) {
+                SearchUserInfoVo vo = new SearchUserInfoVo();
+                BeanUtils.copyProperties(infoDocument, vo);
+                vo.setConcerned(0);
+
+                searchUserInfoVos.add(vo);
+            }
+        }else {
+            List<Long> userIds = userInfoDocuments.stream()
+                    .map(UserInfoDocument::getId)
+                    .toList();
+
+            List<Long> followedUserIds =mapper.getFollowedUserIds(localUserId,userIds);
+            for (UserInfoDocument infoDocument : userInfoDocuments) {
+                SearchUserInfoVo vo = new SearchUserInfoVo();
+                BeanUtils.copyProperties(infoDocument, vo);
+                // 默认关注状态
+                vo.setConcerned(followedUserIds.contains(infoDocument.getId()) ? 1 : 0);
+                searchUserInfoVos.add(vo);
+            }
+
+        }
+
+        return searchUserInfoVos;
     }
 
     private List<UserInfoDocument> EsQueryUser(String query, Integer sort, Integer period, Long page, Long size) {
@@ -292,7 +318,7 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
                 )
                 .withPageable(PageRequest.of(page.intValue(), size.intValue()))
                 //粉丝最多排序  默认
-                .withSort(Sort.sort(UserInfoDocument.class).by(UserInfoDocument::getFans).descending())
+                // .withSort(Sort.sort(UserInfoDocument.class).by(UserInfoDocument::getFans).descending())
                 .build();
 
         //排序控制

@@ -8,6 +8,7 @@ import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.common.es.domain.UserInfoDocument;
+import com.vk.common.es.domain.UserReadDocument;
 import com.vk.common.es.repository.ArticleDocumentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTe
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
 import org.springframework.data.elasticsearch.core.query.HighlightQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
@@ -262,6 +264,49 @@ public class SearchApplicationTests {
                 content.setName(highlightTitle);
             });
         });
+    }
+
+
+    @Test
+    void EsQueryRead() {
+        String pre = "<span style='color:red'>";
+        String post = "</span>";
+        String query = "是";
+        Long userid = 2L;
+        int page = 1;
+        int size = 10;
+
+        Query nativeQueryquery = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> b
+                                .must(s -> s.match(m -> m.field("title").query(query)))
+                                .must(s -> s.term(m -> m.field("entryId").value(userid)))
+                        )
+                )
+                // 指定要高亮的字段将其加上头尾标签
+                .withHighlightQuery(
+                        new HighlightQuery(
+                                new Highlight(
+                                        HighlightParameters.builder().withPreTags(pre).withPostTags(post).build(),
+                                        List.of(new HighlightField("title"))
+                                ), String.class)
+                )
+                .withPageable(PageRequest.of(page - 1, size))
+                // 粉丝最多排序  默认
+                .build();
+
+        SearchHits<UserReadDocument> searchHits = elasticsearchOperations.search(nativeQueryquery, UserReadDocument.class);
+        searchHits.forEach(hit -> {
+            // 打印原始文档内容
+            System.out.println("Document: " + hit.getContent());
+
+            // 打印高亮字段
+            hit.getHighlightFields().forEach((fieldName, highlight) -> {
+                System.out.println("Field: " + fieldName);
+                System.out.println("Highlights: " + String.join(", ", highlight));
+            });
+        });
+
     }
 
 }

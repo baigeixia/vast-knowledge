@@ -7,6 +7,7 @@ import com.vk.user.domain.AuthorInfo;
 import com.vk.user.domain.vo.LocalUserInfoVo;
 import com.vk.user.domain.vo.UserInfoVo;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Set;
@@ -21,4 +22,6 @@ public interface ApUserMapper extends BaseMapper<ApUser> {
 
 
     List<AuthorInfo> selectListOrInfo(@Param("ids") Set<Long> ids);
+    @Select("select name from ap_user where  id=#{id}")
+    String getUserName(@Param("id") Long userId);
 }

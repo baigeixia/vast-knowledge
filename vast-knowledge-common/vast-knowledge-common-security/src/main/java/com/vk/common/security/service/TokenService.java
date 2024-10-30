@@ -1,5 +1,7 @@
 package com.vk.common.security.service;
 
+
+import com.vk.system.api.model.LoginUser;
 import jakarta.servlet.http.HttpServletRequest;
 import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.constant.SecurityConstants;
@@ -10,7 +12,7 @@ import com.vk.common.core.utils.ip.IpUtils;
 import com.vk.common.core.utils.uuid.IdUtils;
 import com.vk.common.redis.service.RedisService;
 import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.model.LoginUser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
