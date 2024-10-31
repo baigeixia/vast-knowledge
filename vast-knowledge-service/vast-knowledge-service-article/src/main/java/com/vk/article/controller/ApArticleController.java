@@ -160,5 +160,12 @@ public class ApArticleController {
         return R.ok(articleIdList)  ;
     }
 
+    @DeleteMapping("/deleteOne")
+    public AjaxResult deleteOne(
+            @RequestParam(name = "id") Long id
+    ){
+        apArticleService.deleteOne(id);
+        return AjaxResult.success();
+    }
 
 }

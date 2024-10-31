@@ -4,6 +4,7 @@ import com.mybatisflex.core.BaseMapper;
 import com.vk.behaviour.domain.ApReadBehavior;
 import com.vk.common.es.domain.UserInfoDocument;
 import com.vk.common.es.domain.UserReadDocument;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -31,4 +32,6 @@ public interface ApReadBehaviorMapper extends BaseMapper<ApReadBehavior> {
 
     List<UserReadDocument> selectForCondition(@Param(value="redisTime") LocalDateTime publishTime,@Param(value="nowTime") LocalDateTime nowTime);
 
+    @Delete("delete from  ap_read_behavior where  entry_id=#{localUserId}")
+    void clearAll(@Param("localUserId")Long localUserId);
 }

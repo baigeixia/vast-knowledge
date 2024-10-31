@@ -24,13 +24,12 @@ public class ApUserFollowServiceImpl extends ServiceImpl<ApUserFollowMapper, ApU
 
     @Override
     public Page<FollowListVo> getList(Long page, Long size, Long userId) {
-        Long localID = RequestContextUtil.getUserId();
 
         if (StringUtils.isLongEmpty(userId)) {
-            userId = localID;
+            userId = RequestContextUtil.getUserId();
         }
 
-        List<FollowListVo> followListVos = mapper.getList(userId, (page-1)*size,size,localID);
+        List<FollowListVo> followListVos = mapper.getList(userId, (page-1)*size,size,userId);
         return new Page<>(followListVos,page,size,0L);
     }
 }

@@ -111,8 +111,10 @@ public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMappe
     @Override
     public Map<Long, Integer> articleLike(Set<Long> ids) {
         CustomSimpleThrowUtils.ObjectIsEmpty(ids, "参数错误");
-        Long userId = RequestContextUtil.getUserId();
-
+        Long userId = RequestContextUtil.getUserIdNotLogin();
+        if (null==userId){
+            return null;
+        }
         List<ApLikesBehavior> userLikes = mapper.selectUserLikes(userId, ids);
         return userLikes.stream().collect(Collectors.toMap(ApLikesBehavior::getArticleId, ApLikesBehavior::getOperation, (existingValue, newValue) -> newValue));
 
@@ -122,7 +124,10 @@ public class ApLikesBehaviorServiceImpl extends ServiceImpl<ApLikesBehaviorMappe
     public ArticleAndCommentLikeVo commentLike(Long artId, Set<Long> ids) {
         CustomSimpleThrowUtils.ObjectIsEmpty(ids, "参数错误");
         CustomSimpleThrowUtils.LongIsEmpty(artId, "id错误");
-        Long userId = RequestContextUtil.getUserId();
+        Long userId = RequestContextUtil.getUserIdNotLogin();
+        if (null==userId){
+            return null;
+        }
 
         ArticleAndCommentLikeVo vo = new ArticleAndCommentLikeVo();
 

@@ -32,10 +32,11 @@ public class ApFollowBehaviorController {
      */
     @GetMapping("list")
     public AjaxResult followList(
+            @RequestParam(name = "id",required = false) Long id ,
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size
     ) {
-       List<FollowNotificationListVo> result= apFollowBehaviorService.followList(page,size);
+       List<FollowNotificationListVo> result= apFollowBehaviorService.followList(id,page,size);
         return AjaxResult.success(result);
     }
 

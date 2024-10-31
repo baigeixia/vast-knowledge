@@ -6,6 +6,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.feign.RemoteClientArticleQueryService;
 import com.vk.behaviour.domain.ApReadBehavior;
+import com.vk.behaviour.domain.vo.LocalReadSearchVo;
 import com.vk.behaviour.domain.vo.UserFootMarkListVo;
 import com.vk.behaviour.mapper.ApReadBehaviorMapper;
 import com.vk.behaviour.service.ApReadBehaviorService;
@@ -40,6 +41,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -99,10 +101,13 @@ public class ApReadBehaviorServiceImpl extends ServiceImpl<ApReadBehaviorMapper,
 
     @Override
     public ApReadBehavior getArticleInfo(Long id) {
-        Long userId = RequestContextUtil.getUserId();
-        QueryWrapper wrapper = QueryWrapper.create().select();
-        wrapper.where(AP_READ_BEHAVIOR.ARTICLE_ID.eq(id).and(AP_READ_BEHAVIOR.ENTRY_ID.eq(userId)));
-        return mapper.selectOneByQuery(wrapper);
+        Long userId = RequestContextUtil.getUserIdNotLogin();
+        if (!StringUtils.isLongEmpty(userId)){
+            QueryWrapper wrapper = QueryWrapper.create().select();
+            wrapper.where(AP_READ_BEHAVIOR.ARTICLE_ID.eq(id).and(AP_READ_BEHAVIOR.ENTRY_ID.eq(userId)));
+            return mapper.selectOneByQuery(wrapper);
+        }
+        return null;
     }
 
     @Override
@@ -155,21 +160,81 @@ public class ApReadBehaviorServiceImpl extends ServiceImpl<ApReadBehaviorMapper,
     }
 
     @Override
-    public List<UserFootMarkListVo> searchRead(String query, Long page, Long size) {
+    public LocalReadSearchVo searchRead(String query, Long page, Long size) {
         if (StringUtils.isEmpty(query)){
             throw  new LeadNewsException("搜索内容不能为空");
         }
-
+        LocalReadSearchVo resultVo = new LocalReadSearchVo();
         SearchHits<UserReadDocument> searchHits = EsQueryRead(query, page, size);
         long totalHits = searchHits.getTotalHits();
+        resultVo.setTotalHits(totalHits);
 
-        List<UserReadDocument> readDocuments = searchHits.stream().map(SearchHit::getContent).toList();
+        Map<Long, String> highlightMap = new LinkedHashMap<>();
+        List<UserReadDocument> readDocuments = searchHits.stream().map(hit -> {
+            StringBuilder highlightTitleBuilder = new StringBuilder();
+            Long articleId = hit.getContent().getArticleId();
+            hit.getHighlightFields().forEach((fieldName, highlight) -> {
+                if (highlight != null && !highlight.isEmpty()) {
+                    // 合并高亮标题
+                    if (!highlightTitleBuilder.isEmpty()) {
+                        highlightTitleBuilder.append(", ");
+                    }
+                    highlightTitleBuilder.append(String.join(", ", highlight));
+                }
+            });
+            highlightMap.merge(articleId, highlightTitleBuilder.toString(), (existing, newTitle) -> existing + ", " + newTitle);
+            return hit.getContent();
+        }).toList();
+
 
         Set<Long> articleIds = readDocuments.stream().map(UserReadDocument::getArticleId).collect(Collectors.toSet());
 
-        return buildFootMarkList(articleIds, readDocuments, UserReadDocument::getArticleId, UserReadDocument::getUpdatedTime);
+        List<UserFootMarkListVo> userFootMarkListVos = buildFootMarkList(articleIds, readDocuments, UserReadDocument::getArticleId, UserReadDocument::getUpdatedTime);
+        userFootMarkListVos.forEach(i->i.getFootMark().forEach(h->h.setTitle(highlightMap.get(h.getId()))));
+        resultVo.setFootMarkLists(userFootMarkListVos);
+
+        return resultVo;
     }
 
+    private final ReentrantLock lock = new ReentrantLock();
+    @Override
+    @Async("asyncTaskExecutor")
+    public void clearAll(Long userid) {
+        log.info("开始执行 clearAll for userId: {}", userid);
+
+        if (lock.tryLock()) { // 使用 tryLock 防止死锁
+            try {
+                log.info("执行 clearAll");
+                List<UserReadDocument> documents = userReadDocumentRepository.findByEntryId(userid);
+
+                if (!documents.isEmpty()) {
+                    userReadDocumentRepository.deleteAll(documents);
+                    log.info("成功删除 {} 个文档", documents.size());
+                } else {
+                    log.info("没有找到要删除的文档");
+                }
+
+                mapper.clearAll(userid);
+            } catch (Exception e) {
+                log.error("清除操作失败", e);
+            } finally {
+                lock.unlock(); // 确保释放锁
+            }
+        } else {
+            log.warn("无法获取锁，clearAll 操作被跳过");
+        }
+    }
+
+
+    /**
+     * 查询文章返回 List<UserFootMarkListVo>
+     * @param ids
+     * @param readBehaviors
+     * @param articleIdExtractor
+     * @param updatedTimeExtractor
+     * @return
+     * @param <T>
+     */
     private <T> List<UserFootMarkListVo> buildFootMarkList(Set<Long> ids, List<T> readBehaviors, Function<T, Long> articleIdExtractor, Function<T, LocalDateTime> updatedTimeExtractor) {
         if (ObjectUtils.isEmpty(ids)) {
             return Collections.emptyList(); // 如果 ids 为空，返回空列表

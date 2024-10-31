@@ -2,8 +2,10 @@ package com.vk.behaviour.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import com.vk.behaviour.domain.ApReadBehavior;
+import com.vk.behaviour.domain.vo.LocalReadSearchVo;
 import com.vk.behaviour.domain.vo.UserFootMarkListVo;
 import com.vk.behaviour.service.ApReadBehaviorService;
+import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,8 +51,16 @@ public class ApReadBehaviorController {
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size
     ){
-        List<UserFootMarkListVo> result= apReadBehaviorService.searchRead(query,page,size);
+        LocalReadSearchVo result= apReadBehaviorService.searchRead(query,page,size);
         return AjaxResult.success(result);
+    }
+
+    @GetMapping("/clearAll")
+    public AjaxResult clearAll(
+    ){
+        Long localUserId = RequestContextUtil.getUserId();
+       apReadBehaviorService.clearAll(localUserId);
+        return AjaxResult.success();
     }
 
 

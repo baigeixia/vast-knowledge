@@ -27,13 +27,12 @@ public class ApUserFanServiceImpl extends ServiceImpl<ApUserFanMapper, ApUserFan
 
     @Override
     public Page<FanListVo> getList(Long page, Long size, Long userId) {
-        Long localID = RequestContextUtil.getUserId();
 
         if (StringUtils.isLongEmpty(userId)) {
-            userId = localID;
+            userId = RequestContextUtil.getUserId();
         }
 
-        List<FanListVo> fanListVos = mapper.getList(userId, (page-1)*size,size,localID);
+        List<FanListVo> fanListVos = mapper.getList(userId, (page-1)*size,size,userId);
         return new Page<>(fanListVos,page,size,0L);
     }
 }

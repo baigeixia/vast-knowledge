@@ -45,4 +45,6 @@ public interface ApArticleService extends IService<ApArticle> {
     Long selectCount(LocalDateTime now);
 
     void importAll(long page, Long size, CountDownLatch countDownLatch, LocalDateTime now);
+
+    void deleteOne(Long id);
 }

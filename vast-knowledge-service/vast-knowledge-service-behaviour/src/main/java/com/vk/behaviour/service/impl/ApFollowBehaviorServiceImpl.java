@@ -10,6 +10,7 @@ import com.vk.behaviour.domain.vo.notification.follow.FollowNotificationListVo;
 import com.vk.behaviour.mapper.ApFollowBehaviorMapper;
 import com.vk.behaviour.service.ApFollowBehaviorService;
 import com.vk.common.core.utils.RequestContextUtil;
+import com.vk.common.core.utils.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -29,9 +30,12 @@ import java.util.stream.Collectors;
 public class ApFollowBehaviorServiceImpl extends ServiceImpl<ApFollowBehaviorMapper, ApFollowBehavior> implements ApFollowBehaviorService {
 
     @Override
-    public List<FollowNotificationListVo> followList(Long page, Long size) {
+    public List<FollowNotificationListVo> followList(Long userId, Long page, Long size) {
         List<FollowNotificationListVo> vos = new ArrayList<>();
-        Long userId = RequestContextUtil.getUserId();
+        if (StringUtils.isLongEmpty(userId)){
+             userId = RequestContextUtil.getUserId();
+        }
+
         page = (page - 1) * size;
 
         List<FollowNotifyCountMap> countMapList = mapper.getFollowNotifyCountMap(userId, page, size);

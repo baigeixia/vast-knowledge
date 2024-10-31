@@ -115,7 +115,10 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
 
     @Override
     public UserInfoVo getInfo(Long id) {
-        Long  userid = RequestContextUtil.getUserId();
+        Long  userid = RequestContextUtil.getUserIdNotLogin();
+        if (null==userid && null==id){
+            return null;
+        }
         if (StringUtils.isLongEmpty(id)){
             return userInfoIdOne(userid);
         }else {
@@ -180,7 +183,10 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
 
     @Override
     public InfoRelationVo InfoRelation(Long id) {
-        Long userid = RequestContextUtil.getUserId();
+        Long userid = RequestContextUtil.getUserIdNotLogin();
+        if (null==userid){
+            return null;
+        }
         if (StringUtils.isLongEmpty(id)){
             id=userid;
         }

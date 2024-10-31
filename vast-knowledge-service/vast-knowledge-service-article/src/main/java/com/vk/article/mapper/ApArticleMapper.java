@@ -26,4 +26,7 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
     List<ArticleInfoDocument> selectByPage(@Param(value = "start") Long start, @Param(value="size") Long size, @Param(value="publishTime") LocalDateTime publishTime);
 
     List<ArticleInfoDocument> selectForCondition(@Param(value="redisTime") LocalDateTime publishTime,@Param(value="nowTime") LocalDateTime nowTime);
+
+    @Select("select count(1) from ap_article a inner join ap_article_config c ON a.id = c.article_id where a.author_id=#{localUserId} and a.id=#{articleId} and c.is_delete=0 ")
+    Long selectCountOne(@Param(value = "articleId")Long articleId,@Param(value = "localUserId")Long localUserId);
 }

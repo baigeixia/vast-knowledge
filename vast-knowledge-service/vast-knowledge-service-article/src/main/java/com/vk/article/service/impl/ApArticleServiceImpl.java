@@ -8,6 +8,7 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
+import com.vk.article.domain.table.ApArticleConfigTableDef;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
@@ -240,6 +241,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         Page<HomeArticleListVo> listVoPage;
 
         QueryWrapper wrapper = QueryWrapper.create();
+        wrapper.innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID)).where(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0)));
         if (null != tag && tag != 0) {
             wrapper.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
         }
@@ -409,5 +411,22 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             countDownLatch.countDown();
         }
 
+    }
+
+    @Override
+    public void deleteOne(Long articleId) {
+        if (StringUtils.isLongEmpty(articleId)){
+            throw new LeadNewsException("文章id不能为空");
+        }
+        Long localUserId = RequestContextUtil.getUserId();
+
+        Long dbId =mapper.selectCountOne(articleId,localUserId);
+        if (StringUtils.isLongEmpty(dbId)){
+            throw new LeadNewsException("文章不存在或者已经被删除");
+        }
+
+        articleDocumentRepository.deleteById(articleId);
+
+        apArticleConfigMapper.deleteByOne(articleId);
     }
 }

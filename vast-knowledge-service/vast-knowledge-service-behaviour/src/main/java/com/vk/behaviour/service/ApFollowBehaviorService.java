@@ -14,5 +14,5 @@ import java.util.List;
  */
 public interface ApFollowBehaviorService extends IService<ApFollowBehavior> {
 
-    List<FollowNotificationListVo> followList(Long page, Long size);
+    List<FollowNotificationListVo> followList(Long id,Long page, Long size);
 }

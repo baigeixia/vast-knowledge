@@ -2,6 +2,7 @@ package com.vk.behaviour.service;
 
 import com.mybatisflex.core.service.IService;
 import com.vk.behaviour.domain.ApReadBehavior;
+import com.vk.behaviour.domain.vo.LocalReadSearchVo;
 import com.vk.behaviour.domain.vo.UserFootMarkListVo;
 import com.vk.common.es.domain.UserReadDocument;
 
@@ -27,5 +28,7 @@ public interface ApReadBehaviorService extends IService<ApReadBehavior> {
 
     List<UserReadDocument> selectForCondition(LocalDateTime redisTime, LocalDateTime now);
 
-    List<UserFootMarkListVo> searchRead(String query, Long page, Long size);
+    LocalReadSearchVo searchRead(String query, Long page, Long size);
+
+    void clearAll(Long userid);
 }
