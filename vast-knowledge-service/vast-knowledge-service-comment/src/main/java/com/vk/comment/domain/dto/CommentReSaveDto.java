@@ -11,7 +11,7 @@ public class CommentReSaveDto {
      */
     private  Long repayAuthorId;
     /**
-     * 回复评论用户id
+     * 用户id
      */
     private  Long entryId;
 

@@ -2,6 +2,7 @@ package com.vk.common.security.service;
 
 
 import com.vk.system.api.model.LoginUser;
+import com.vk.user.model.LoginApUser;
 import jakarta.servlet.http.HttpServletRequest;
 import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.constant.SecurityConstants;
@@ -148,7 +149,7 @@ public class TokenService
      *
      * @param loginUser
      */
-    public void verifyToken(LoginUser loginUser)
+    public void verifyToken(LoginUser loginUser )
     {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
@@ -156,6 +157,25 @@ public class TokenService
         {
             refreshToken(loginUser);
         }
+    }
+
+    public void verifyToken(LoginApUser loginUser )
+    {
+        long expireTime = loginUser.getExpireTime();
+        long currentTime = System.currentTimeMillis();
+        if (expireTime - currentTime <= MILLIS_MINUTE_TEN)
+        {
+            refreshToken(loginUser);
+        }
+    }
+
+    public void refreshToken(LoginApUser loginUser)
+    {
+        loginUser.setLoginTime(System.currentTimeMillis());
+        loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
+        // 根据uuid将loginUser缓存
+        String userKey = getTokenKey(loginUser.getToken());
+        redisService.setCacheObject(userKey, loginUser, expireTime, TimeUnit.MINUTES);
     }
 
     /**

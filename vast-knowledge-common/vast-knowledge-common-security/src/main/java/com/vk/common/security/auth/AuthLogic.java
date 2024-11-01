@@ -11,9 +11,11 @@ import com.vk.common.security.annotation.Logical;
 import com.vk.common.security.annotation.RequiresLogin;
 import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.annotation.RequiresRoles;
+import com.vk.common.security.service.ClientTokenService;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.api.model.LoginUser;
+import com.vk.user.model.LoginApUser;
 import org.springframework.util.PatternMatchUtils;
 
 import java.util.Collection;
@@ -34,6 +36,7 @@ public class AuthLogic
     private static final String SUPER_ADMIN = "admin";
 
     public TokenService tokenService = SpringUtils.getBean(TokenService.class);
+    public ClientTokenService clientTokenService = SpringUtils.getBean(ClientTokenService.class);
 
     /**
      * 会话注销
@@ -95,6 +98,12 @@ public class AuthLogic
         return tokenService.getLoginUser(token);
     }
 
+    public LoginApUser getLoginApUser(String token)
+    {
+        return clientTokenService.getLoginApUser(token);
+    }
+
+
     /**
      * 验证当前用户有效期, 如果相差不足120分钟，自动刷新缓存
      * 
@@ -103,6 +112,10 @@ public class AuthLogic
     public void verifyLoginUserExpire(LoginUser loginUser)
     {
         tokenService.verifyToken(loginUser);
+    }
+    public void verifyLoginUserExpire(LoginApUser LoginApUser)
+    {
+        tokenService.verifyToken(LoginApUser);
     }
 
     /**

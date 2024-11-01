@@ -79,11 +79,27 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
             throw new LeadNewsException("评论内容或回复图片不能为空");
         }
 
+        Set<Long> longHashSet = new HashSet<>();
+
+        longHashSet.add(userId);
+        longHashSet.add(repayAuthorId);
+
+        R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(longHashSet);
+        ValidationUtils.validateR(userList,"错误的用户");
+
+        Map<Long, AuthorInfo> data = userList.getData();
+        if (data.isEmpty()){
+            throw new LeadNewsException("错误的用户");
+        }
+
+        AuthorInfo info = data.get(userId);
+        String username = info.getUsername();
+
         LocalDateTime dateTime = LocalDateTime.now();
 
         ApCommentRepay commentRepay = new ApCommentRepay();
         commentRepay.setAuthorId(userId);
-        commentRepay.setAuthorName(userName);
+        commentRepay.setAuthorName(username);
         commentRepay.setCommentId(commentId);
         commentRepay.setCommentRepayId(commentRepayId);
         commentRepay.setContent(content);
@@ -126,19 +142,9 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
             throw new LeadNewsException("回复用户缺失");
         }
 
-        HashSet<Long> longHashSet = new HashSet<>();
-
-        longHashSet.add(userId);
-        longHashSet.add(authorIdRe);
-
-        R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(longHashSet);
-        ValidationUtils.validateR(userList,"错误的用户");
-
-
-        Map<Long, AuthorInfo> data = userList.getData();
 
         listRe.setReply(data.get(authorIdRe));
-        listRe.setAuthor(data.get(userId));
+        listRe.setAuthor(info);
 
         ApCommentRepayDocument repayDocument = new ApCommentRepayDocument();
         BeanUtils.copyProperties(commentRepay,repayDocument);

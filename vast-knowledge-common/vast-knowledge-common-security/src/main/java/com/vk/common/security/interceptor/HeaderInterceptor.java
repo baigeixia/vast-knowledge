@@ -8,6 +8,7 @@ import com.vk.common.core.utils.StringUtils;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.api.model.LoginUser;
+import com.vk.user.model.LoginApUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
@@ -36,11 +37,11 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
         String token = SecurityUtils.getToken();
         if (StringUtils.isNotEmpty(token))
         {
-            LoginUser loginUser = AuthUtil.getLoginUser(token);
-            if (StringUtils.isNotNull(loginUser))
+            LoginApUser loginApUser = AuthUtil.getLoginApUser(token);
+            if (StringUtils.isNotNull(loginApUser))
             {
-                AuthUtil.verifyLoginUserExpire(loginUser);
-                SecurityContextHolder.set(SecurityConstants.LOGIN_USER, loginUser);
+                AuthUtil.verifyLoginUserExpire(loginApUser);
+                SecurityContextHolder.set(SecurityConstants.LOGIN_USER, loginApUser);
             }
         }
         return true;

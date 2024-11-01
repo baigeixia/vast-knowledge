@@ -4,6 +4,7 @@ package com.vk.common.security.auth;
 import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.annotation.RequiresRoles;
 import com.vk.system.api.model.LoginUser;
+import com.vk.user.model.LoginApUser;
 
 /**
  * Token 权限验证工具类
@@ -54,6 +55,10 @@ public class AuthUtil
         return authLogic.getLoginUser(token);
     }
 
+    public static LoginApUser getLoginApUser(String token)
+    {
+        return authLogic.getLoginApUser(token);
+    }
     /**
      * 验证当前用户有效期
      * 
@@ -62,6 +67,11 @@ public class AuthUtil
     public static void verifyLoginUserExpire(LoginUser loginUser)
     {
         authLogic.verifyLoginUserExpire(loginUser);
+    }
+
+    public static void verifyLoginUserExpire(LoginApUser loginApUser)
+    {
+        authLogic.verifyLoginUserExpire(loginApUser);
     }
 
     /**

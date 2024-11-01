@@ -36,10 +36,10 @@ public class IgnoreWhiteProperties
         whites.add("/dev-core/article/Content/getInfo");
         whites.add("/dev-core/article/article/info");
         whites.add("/dev-core/comment/Comment/getCommentList");
-        whites.add("/dev-system/user/info/getInfo");
+        // whites.add("/dev-system/user/info/getInfo");
         whites.add("/dev-collection/behaviour/likes/commentLike/**");
         whites.add("/dev-collection/behaviour/behavior/list");
-        whites.add("/dev-system/user/info/InfoRelation");
+        // whites.add("/dev-system/user/info/InfoRelation");
         whites.add("/dev-core/article/article/posts");
         whites.add("/dev-collection/behaviour/collect/list");
         whites.add("/dev-system/user/follow/list");
