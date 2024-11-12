@@ -7,7 +7,6 @@ import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.model.LoginUser;
 import com.vk.user.model.LoginApUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

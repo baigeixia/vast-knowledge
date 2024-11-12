@@ -1,7 +1,7 @@
 package com.vk.system.service.impl;
 
 
-import com.vk.system.api.domain.SysLogininfor;
+import com.vk.system.domain.SysLogininfor;
 import com.vk.system.mapper.SysLogininforMapper;
 import com.vk.system.service.ISysLogininforService;
 import org.springframework.beans.factory.annotation.Autowired;

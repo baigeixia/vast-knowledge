@@ -1,10 +1,10 @@
-package com.vk.system.api;
+package com.vk.system.feign;
 
 
 import com.vk.common.core.constant.ServiceNameConstants;
 import com.vk.common.core.domain.R;
-import com.vk.system.api.domain.SysFile;
-import com.vk.system.api.factory.RemoteFileFallbackFactory;
+import com.vk.system.domain.SysFile;
+import com.vk.system.factory.RemoteFileFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;

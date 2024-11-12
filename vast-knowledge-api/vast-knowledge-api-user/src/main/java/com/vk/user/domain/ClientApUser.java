@@ -2,6 +2,8 @@ package com.vk.user.domain;
 
 
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
  * @author 张三
  * @since 2024-05-13
  */
+@Data
 public class ClientApUser implements Serializable {
 
     /**
@@ -25,10 +28,9 @@ public class ClientApUser implements Serializable {
     private String salt;
 
     /**
-     * 用户名
+     * 用户邮箱
      */
-    private String name;
-
+    private String email;
     /**
      * 密码,md5加密
      */
@@ -74,99 +76,4 @@ public class ClientApUser implements Serializable {
      */
     private LocalDateTime createdTime;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public Integer getSex() {
-        return sex;
-    }
-
-    public void setSex(Integer sex) {
-        this.sex = sex;
-    }
-
-    public Integer getIsCertification() {
-        return isCertification;
-    }
-
-    public void setIsCertification(Integer isCertification) {
-        this.isCertification = isCertification;
-    }
-
-    public Integer getIsIdentityAuthentication() {
-        return isIdentityAuthentication;
-    }
-
-    public void setIsIdentityAuthentication(Integer isIdentityAuthentication) {
-        this.isIdentityAuthentication = isIdentityAuthentication;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Integer getFlag() {
-        return flag;
-    }
-
-    public void setFlag(Integer flag) {
-        this.flag = flag;
-    }
-
-    public LocalDateTime getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(LocalDateTime createdTime) {
-        this.createdTime = createdTime;
-    }
 }

@@ -1,6 +1,6 @@
 package com.vk.system.service;
 
-import com.vk.system.api.domain.SysUser;
+import com.vk.system.domain.SysUser;
 
 import java.util.Set;
 

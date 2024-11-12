@@ -1,5 +1,6 @@
 package com.vk.common.filter;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
@@ -20,14 +21,12 @@ public class IgnoreWhiteProperties
     /**
      * 放行白名单配置，网关不校验此处的白名单
      */
-    private List<String> whites = new ArrayList<>();
-
-    public void setWhites(List<String> whites)
-    {
-        this.whites = whites;
+    private List<String> whites ;
+    @PostConstruct
+    private  void init(){
+        initializeWhites();
     }
-
-    public List<String> getWhites() {
+    private void initializeWhites() {
         whites.add("/dev-collection/analyze/channel/page");
         whites.add("/dev-core/article/article/homeList");
         whites.add("/dev-collection/behaviour/likes/articleLike");
@@ -44,6 +43,15 @@ public class IgnoreWhiteProperties
         whites.add("/dev-collection/behaviour/collect/list");
         whites.add("/dev-system/user/follow/list");
         whites.add("/dev-system/user/fan/list");
-        return whites;
+    }
+
+    public void setWhites(List<String> whites)
+    {
+        this.whites = whites;
+    }
+
+
+    public List<String> getWhites() {
+        return this.whites;
     }
 }

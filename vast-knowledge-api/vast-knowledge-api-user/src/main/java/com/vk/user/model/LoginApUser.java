@@ -1,7 +1,9 @@
 package com.vk.user.model;
 
 import com.vk.user.domain.ClientApUser;
+import lombok.Data;
 
+@Data
 public class LoginApUser {
     /**
      * 用户信息
@@ -17,9 +19,8 @@ public class LoginApUser {
      * 用户名id
      */
     private Long userid;
-
     /**
-     * 用户名
+     * 用户名称
      */
     private String username;
 
@@ -62,13 +63,7 @@ public class LoginApUser {
         this.userid = userid;
     }
 
-    public String getUsername() {
-        return username;
-    }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public Long getLoginTime() {
         return loginTime;

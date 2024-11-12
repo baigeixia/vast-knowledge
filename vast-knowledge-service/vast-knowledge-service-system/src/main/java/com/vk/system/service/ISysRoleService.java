@@ -1,6 +1,6 @@
 package com.vk.system.service;
 
-import com.vk.system.api.domain.SysRole;
+import com.vk.system.domain.SysRole;
 import com.vk.system.domain.SysUserRole;
 
 import java.util.List;

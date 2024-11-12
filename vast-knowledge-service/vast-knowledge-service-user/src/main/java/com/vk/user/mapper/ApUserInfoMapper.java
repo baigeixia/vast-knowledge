@@ -3,6 +3,8 @@ package com.vk.user.mapper;
 import com.mybatisflex.core.BaseMapper;
 import com.vk.common.es.domain.UserInfoDocument;
 import com.vk.user.domain.ApUserInfo;
+import com.vk.user.domain.ClientApUser;
+import com.vk.user.domain.dto.UserInfoLogin;
 import com.vk.user.domain.vo.UserInfoVo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -31,4 +33,6 @@ public interface ApUserInfoMapper extends BaseMapper<ApUserInfo> {
     List<UserInfoDocument> selectForCondition(@Param(value="redisTime") LocalDateTime publishTime,@Param(value="nowTime") LocalDateTime nowTime);
 
     List<Long> getFollowedUserIds(@Param(value = "localId") Long localUserId, @Param(value = "userIds")List<Long> userIds);
+
+    UserInfoLogin selectNameGetInfo(@Param("name")String name);
 }

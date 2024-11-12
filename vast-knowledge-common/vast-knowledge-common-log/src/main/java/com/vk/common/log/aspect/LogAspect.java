@@ -10,7 +10,7 @@ import com.vk.common.log.filter.PropertyPreExcludeFilter;
 import com.vk.common.log.service.AsyncLogService;
 import com.vk.common.security.utils.SecurityUtils;
 
-import com.vk.system.api.domain.SysOperLog;
+import com.vk.system.domain.SysOperLog;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;

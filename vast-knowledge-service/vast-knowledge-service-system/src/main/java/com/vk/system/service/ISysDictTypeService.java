@@ -1,7 +1,7 @@
 package com.vk.system.service;
 
-import com.vk.system.api.domain.SysDictData;
-import com.vk.system.api.domain.SysDictType;
+import com.vk.system.domain.SysDictData;
+import com.vk.system.domain.SysDictType;
 
 import java.util.List;
 

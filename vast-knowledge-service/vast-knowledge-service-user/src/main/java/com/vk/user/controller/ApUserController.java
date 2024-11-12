@@ -4,9 +4,11 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.security.annotation.InnerAuth;
-import com.vk.user.domain.ApUser;
-import com.vk.user.domain.AuthorInfo;
-import com.vk.user.domain.ClientApUser;
+import com.vk.user.domain.*;
+import com.vk.user.domain.dto.UserInfoLogin;
+import com.vk.user.domain.vo.UserInfoVo;
+import com.vk.user.mapper.ApUserInfoMapper;
+import com.vk.user.mapper.ApUserMapper;
 import com.vk.user.model.LoginApUser;
 import com.vk.user.service.ApUserService;
 import org.springframework.beans.BeanUtils;
@@ -31,13 +33,17 @@ public class ApUserController {
 
     @Autowired
     private ApUserService apUserService;
+    @Autowired
+    private ApUserMapper apUserMapper;
+
 
     @InnerAuth
     @GetMapping("/info/{username}")
     public R<LoginApUser> info(@PathVariable(name = "username") String username)
     {
-        ApUser apUser = apUserService.getOne(QueryWrapper.create().where(AP_USER.NAME.eq(username)));
-        if (StringUtils.isNull(apUser))
+        // ApUser apUser = apUserService.getOne(QueryWrapper.create().where(AP_USER.NAME.eq(username)));
+        UserAndInfo userInfoVo = apUserMapper.getUserinfoByName(username);
+        if (StringUtils.isNull(userInfoVo))
         {
             return R.fail("用户名或密码错误");
         }
@@ -47,8 +53,9 @@ public class ApUserController {
         // Set<String> permissions = permissionService.getMenuPermission(sysUser);
         LoginApUser resultVo = new LoginApUser();
         ClientApUser user = new ClientApUser();
-        BeanUtils.copyProperties(apUser,user);
-        resultVo.setApUser(user);
+        BeanUtils.copyProperties(userInfoVo,user);
+        resultVo.setUsername(userInfoVo.getName());
+        resultVo.setClientApUser(user);
         return R.ok(resultVo);
     }
 

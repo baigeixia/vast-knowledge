@@ -1,8 +1,8 @@
 package com.vk.common.log.service;
 
 import com.vk.common.core.constant.SecurityConstants;
-import com.vk.system.api.RemoteLogService;
-import com.vk.system.api.domain.SysOperLog;
+import com.vk.system.feign.RemoteLogService;
+import com.vk.system.domain.SysOperLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;

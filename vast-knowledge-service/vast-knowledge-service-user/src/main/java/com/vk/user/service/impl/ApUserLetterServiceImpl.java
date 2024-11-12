@@ -8,11 +8,14 @@ import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.ApUserLetter;
 import com.vk.user.domain.AuthorInfo;
+import com.vk.user.domain.UserAndInfo;
+import com.vk.user.domain.dto.UserInfoLogin;
 import com.vk.user.domain.vo.MsgInfo;
 import com.vk.user.domain.vo.MsgListVo;
 import com.vk.user.domain.vo.MsgUserInfo;
 import com.vk.user.domain.vo.MsgUserListVo;
 import com.vk.user.mapper.ApUserLetterMapper;
+import com.vk.user.mapper.ApUserMapper;
 import com.vk.user.service.ApUserLetterService;
 import com.vk.user.service.ApUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ApUserLetterServiceImpl extends ServiceImpl<ApUserLetterMapper, ApUserLetter> implements ApUserLetterService {
 
+    @Autowired
+    private ApUserMapper apUserMapper;
     @Autowired
     private ApUserService apUserService;
 
@@ -84,11 +89,11 @@ public class ApUserLetterServiceImpl extends ServiceImpl<ApUserLetterMapper, ApU
 
     @Override
     public MsgListVo msgList(Long userId, Integer page, Integer size) {
-        ApUser receiver = apUserService.getById(userId);
+        UserAndInfo receiver = apUserMapper.getUserinfo(userId);
         CustomSimpleThrowUtils.ObjectIsEmpty(receiver, "错误的receiver用户");
 
         Long localUserId = RequestContextUtil.getUserId();
-        ApUser sender = apUserService.getById(localUserId);
+        UserAndInfo sender = apUserMapper.getUserinfo(localUserId);
         CustomSimpleThrowUtils.ObjectIsEmpty(sender, "错误的sender用户");
         page = (page - 1) * size;
 

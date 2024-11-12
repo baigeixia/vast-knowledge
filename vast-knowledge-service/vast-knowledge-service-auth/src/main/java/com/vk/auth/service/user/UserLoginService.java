@@ -82,7 +82,8 @@ public class UserLoginService {
             throw new ServiceException("对不起，您的账号：" + email + " 已停用");
         }
 
-        passwordService.validate(apUser.getName(), apUser.getPassword(), password,userInfo.getApUser().getSalt());
+        // passwordService.validate(apUser.getName(), apUser.getPassword(), password,userInfo.getApUser().getSalt());
+        passwordService.validate(apUser.getEmail(), apUser.getPassword(), password,userInfo.getApUser().getSalt());
         recordLogService.recordLogininfor(email, Constants.LOGIN_SUCCESS, "登录成功");
 
         return userInfo;

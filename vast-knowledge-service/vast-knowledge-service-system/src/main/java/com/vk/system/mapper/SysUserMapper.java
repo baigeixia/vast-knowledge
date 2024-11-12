@@ -1,6 +1,6 @@
 package com.vk.system.mapper;
 
-import com.vk.system.api.domain.SysUser;
+import com.vk.system.domain.SysUser;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

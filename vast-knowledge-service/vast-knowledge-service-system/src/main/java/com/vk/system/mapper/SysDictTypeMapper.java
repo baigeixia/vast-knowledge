@@ -1,6 +1,6 @@
 package com.vk.system.mapper;
 
-import com.vk.system.api.domain.SysDictType;
+import com.vk.system.domain.SysDictType;
 
 import java.util.List;
 

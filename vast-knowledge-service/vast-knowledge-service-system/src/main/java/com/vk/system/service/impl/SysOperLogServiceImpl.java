@@ -1,6 +1,6 @@
 package com.vk.system.service.impl;
 
-import com.vk.system.api.domain.SysOperLog;
+import com.vk.system.domain.SysOperLog;
 import com.vk.system.mapper.SysOperLogMapper;
 import com.vk.system.service.ISysOperLogService;
 import org.springframework.beans.factory.annotation.Autowired;

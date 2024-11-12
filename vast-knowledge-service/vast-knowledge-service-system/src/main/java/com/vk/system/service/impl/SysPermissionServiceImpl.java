@@ -1,8 +1,8 @@
 package com.vk.system.service.impl;
 
 import com.vk.common.core.utils.AdminCheck;
-import com.vk.system.api.domain.SysRole;
-import com.vk.system.api.domain.SysUser;
+import com.vk.system.domain.SysRole;
+import com.vk.system.domain.SysUser;
 import com.vk.system.service.ISysMenuService;
 import com.vk.system.service.ISysPermissionService;
 import com.vk.system.service.ISysRoleService;

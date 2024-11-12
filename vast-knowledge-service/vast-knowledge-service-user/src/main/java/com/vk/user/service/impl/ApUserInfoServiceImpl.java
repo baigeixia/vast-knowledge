@@ -362,7 +362,6 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             UserInfoVo userInfoVo = mapper.selectGetInfo(id);
             userInfoVo.setPhone(maskPhoneNumber(userInfoVo.getPhone()));
 
-
             redisService.setCacheObject(redisUserInfoKey(id), userInfoVo);
             return userInfoVo;
         }

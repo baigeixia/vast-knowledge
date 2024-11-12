@@ -3,7 +3,7 @@ package com.vk.common.security.auth;
 
 import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.annotation.RequiresRoles;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.model.LoginUser;
 import com.vk.user.model.LoginApUser;
 
 /**

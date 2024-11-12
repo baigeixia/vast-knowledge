@@ -1,7 +1,7 @@
 package com.vk.common.security.service;
 
 
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.model.LoginUser;
 import com.vk.user.model.LoginApUser;
 import jakarta.servlet.http.HttpServletRequest;
 import com.vk.common.core.constant.CacheConstants;

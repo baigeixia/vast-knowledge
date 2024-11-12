@@ -10,7 +10,7 @@ import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.model.LoginUser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;

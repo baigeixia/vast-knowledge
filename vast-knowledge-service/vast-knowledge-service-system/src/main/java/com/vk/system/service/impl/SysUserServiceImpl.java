@@ -8,9 +8,8 @@ import com.vk.common.core.utils.StringUtils;
 
 import com.vk.common.core.utils.bean.BeanValidators;
 import com.vk.common.datascope.annotation.DataScope;
-import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.domain.SysRole;
-import com.vk.system.api.domain.SysUser;
+import com.vk.system.domain.SysRole;
+import com.vk.system.domain.SysUser;
 import com.vk.system.domain.SysPost;
 import com.vk.system.domain.SysUserPost;
 import com.vk.system.domain.SysUserRole;

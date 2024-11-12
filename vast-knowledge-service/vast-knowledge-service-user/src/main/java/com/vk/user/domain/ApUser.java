@@ -39,7 +39,7 @@ public class ApUser implements Serializable {
     /**
      * 用户名
      */
-    private String name;
+    private String email;
 
     /**
      * 密码,md5加密

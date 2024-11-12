@@ -1,10 +1,10 @@
-package com.vk.system.api.factory;
+package com.vk.system.factory;
 
 
 import com.vk.common.core.domain.R;
-import com.vk.system.api.RemoteLogService;
-import com.vk.system.api.domain.SysLogininfor;
-import com.vk.system.api.domain.SysOperLog;
+import com.vk.system.domain.SysLogininfor;
+import com.vk.system.domain.SysOperLog;
+import com.vk.system.feign.RemoteLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;

@@ -12,9 +12,9 @@ import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.ip.IpUtils;
 import com.vk.common.redis.service.RedisService;
 import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.RemoteUserService;
-import com.vk.system.api.domain.SysUser;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.feign.RemoteUserService;
+import com.vk.system.domain.SysUser;
+import com.vk.system.model.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -85,7 +85,7 @@ public class SysLoginService
         }
         
         LoginUser userInfo = userResult.getData();
-        SysUser user = userResult.getData().getSysUser();
+        SysUser user = userInfo.getSysUser();
         if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
             recordLogService.recordLogininfor(username, Constants.LOGIN_FAIL, "对不起，您的账号已被删除");

@@ -1,4 +1,4 @@
-package com.vk.system.api.domain;
+package com.vk.system.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

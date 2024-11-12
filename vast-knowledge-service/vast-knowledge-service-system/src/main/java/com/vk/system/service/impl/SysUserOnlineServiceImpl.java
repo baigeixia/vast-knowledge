@@ -1,7 +1,7 @@
 package com.vk.system.service.impl;
 
 import com.vk.common.core.utils.StringUtils;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.model.LoginUser;
 import com.vk.system.domain.SysUserOnline;
 import com.vk.system.service.ISysUserOnlineService;
 import org.springframework.stereotype.Service;

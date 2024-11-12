@@ -1,7 +1,7 @@
 package com.vk.system.service.impl;
 
 import com.vk.common.security.utils.DictUtils;
-import com.vk.system.api.domain.SysDictData;
+import com.vk.system.domain.SysDictData;
 import com.vk.system.mapper.SysDictDataMapper;
 import com.vk.system.service.ISysDictDataService;
 import org.springframework.beans.factory.annotation.Autowired;

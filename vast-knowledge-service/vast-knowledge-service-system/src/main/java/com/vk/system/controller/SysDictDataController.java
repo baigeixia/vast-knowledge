@@ -9,7 +9,7 @@ import com.vk.common.log.annotation.Log;
 import com.vk.common.log.enums.BusinessType;
 import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.domain.SysDictData;
+import com.vk.system.domain.SysDictData;
 import com.vk.system.service.ISysDictDataService;
 import com.vk.system.service.ISysDictTypeService;
 import jakarta.servlet.http.HttpServletResponse;

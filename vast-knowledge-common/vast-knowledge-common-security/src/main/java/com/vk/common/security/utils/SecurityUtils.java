@@ -6,7 +6,7 @@ import com.vk.common.core.constant.TokenConstants;
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.model.LoginUser;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 

@@ -26,6 +26,15 @@
         i.is_display_image AS isDisplayImage,
         i.updated_time AS updatedTime
     </sql>
+    <select id="selectNameGetInfo" resultType="com.vk.user.domain.dto.UserInfoLogin">
+        select
+            u.*,
+            i.name
+        from ap_user u
+        LEFT JOIN ap_user_info i ON u.id = i.user_id
+        WHERE u.name = #{name}
+    </select>
+
     <select id="selectGetInfo" resultType="com.vk.user.domain.vo.UserInfoVo">
         select
         <include refid="userInfoColumns"/>

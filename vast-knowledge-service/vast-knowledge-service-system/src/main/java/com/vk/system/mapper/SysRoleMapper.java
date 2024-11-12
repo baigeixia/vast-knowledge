@@ -1,6 +1,6 @@
 package com.vk.system.mapper;
 
-import com.vk.system.api.domain.SysRole;
+import com.vk.system.domain.SysRole;
 
 import java.util.List;
 

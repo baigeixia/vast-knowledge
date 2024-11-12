@@ -1,6 +1,6 @@
 package com.vk.system.mapper;
 
-import com.vk.system.api.domain.SysOperLog;
+import com.vk.system.domain.SysOperLog;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.vk.system.api.domain;
+package com.vk.system.domain;
 
 import com.vk.common.core.web.domain.BaseEntity;
 import jakarta.validation.constraints.Email;

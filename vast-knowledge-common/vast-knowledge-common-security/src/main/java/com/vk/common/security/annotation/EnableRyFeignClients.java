@@ -19,7 +19,7 @@ public @interface EnableRyFeignClients
 {
     String[] value() default {};
 
-    String[] basePackages() default { "com.vk" };
+    String[] basePackages() default { "com.vk.*.feign" };
 
     Class<?>[] basePackageClasses() default {};
 

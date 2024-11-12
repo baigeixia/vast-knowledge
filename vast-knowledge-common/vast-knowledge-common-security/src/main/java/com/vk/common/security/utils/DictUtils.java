@@ -5,7 +5,7 @@ import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.utils.SpringUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.redis.service.RedisService;
-import com.vk.system.api.domain.SysDictData;
+import com.vk.system.domain.SysDictData;
 
 
 import java.util.Collection;

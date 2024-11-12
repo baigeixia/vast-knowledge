@@ -4,6 +4,7 @@ import com.mybatisflex.core.BaseMapper;
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.AuthorInfo;
+import com.vk.user.domain.UserAndInfo;
 import com.vk.user.domain.vo.LocalUserInfoVo;
 import com.vk.user.domain.vo.UserInfoVo;
 import org.apache.ibatis.annotations.Param;
@@ -24,4 +25,10 @@ public interface ApUserMapper extends BaseMapper<ApUser> {
     List<AuthorInfo> selectListOrInfo(@Param("ids") Set<Long> ids);
     @Select("select name from ap_user where  id=#{id}")
     String getUserName(@Param("id") Long userId);
+
+    @Select("select  u.*,i.* from ap_user u inner join  ap_user_info i ON u.id=i.user_id where u.id=#{id} and u.status=0")
+    UserAndInfo getUserinfo(@Param("id")Long userId);
+
+    @Select("select  u.*,i.* from ap_user u inner join  ap_user_info i ON u.id=i.user_id where u.email=#{email} and u.status=0")
+    UserAndInfo getUserinfoByName(@Param("email") String email);
 }

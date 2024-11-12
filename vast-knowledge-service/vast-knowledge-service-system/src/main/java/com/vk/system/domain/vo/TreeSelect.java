@@ -1,7 +1,7 @@
 package com.vk.system.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.vk.system.api.domain.SysDept;
+import com.vk.system.domain.SysDept;
 import com.vk.system.domain.SysMenu;
 
 import java.io.Serializable;

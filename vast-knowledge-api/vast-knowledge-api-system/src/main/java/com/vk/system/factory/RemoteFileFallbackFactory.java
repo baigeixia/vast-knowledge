@@ -1,9 +1,9 @@
-package com.vk.system.api.factory;
+package com.vk.system.factory;
 
 
 import com.vk.common.core.domain.R;
-import com.vk.system.api.RemoteFileService;
-import com.vk.system.api.domain.SysFile;
+import com.vk.system.domain.SysFile;
+import com.vk.system.feign.RemoteFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;

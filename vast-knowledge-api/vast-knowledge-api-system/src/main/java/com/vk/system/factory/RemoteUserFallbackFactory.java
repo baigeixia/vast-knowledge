@@ -1,10 +1,10 @@
-package com.vk.system.api.factory;
+package com.vk.system.factory;
 
 
 import com.vk.common.core.domain.R;
-import com.vk.system.api.RemoteUserService;
-import com.vk.system.api.domain.SysUser;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.domain.SysUser;
+import com.vk.system.feign.RemoteUserService;
+import com.vk.system.model.LoginUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;

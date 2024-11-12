@@ -1,12 +1,12 @@
-package com.vk.system.api;
+package com.vk.system.feign;
 
 
 import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.constant.ServiceNameConstants;
 import com.vk.common.core.domain.R;
-import com.vk.system.api.domain.SysUser;
-import com.vk.system.api.factory.RemoteUserFallbackFactory;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.domain.SysUser;
+import com.vk.system.factory.RemoteUserFallbackFactory;
+import com.vk.system.model.LoginUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

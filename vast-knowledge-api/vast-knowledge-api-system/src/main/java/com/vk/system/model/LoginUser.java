@@ -1,7 +1,7 @@
-package com.vk.system.api.model;
+package com.vk.system.model;
 
 
-import com.vk.system.api.domain.SysUser;
+import com.vk.system.domain.SysUser;
 
 import java.io.Serializable;
 import java.util.Set;

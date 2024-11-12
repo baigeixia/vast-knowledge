@@ -1,6 +1,6 @@
 package com.vk.system.mapper;
 
-import com.vk.system.api.domain.SysDictData;
+import com.vk.system.domain.SysDictData;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

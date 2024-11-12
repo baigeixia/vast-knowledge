@@ -25,7 +25,7 @@ public class CorsConfig
     private static final String ALLOWED_METHODS = "GET,POST,PUT,DELETE,OPTIONS,HEAD";
     private static final String ALLOWED_ORIGIN = "*";
     private static final String ALLOWED_EXPOSE = "*";
-    private static final String MAX_AGE = "18000L";
+    private static final String MAX_AGE = "18000";
 
     @Bean
     public WebFilter corsFilter()

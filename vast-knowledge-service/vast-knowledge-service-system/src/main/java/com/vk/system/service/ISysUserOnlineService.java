@@ -1,6 +1,6 @@
 package com.vk.system.service;
 
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.model.LoginUser;
 import com.vk.system.domain.SysUserOnline;
 
 /**

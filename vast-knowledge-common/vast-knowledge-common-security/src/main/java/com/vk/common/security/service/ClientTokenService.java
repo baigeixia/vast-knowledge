@@ -51,10 +51,11 @@ public class ClientTokenService
     {
         String token = IdUtils.fastUUID();
         Long userId = loginUser.getApUser().getId();
-        String userName = loginUser.getApUser().getName();
+        // String userName = loginUser.getApUser().getName();
+        String username = loginUser.getUsername();
         loginUser.setToken(token);
         loginUser.setUserid(userId);
-        loginUser.setUsername(userName);
+        // loginUser.setUsername(email);
         loginUser.setIpaddr(IpUtils.getIpAddr());
         refreshToken(loginUser);
 
@@ -62,7 +63,7 @@ public class ClientTokenService
         Map<String, Object> claimsMap = new HashMap<String, Object>();
         claimsMap.put(SecurityConstants.USER_KEY, token);
         claimsMap.put(SecurityConstants.DETAILS_USER_ID, userId);
-        claimsMap.put(SecurityConstants.DETAILS_USERNAME, userName);
+        claimsMap.put(SecurityConstants.DETAILS_USERNAME, username);
 
         // 接口返回信息
         Map<String, Object> rspMap = new HashMap<String, Object>();

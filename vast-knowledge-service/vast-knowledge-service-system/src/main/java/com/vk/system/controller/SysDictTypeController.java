@@ -8,7 +8,7 @@ import com.vk.common.log.annotation.Log;
 import com.vk.common.log.enums.BusinessType;
 import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.domain.SysDictType;
+import com.vk.system.domain.SysDictType;
 import com.vk.system.service.ISysDictTypeService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

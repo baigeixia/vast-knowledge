@@ -1,7 +1,7 @@
 package com.vk.system.mapper;
 
 
-import com.vk.system.api.domain.SysLogininfor;
+import com.vk.system.domain.SysLogininfor;
 
 import java.util.List;
 

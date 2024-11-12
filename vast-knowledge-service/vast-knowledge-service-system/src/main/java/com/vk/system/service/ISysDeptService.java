@@ -1,6 +1,6 @@
 package com.vk.system.service;
 
-import com.vk.system.api.domain.SysDept;
+import com.vk.system.domain.SysDept;
 import com.vk.system.domain.vo.TreeSelect;
 
 import java.util.List;

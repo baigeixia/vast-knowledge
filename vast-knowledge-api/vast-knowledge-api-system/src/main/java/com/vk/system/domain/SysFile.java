@@ -1,4 +1,4 @@
-package com.vk.system.api.domain;
+package com.vk.system.domain;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;

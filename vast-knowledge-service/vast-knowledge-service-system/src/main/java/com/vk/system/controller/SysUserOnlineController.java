@@ -9,7 +9,7 @@ import com.vk.common.log.annotation.Log;
 import com.vk.common.log.enums.BusinessType;
 import com.vk.common.redis.service.RedisService;
 import com.vk.common.security.annotation.RequiresPermissions;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.model.LoginUser;
 import com.vk.system.domain.SysUserOnline;
 import com.vk.system.service.ISysUserOnlineService;
 import org.springframework.beans.factory.annotation.Autowired;

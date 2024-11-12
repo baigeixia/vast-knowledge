@@ -4,8 +4,8 @@ import com.vk.common.core.constant.Constants;
 import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.ip.IpUtils;
-import com.vk.system.api.RemoteLogService;
-import com.vk.system.api.domain.SysLogininfor;
+import com.vk.system.feign.RemoteLogService;
+import com.vk.system.domain.SysLogininfor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -14,7 +14,7 @@ import com.vk.common.security.annotation.RequiresRoles;
 import com.vk.common.security.service.ClientTokenService;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
-import com.vk.system.api.model.LoginUser;
+import com.vk.system.model.LoginUser;
 import com.vk.user.model.LoginApUser;
 import org.springframework.util.PatternMatchUtils;
 
