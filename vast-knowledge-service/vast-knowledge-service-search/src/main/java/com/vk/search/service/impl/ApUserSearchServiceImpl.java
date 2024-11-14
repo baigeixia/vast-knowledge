@@ -1,14 +1,21 @@
 package com.vk.search.service.impl;
 
 import co.elastic.clients.json.JsonData;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.feign.RemoteClientArticleQueryService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.RequestContextUtil;
+import com.vk.common.core.utils.StringUtils;
+import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.es.domain.ArticleInfoDocument;
+import com.vk.search.domain.ApHotWords;
 import com.vk.search.domain.ApUserSearch;
+import com.vk.search.domain.table.ApHotWordsTableDef;
+import com.vk.search.domain.table.ApUserSearchTableDef;
 import com.vk.search.mapper.ApUserSearchMapper;
 import com.vk.search.service.ApUserSearchService;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +37,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
+import static com.vk.search.domain.table.ApHotWordsTableDef.AP_HOT_WORDS;
+import static com.vk.search.domain.table.ApUserSearchTableDef.AP_USER_SEARCH;
+
 /**
  * APP用户搜索信息 服务层实现。
  *
@@ -45,6 +55,8 @@ public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApU
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
+
+
     /**
      * @param query  搜索内容  3 标签
      * @param type   头部标题 0 综合     1 文章   4 用户
@@ -58,11 +70,74 @@ public class ApUserSearchServiceImpl extends ServiceImpl<ApUserSearchMapper, ApU
     public List<HomeArticleListVo> searchInfo(String query, Integer type, Integer sort, Integer period, Long page, Long size) {
         if (type == 1 || type == 0) {
             page = (page - 1);
+            Long userId = RequestContextUtil.getUserIdNotLogin();
+            if (!StringUtils.isLongEmpty(userId)){
+                TaskVirtualExecutorUtil.executeWith(()->{
+                    insertSearch(query, userId);
+                });
+            }
             return EsQueryTitle(query, sort, period, page, size);
         }else {
             throw  new LeadNewsException("错误的类型");
         }
     }
+
+    private ApUserSearch insertSearch(String query, Long userId) {
+        ApUserSearch apUserSearches = mapper.selectOneByQuery(QueryWrapper.create().select(AP_USER_SEARCH.ID).where(AP_USER_SEARCH.ENTRY_ID.eq(userId).and(AP_USER_SEARCH.KEYWORD.eq(query))));
+        LocalDateTime dateTime = LocalDateTime.now();
+        ApUserSearch search = new ApUserSearch();
+        if (null==apUserSearches){
+            search.setEntryId(userId);
+            search.setKeyword(query);
+            search.setStatus(1);
+            search.setCreatedTime(dateTime);
+            mapper.insert(search);
+        }else {
+            search.setId(apUserSearches.getId());
+            search.setCreatedTime(dateTime);
+            mapper.update(search);
+        }
+        search.setKeyword(query);
+        return search;
+    }
+
+    @Override
+    public List<ApUserSearch> userSearch() {
+        Long userId = RequestContextUtil.getUserIdNotLogin();
+        if (StringUtils.isLongEmpty(userId)) {
+            return List.of();
+        }
+        List<ApUserSearch> apUserSearches = mapper.selectListByQuery(
+                QueryWrapper.create().select(AP_USER_SEARCH.ID,AP_USER_SEARCH.KEYWORD).where(AP_USER_SEARCH.ENTRY_ID.eq(userId)
+                        .and(AP_USER_SEARCH.STATUS.eq(1))).orderBy(AP_USER_SEARCH.CREATED_TIME, false).limit(10)
+        );
+
+        return apUserSearches;
+    }
+
+    @Override
+    public ApUserSearch addUserSearch(String query) {
+        Long userId = RequestContextUtil.getUserIdNotLogin();
+        if (StringUtils.isLongEmpty(userId)) {
+            return null;
+        }
+        ApUserSearch search = insertSearch(query, userId);
+        return search;
+    }
+
+    @Override
+    public void rmHistory(Long id) {
+        mapper.deleteById(id);
+    }
+
+    @Override
+    public void rmHistoryAll() {
+        Long userIdNotLogin = RequestContextUtil.getUserIdNotLogin();
+        if (!StringUtils.isLongEmpty(userIdNotLogin)){
+            mapper.deleteByQuery(QueryWrapper.create().where(AP_USER_SEARCH.ENTRY_ID.eq(userIdNotLogin)));
+        }
+    }
+
 
     private List<HomeArticleListVo> EsQueryTitle(String query, Integer sort, Integer period, Long page, Long size) {
         String pre = "<span style='color:red'>";

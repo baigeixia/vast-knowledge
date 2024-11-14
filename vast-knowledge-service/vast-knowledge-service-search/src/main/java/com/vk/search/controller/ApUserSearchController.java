@@ -2,12 +2,12 @@ package com.vk.search.controller;
 
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.common.core.web.domain.AjaxResult;
+import com.vk.common.redis.service.RedisService;
+import com.vk.search.domain.ApHotWords;
+import com.vk.search.domain.ApUserSearch;
 import com.vk.search.service.ApUserSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,6 +23,9 @@ public class ApUserSearchController {
 
     @Autowired
     private ApUserSearchService apUserSearchService;
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * @param page 页数
@@ -48,4 +51,37 @@ public class ApUserSearchController {
     }
 
 
+    @GetMapping("/userSearch")
+    public AjaxResult userSearch() {
+        List<ApUserSearch> result=apUserSearchService.userSearch();
+        return AjaxResult.success(result);
+    }
+
+    @GetMapping("/addUserSearch")
+    public AjaxResult addUserSearch(
+            @RequestParam(name = "query") String query
+    ) {
+        ApUserSearch result=apUserSearchService.addUserSearch(query);
+        return AjaxResult.success(result);
+    }
+
+
+
+    @DeleteMapping("/rmHistory")
+    public AjaxResult rmHistory(
+            @RequestParam(name = "id") Long id
+    ) {
+        apUserSearchService.rmHistory(id);
+        return AjaxResult.success();
+    }
+
+    @DeleteMapping("/rmHistoryAll")
+    public AjaxResult rmHistory(
+    ) {
+        apUserSearchService.rmHistoryAll();
+        return AjaxResult.success();
+    }
+
+
 }
+

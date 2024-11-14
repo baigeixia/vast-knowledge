@@ -7,6 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 
 public class RequestContextUtil {
     /**
@@ -35,7 +39,9 @@ public class RequestContextUtil {
      * @return
      */
     public static String getUserName(){
-        return String.valueOf(RequestContextUtil.getHeader(SecurityConstants.DETAILS_USERNAME));
+        String headerValue = RequestContextUtil.getHeader(SecurityConstants.DETAILS_USERNAME);
+        // 解码URL编码的字符串
+        return URLDecoder.decode(headerValue, StandardCharsets.UTF_8);
     }
 
     public static String getHeader(String headerName){

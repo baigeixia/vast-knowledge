@@ -3,6 +3,8 @@ package com.vk.search.service;
 import com.mybatisflex.core.service.IService;
 import com.vk.search.domain.ApHotWords;
 
+import java.util.List;
+
 /**
  * 搜索热词 服务层。
  *
@@ -11,4 +13,5 @@ import com.vk.search.domain.ApHotWords;
  */
 public interface ApHotWordsService extends IService<ApHotWords> {
 
+    List<ApHotWords> getTrending();
 }

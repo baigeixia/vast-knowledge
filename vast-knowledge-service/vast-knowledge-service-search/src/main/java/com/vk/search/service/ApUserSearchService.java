@@ -2,6 +2,7 @@ package com.vk.search.service;
 
 import com.mybatisflex.core.service.IService;
 import com.vk.article.domain.HomeArticleListVo;
+import com.vk.search.domain.ApHotWords;
 import com.vk.search.domain.ApUserSearch;
 
 import java.util.List;
@@ -15,4 +16,12 @@ import java.util.List;
 public interface ApUserSearchService extends IService<ApUserSearch> {
 
     List<HomeArticleListVo> searchInfo(String query, Integer type, Integer sort, Integer period,Long page ,Long size);
+
+    List<ApUserSearch> userSearch();
+
+    ApUserSearch addUserSearch(String query);
+
+    void rmHistory(Long id);
+
+    void rmHistoryAll();
 }
