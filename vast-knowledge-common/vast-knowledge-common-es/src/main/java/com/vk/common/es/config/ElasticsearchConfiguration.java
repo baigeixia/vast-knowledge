@@ -27,7 +27,7 @@ public class ElasticsearchConfiguration extends ElasticsearchConfigurationSuppor
     // @Bean
     // @Override
     // @NonNull
-    // public ElasticsearchCustomConversions  elasticsearchCustomConversions() {
+    // public Elasti csearchCustomConversions  elasticsearchCustomConversions() {
     //     return  new ElasticsearchCustomConversions(
     //             Collections.singletonList(new LocalDateTimeToLongConverter())
     //             // Collections.singletonList(new LongToLocalDateTimeConverter())

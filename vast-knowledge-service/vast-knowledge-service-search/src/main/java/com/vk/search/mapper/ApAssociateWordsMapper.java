@@ -1,7 +1,7 @@
 package com.vk.search.mapper;
 
 import com.mybatisflex.core.BaseMapper;
-import com.vk.common.es.domain.HotWordsDocument;
+import com.vk.common.es.domain.AssociateWordsDocument;
 import com.vk.search.domain.ApAssociateWords;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -19,5 +19,8 @@ public interface ApAssociateWordsMapper extends BaseMapper<ApAssociateWords> {
 
 
     @Select("select id,associate_words as associateWords,created_time as createdTime from ap_associate_words WHERE created_time <= #{now} LIMIT #{page}, #{size}  ")
-    List<HotWordsDocument> selectByPage(@Param("page") long page, @Param("size")Long size, @Param("now")LocalDateTime now);
+    List<AssociateWordsDocument> selectByPage(@Param("page") long page, @Param("size")Long size, @Param("now")LocalDateTime now);
+
+
+    List<AssociateWordsDocument> selectForCondition(@Param(value="redisTime") LocalDateTime publishTime,@Param(value="nowTime") LocalDateTime nowTime);
 }

@@ -8,6 +8,7 @@ import com.vk.search.domain.ApAssociateWords;
 import com.vk.search.domain.table.ApAssociateWordsTableDef;
 import com.vk.search.domain.vo.AssociateListVo;
 import com.vk.search.service.ApAssociateWordsService;
+import com.vk.search.util.SyncUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +39,7 @@ public class ApAssociateWordsController {
     private RedisService redisService;
     private String endTimeStr = null;
     private static final Long size = 5000L;
-    public static final DateTimeFormatter FORMATTER_YMDHMS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    public static volatile boolean sync_status = false;
+
 
     /**
      * 同步联想词。
@@ -50,13 +50,13 @@ public class ApAssociateWordsController {
     public AjaxResult sync() {
         Long startTime = System.currentTimeMillis();
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-        String startTimeStr = now.format(FORMATTER_YMDHMS);
+        String startTimeStr = now.format(SyncUtil.FORMATTER_YMDHMS);
         log.info("全量同步start：{}",startTimeStr);
         Boolean flag = redisService.cacheObjectIfAbsent("associateTime", startTimeStr);
         log.info("全量同步start：{}, redisFlag={}",startTimeStr, flag);
         if (Boolean.TRUE.equals(flag)) {
             try {
-                sync_status = true;
+                SyncUtil.sync_status = true;
                 //1.查询统计所有数量
                 // Long total = apAssociateWordsService.selectCount(now);
                 Long total = apAssociateWordsService.getMapper().selectCountByQuery(
@@ -74,14 +74,14 @@ public class ApAssociateWordsController {
                 } catch (InterruptedException e) {
                     log.error("全量同步error countDownLatch await ：{}",e.getMessage());
                 }
-               sync_status = false;
+                SyncUtil.sync_status = false;
             }catch (Exception e){
-               sync_status = false;
+                SyncUtil.sync_status = false;
                 log.error("全量同步error：{}, redisFlag={}",startTimeStr, flag, e);
                 return AjaxResult.error("发生异常了: " + e.getMessage());
             }
             Long endTime = System.currentTimeMillis();
-            endTimeStr = now.format(FORMATTER_YMDHMS);
+            endTimeStr = now.format(SyncUtil.FORMATTER_YMDHMS);
             log.info("全量同步end：{}, redisFlag={},cost={}",startTimeStr, flag,(endTime - startTime));
         }else {
             return AjaxResult.success("正在执行中....");

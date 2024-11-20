@@ -4,4 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.search.mapper.ApAssociateWordsMapper">
 
+    <select id="selectForCondition" resultType="com.vk.common.es.domain.AssociateWordsDocument">
+        select id,
+               associate_words as associateWords,
+               created_time as createdTime
+        from ap_associate_words
+        where created_time > #{redisTime}
+          and created_time &lt;= #{nowTime}
+    </select>
 </mapper>

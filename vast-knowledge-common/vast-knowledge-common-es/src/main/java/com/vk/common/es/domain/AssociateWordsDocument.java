@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
  */
 @Data
 // es中的索引名称
-@Document(indexName = "hot_words")
-public class HotWordsDocument implements Serializable {
+@Document(indexName = "associate_words")
+public class AssociateWordsDocument implements Serializable {
 
     @Id
     private Long id;

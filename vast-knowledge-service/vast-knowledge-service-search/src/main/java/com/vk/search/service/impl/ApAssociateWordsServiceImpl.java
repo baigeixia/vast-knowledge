@@ -2,8 +2,8 @@ package com.vk.search.service.impl;
 
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.es.domain.HotWordsDocument;
-import com.vk.common.es.repository.HotWordsDocumentRepository;
+import com.vk.common.es.domain.AssociateWordsDocument;
+import com.vk.common.es.repository.AssociateWordsDocumentRepository;
 import com.vk.search.domain.ApAssociateWords;
 import com.vk.search.domain.vo.AssociateListVo;
 import com.vk.search.mapper.ApAssociateWordsMapper;
@@ -39,7 +39,7 @@ import java.util.concurrent.CountDownLatch;
 public class ApAssociateWordsServiceImpl extends ServiceImpl<ApAssociateWordsMapper, ApAssociateWords> implements ApAssociateWordsService {
 
     @Autowired
-    private HotWordsDocumentRepository hotWordsDocumentRepository;
+    private AssociateWordsDocumentRepository associateWordsDocumentRepository;
 
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
@@ -59,14 +59,14 @@ public class ApAssociateWordsServiceImpl extends ServiceImpl<ApAssociateWordsMap
         String threadName = Thread.currentThread().getName();
         log.info("{} start: page={},size={}", threadName,page,size);
         //1分页查询到数据
-        List<HotWordsDocument> hotWordsDocuments = mapper.selectByPage((page - 1) * size, size,now);
-        log.info("{} start: page={},size={}, actualSize={} found", threadName,page,size, hotWordsDocuments.size());
+        List<AssociateWordsDocument> associateWordsDocuments = mapper.selectByPage((page - 1) * size, size,now);
+        log.info("{} start: page={},size={}, actualSize={} found", threadName,page,size, associateWordsDocuments.size());
         //2.分批导入到ES中
         try {
-            hotWordsDocumentRepository.saveAll(hotWordsDocuments);
-            log.info("{} end: page={},size={}, actualSize={} found", threadName,page,size, hotWordsDocuments.size());
+            associateWordsDocumentRepository.saveAll(associateWordsDocuments);
+            log.info("{} end: page={},size={}, actualSize={} found", threadName,page,size, associateWordsDocuments.size());
         } catch (Exception e) {
-            log.error("{} error: page={},size={}, actualSize={} found", threadName,page,size, hotWordsDocuments.size(),e);
+            log.error("{} error: page={},size={}, actualSize={} found", threadName,page,size, associateWordsDocuments.size(),e);
         } finally {
             //减掉数量
             countDownLatch.countDown();
@@ -96,11 +96,11 @@ public class ApAssociateWordsServiceImpl extends ServiceImpl<ApAssociateWordsMap
                                 ), String.class)
                 )
                 .withPageable(PageRequest.of(0, 10))
-                .withSort(Sort.sort(HotWordsDocument.class).by(HotWordsDocument::getCreatedTime).descending())
+                .withSort(Sort.sort(AssociateWordsDocument.class).by(AssociateWordsDocument::getCreatedTime).descending())
                 .withSourceFilter(new FetchSourceFilter(new String[]{field},null))  // 控制显示的字段
                 .build();
 
-        SearchHits<HotWordsDocument> search = elasticsearchOperations.search(nativeQueryquery, HotWordsDocument.class);
+        SearchHits<AssociateWordsDocument> search = elasticsearchOperations.search(nativeQueryquery, AssociateWordsDocument.class);
 
         List<AssociateListVo> highlightS=new ArrayList<>();
 
