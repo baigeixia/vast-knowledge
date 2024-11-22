@@ -1,6 +1,6 @@
 package com.vk.dfs.template;
 
-import com.itheima.dfs.enums.DFSType;
+import com.vk.dfs.enums.DFSType;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public abstract class AbstractDfsTemplate implements DfsTemplate, InitializingBe
         // 现有提供文件存储模板，模板必是DFSType中的一种实现，如果不是则报错
         DFSType support = support();
 
-        if(!Arrays.stream(values).anyMatch(Predicate.isEqual(support))){
+        if(Arrays.stream(values).noneMatch(Predicate.isEqual(support))){
             throw new RuntimeException("不支持的dfs类型");
         }
     }

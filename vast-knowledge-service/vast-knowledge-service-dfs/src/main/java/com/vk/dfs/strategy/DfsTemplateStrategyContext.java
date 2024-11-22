@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class DfsTemplateStrategyContext implements ApplicationContextAware {
 
     //key  就是某一个类型 value 就是接口对应的具体子类对象
-    private Map<DFSType, DfsTemplate> dsfTemplates = new EnumMap<DFSType, DfsTemplate>(DFSType.class);
+    private final Map<DFSType, DfsTemplate> dsfTemplates = new EnumMap<DFSType, DfsTemplate>(DFSType.class);
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

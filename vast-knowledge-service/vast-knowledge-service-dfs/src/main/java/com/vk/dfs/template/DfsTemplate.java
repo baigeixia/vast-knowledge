@@ -1,6 +1,7 @@
 package com.vk.dfs.template;
 
-import com.itheima.dfs.model.BaseFileModel;
+
+import com.vk.dfs.model.BaseFileModel;
 
 import java.util.Collection;
 import java.util.List;

@@ -20,5 +20,9 @@ public enum DFSType {
     /**
      * Minio
      */
-    MINIO;
+    MINIO,
+    /**
+     * 腾讯
+     */
+    TX
 }
