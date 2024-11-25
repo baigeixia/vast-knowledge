@@ -1,9 +1,29 @@
 package com.vk.controller;
 
 
+import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.RequestContextUtil;
+import com.vk.common.core.web.domain.AjaxResult;
+import com.vk.dfs.enums.DFSType;
+import com.vk.dfs.enums.FilePosition;
+import com.vk.dfs.model.BaseFileModel;
+import com.vk.dfs.strategy.DfsTemplateStrategyContext;
+import com.vk.dfs.template.DfsTemplate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * @version 1.0
@@ -17,6 +37,70 @@ public class FileController {
 
     /*@Resource(name="fastDfsTemplate")
     private FastDfsTemplate fastDfsTemplate;*/
+
+    @Autowired
+    private DfsTemplateStrategyContext dfsTemplateStrategyContext;
+
+    @PostMapping("/upload")
+    public AjaxResult upload(
+            @RequestParam("file") MultipartFile multipartFile,
+            @RequestParam("position") String position
+    ) {
+        if (multipartFile.isEmpty()){
+            throw new LeadNewsException("上传内容不能为空");
+        }
+        if (!StringUtils.hasText(position)){
+            throw new LeadNewsException("位置参数不能为空");
+        }
+        if(Arrays.stream(FilePosition.values())
+                .noneMatch(filePosition -> filePosition.name().equals(position.toUpperCase()))){
+            throw new RuntimeException("不支持的位置参数");
+        }
+
+        // 文件存储模板类, 通过支持的类型从策略池获取
+        DfsTemplate dfsTemplate = dfsTemplateStrategyContext.getTemplate(DFSType.TX);
+
+        // 来源鉴权
+        String origin = RequestContextUtil.getHeader("from");
+        log.info("文件来源: {},{}", origin,multipartFile.getOriginalFilename());
+        if(ObjectUtils.isEmpty(origin)){
+            throw new LeadNewsException("不正当来源，拒绝上传");
+        }
+
+        // 非空判断multipartFile  url  图片文件夹/图片名称+时间戳+后缀
+        String filename = multipartFile.getOriginalFilename();
+        if (StringUtils.hasText(filename)){
+            filename=filename.trim();
+            String name = StringUtils.stripFilenameExtension(filename);
+            String nameSub = name.length() <= 50 ? name : name.substring(0, 50);
+            // 获取上传文件的后缀名
+            String ext = StringUtils.getFilenameExtension(filename);
+            long LocalTime = System.currentTimeMillis() / 1000;
+            filename = position+"/"+nameSub + LocalTime + "." + ext;
+        }
+
+        try {
+            // 上传给fastdfs服务器
+            BaseFileModel baseFileModel = new BaseFileModel(
+                    "zhangsan",
+                    multipartFile.getSize(),
+                    filename,
+                    multipartFile.getBytes()
+            );
+            String fullPath = dfsTemplate.uploadFile(baseFileModel);
+
+            log.info("上传文件成功: {}", fullPath);
+
+            /**
+             * {url:地址}
+             */
+            Map<String, String> result = Collections.singletonMap("url", dfsTemplate.getAccessServerAddr() + fullPath);
+            return AjaxResult.success(result);
+        } catch (IOException e) {
+            log.error("上传文件失败", e);
+        }
+        return AjaxResult.error("上传文件失败!");
+    }
 
     // @Autowired
     // private DfsTemplateStrategyContext dfsTemplateStrategyContext;
