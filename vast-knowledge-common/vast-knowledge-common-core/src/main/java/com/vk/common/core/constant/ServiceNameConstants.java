@@ -37,6 +37,7 @@ public class ServiceNameConstants
      * 文章模块
      */
     public static final String ARTICLE_SERVICE = "vk-service-article";
+    public static final String ARTICLE_WEMEDIA = "vk-service-wemedia";
 
 
 }

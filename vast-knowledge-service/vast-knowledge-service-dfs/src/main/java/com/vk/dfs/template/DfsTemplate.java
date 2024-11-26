@@ -3,6 +3,7 @@ package com.vk.dfs.template;
 
 import com.vk.dfs.model.BaseFileModel;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,11 +34,14 @@ public interface DfsTemplate {
      * @param fullPath
      * @return
      */
-    List<byte[]> download(Collection<String> fullPath);
+    List<byte[]> download(Collection<String> fullPath) throws IOException;
 
     /**
      * 返回访问文件的服务器地址，不包含文件相对路径
      * @return
      */
     String getAccessServerAddr();
+
+
+    void deleteList(Collection<String> urls);
 }

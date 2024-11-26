@@ -1,6 +1,7 @@
 package com.vk.dfs.template;
 
 import com.vk.dfs.enums.DFSType;
+import com.vk.dfs.enums.FilePosition;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Arrays;
@@ -19,6 +20,7 @@ public abstract class AbstractDfsTemplate implements DfsTemplate, InitializingBe
      * @return
      */
     public abstract DFSType support();
+
 
     @Override
     public void afterPropertiesSet() throws Exception {
