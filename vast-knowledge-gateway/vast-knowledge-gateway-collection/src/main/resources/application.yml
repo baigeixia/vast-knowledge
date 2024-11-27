@@ -18,3 +18,10 @@ spring:
             - Path=/dev-collection/analyze/**
           filters:
             - StripPrefix=2
+        #dfs
+        - id: vk-service-dfs
+          uri: lb://vk-service-dfs
+          predicates:
+            - Path=/dev-collection/dfs/**
+          filters:
+            - StripPrefix=2

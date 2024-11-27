@@ -2,7 +2,9 @@ package com.vk.wemedia.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import com.vk.wemedia.domain.WmMaterial;
+import com.vk.wemedia.domain.WmMaterialFeign;
 import com.vk.wemedia.service.WmMaterialService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +18,7 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/Material")
+@RequestMapping("/material")
 public class WmMaterialController {
 
     @Autowired
@@ -29,8 +31,10 @@ public class WmMaterialController {
      * @return {@code true} 添加成功，{@code false} 添加失败
      */
     @PostMapping("save")
-    public boolean save(@RequestBody WmMaterial wmMaterial) {
-        return wmMaterialService.save(wmMaterial);
+    public boolean save(@RequestBody WmMaterialFeign wmMaterial) {
+        WmMaterial material = new WmMaterial();
+        BeanUtils.copyProperties(wmMaterial,material);
+        return wmMaterialService.save(material);
     }
 
     /**

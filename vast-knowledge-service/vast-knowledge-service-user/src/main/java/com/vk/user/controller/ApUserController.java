@@ -2,6 +2,7 @@ package com.vk.user.controller;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.common.core.domain.R;
+import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.security.annotation.InnerAuth;
 import com.vk.user.domain.*;
@@ -65,6 +66,11 @@ public class ApUserController {
     public R<Map<Long, AuthorInfo> > getUserList(@RequestBody Set<Long> userId)
     {
         Map<Long, AuthorInfo> result=apUserService.getUserList(userId);
+        return R.ok(result);
+    }
+    @GetMapping("/upImage")
+    R<Boolean> upImage(@RequestParam(name = "url") String url,@RequestParam(name = "userid") Long userid){
+        Boolean result=apUserService.upImage(userid,url);
         return R.ok(result);
     }
 

@@ -50,6 +50,11 @@ public class FastDfsTemplate extends AbstractDfsTemplate {
         return null;
     }
 
+    @Override
+    public void deleteList(Collection<String> urls) {
+
+    }
+
     // @Autowired
     // private FastFileStorageClient client;
     //

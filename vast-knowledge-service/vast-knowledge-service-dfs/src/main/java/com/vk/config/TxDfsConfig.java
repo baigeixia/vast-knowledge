@@ -15,4 +15,5 @@ public class TxDfsConfig {
     private String region;
     private Integer durationSeconds;
     private String bucket;
+    private String host;
 }

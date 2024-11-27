@@ -21,6 +21,14 @@
     <dependencies>
         <dependency>
             <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-api-wemedia</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-api-user</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-redis</artifactId>
         </dependency>
 

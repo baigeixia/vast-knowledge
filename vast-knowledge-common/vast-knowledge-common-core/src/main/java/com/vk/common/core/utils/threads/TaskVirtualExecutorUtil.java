@@ -8,6 +8,9 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 虚拟线程工具类
+ */
 public class TaskVirtualExecutorUtil {
 
     private static final Logger log = LoggerFactory.getLogger(TaskVirtualExecutorUtil.class);

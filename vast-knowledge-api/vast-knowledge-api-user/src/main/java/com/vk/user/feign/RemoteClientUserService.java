@@ -25,4 +25,7 @@ public interface RemoteClientUserService {
     @PostMapping("/User/getUserList")
     R<Map<Long, AuthorInfo>> getUserList(@RequestBody Set<Long> userId);
 
+    @GetMapping("/User/upImage")
+    R<Boolean> upImage(@RequestParam(name = "url") String url,@RequestParam(name = "userid") Long userid);
+
 }

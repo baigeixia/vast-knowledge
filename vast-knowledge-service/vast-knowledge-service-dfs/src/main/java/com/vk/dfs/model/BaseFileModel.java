@@ -18,18 +18,23 @@ public class BaseFileModel {
     //文件大小
     private Long size;
 
+    //上传位置
+    private String origin;
+
     //文件源文件名称
     private String name;
 
     //上传文件的md5值
     private String md5;
+
     //上传文件本身数据
     private byte[] content;
 
-    public BaseFileModel(String author, Long size, String name, byte[] content) {
+    public BaseFileModel(String author, Long size, String name, byte[] content,String origin) {
         this.size = size;
         this.name = name;
         this.content = content;
+        this.origin = origin;
         this.author = author;
         StringBuilder stringBuilder = new StringBuilder();
         this.md5 = DigestUtils.md5DigestAsHex(stringBuilder.append(this.author).append(this.name).append(this.size).toString().getBytes());

@@ -3,8 +3,6 @@ package com.vk.user.service;
 import com.mybatisflex.core.service.IService;
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.AuthorInfo;
-import com.vk.user.domain.vo.LocalUserInfoVo;
-import com.vk.user.domain.vo.UserInfoVo;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,5 +18,5 @@ public interface ApUserService extends IService<ApUser> {
     Map<Long, AuthorInfo> getUserList(Set<Long> userId);
 
 
-
+    Boolean upImage(Long userid,String url);
 }
