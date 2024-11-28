@@ -43,6 +43,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.vk.user.common.constant.UserConstants.redisUserInfoKey;
@@ -110,7 +111,7 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
         Long userid = RequestContextUtil.getUserId();
         redisService.deleteObject(redisUserInfoKey(userid));
         UserInfoVo userInfoVo = mapper.selectGetInfo(userid);
-        redisService.setCacheObject(redisUserInfoKey(userid),userInfoVo);
+        redisService.setCacheObject(redisUserInfoKey(userid),userInfoVo,60*30L, TimeUnit.SECONDS);
     }
 
     @Override
@@ -361,8 +362,8 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             }
             UserInfoVo userInfoVo = mapper.selectGetInfo(id);
             userInfoVo.setPhone(maskPhoneNumber(userInfoVo.getPhone()));
-
-            redisService.setCacheObject(redisUserInfoKey(id), userInfoVo);
+            redisService.setCacheObject(redisUserInfoKey(id),userInfoVo,60*30L, TimeUnit.SECONDS);
+            // redisService.setCacheObject(redisUserInfoKey(id), userInfoVo);
             return userInfoVo;
         }
 

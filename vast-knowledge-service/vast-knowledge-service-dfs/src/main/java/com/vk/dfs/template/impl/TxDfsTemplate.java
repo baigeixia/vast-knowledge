@@ -129,7 +129,7 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
     private void upArticle(String path,Long userId) {
         WmMaterialFeign feign = new WmMaterialFeign();
         feign.setUrl(path);
-        feign.setUserId(1L);
+        feign.setUserId(userId);
         feign.setType(0);
         feign.setIsCollection(false);
         feign.setCreatedTime(LocalDateTime.now());

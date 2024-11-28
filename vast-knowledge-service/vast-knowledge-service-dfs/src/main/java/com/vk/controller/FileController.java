@@ -1,11 +1,13 @@
 package com.vk.controller;
 
 
+import com.alibaba.nacos.common.utils.UuidUtils;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
+import com.vk.common.core.utils.uuid.UUID;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.config.DfsConfig;
 import com.vk.config.TxDfsConfig;
@@ -36,7 +38,7 @@ import java.util.function.Predicate;
 @RestController
 @RequestMapping("/dfs")
 @Slf4j
-@CrossOrigin
+// @CrossOrigin
 public class FileController {
 
     @Autowired
@@ -77,16 +79,13 @@ public class FileController {
         // 非空判断multipartFile  url  图片文件夹/图片名称+时间戳+后缀
         String filename = multipartFile.getOriginalFilename();
         if (StringUtils.hasText(filename)){
-            filename=filename.trim();
-            String name = StringUtils.stripFilenameExtension(filename);
-            String nameSub = name.length() <= 50 ? name : name.substring(0, 50);
             // 获取上传文件的后缀名
             String ext = StringUtils.getFilenameExtension(filename);
             if (dfsConfig.getMatchExt().stream().noneMatch(Predicate.isEqual(ext))){
                 throw new LeadNewsException("不支持的文件类型");
             }
-            long LocalTime = System.currentTimeMillis() / 1000;
-            filename = origin+"/"+nameSub + LocalTime + "." + ext;
+            String replace = UUID.randomUUID().toString().replace("-", "");
+            filename = origin+"/"+replace + "." + ext;
         }
 
         try {
@@ -97,7 +96,7 @@ public class FileController {
                     filename,
                     multipartFile.getBytes(),
                     origin
-                    );
+            );
             String fullPath = dfsTemplate.uploadFile(baseFileModel);
             log.info("上传文件成功: {}", fullPath);
 

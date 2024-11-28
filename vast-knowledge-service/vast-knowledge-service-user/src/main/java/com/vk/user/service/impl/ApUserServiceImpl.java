@@ -5,6 +5,8 @@ import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.redis.service.RedisService;
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.AuthorInfo;
+import com.vk.user.domain.vo.UserInfoVo;
+import com.vk.user.mapper.ApUserInfoMapper;
 import com.vk.user.mapper.ApUserMapper;
 import com.vk.user.service.ApUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import static com.vk.user.common.constant.UserConstants.redisUserInfoKey;
 
 /**
  * APP用户信息 服务层实现。
@@ -24,6 +29,10 @@ public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> impleme
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private ApUserInfoMapper apUserInfoMapper;
+
 
     @Override
     public Map<Long, AuthorInfo> getUserList(Set<Long> userId) {
@@ -60,8 +69,13 @@ public class ApUserServiceImpl extends ServiceImpl<ApUserMapper, ApUser> impleme
         ApUser upUser = new ApUser();
         upUser.setId(one.getId());
         upUser.setImage(url);
-
-        return  this.updateById(upUser);
+        boolean updateById = this.updateById(upUser);
+        if (updateById){
+            redisService.deleteObject(redisUserInfoKey(userid));
+            UserInfoVo userInfoVo = apUserInfoMapper.selectGetInfo(userid);
+            redisService.setCacheObject(redisUserInfoKey(userid),userInfoVo,60*30L, TimeUnit.SECONDS);
+        }
+        return updateById;
     }
 
 
