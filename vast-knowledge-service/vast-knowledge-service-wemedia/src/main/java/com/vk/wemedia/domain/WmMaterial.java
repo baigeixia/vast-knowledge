@@ -1,5 +1,6 @@
 package com.vk.wemedia.domain;
 
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -50,6 +51,11 @@ public class WmMaterial implements Serializable {
      * 是否收藏
      */
     private Boolean isCollection;
+    /**
+     * 是否删除
+     */
+    @Column(isLogicDelete = true)
+    private Boolean del;
 
     /**
      * 创建时间

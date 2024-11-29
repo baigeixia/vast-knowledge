@@ -1,5 +1,6 @@
 package com.vk.wemedia.service;
 
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import com.vk.wemedia.domain.WmMaterial;
 
@@ -11,4 +12,5 @@ import com.vk.wemedia.domain.WmMaterial;
  */
 public interface WmMaterialService extends IService<WmMaterial> {
 
+    Page<WmMaterial> pageList(Integer type, Integer page, Integer size);
 }

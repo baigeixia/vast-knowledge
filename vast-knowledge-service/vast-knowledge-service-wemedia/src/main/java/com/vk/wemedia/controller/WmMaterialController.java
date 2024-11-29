@@ -1,15 +1,17 @@
 package com.vk.wemedia.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.wemedia.domain.WmMaterial;
 import com.vk.wemedia.domain.WmMaterialFeign;
 import com.vk.wemedia.service.WmMaterialService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 自媒体图文素材信息 控制层。
@@ -33,8 +35,26 @@ public class WmMaterialController {
     @PostMapping("save")
     public boolean save(@RequestBody WmMaterialFeign wmMaterial) {
         WmMaterial material = new WmMaterial();
-        BeanUtils.copyProperties(wmMaterial,material);
+        BeanUtils.copyProperties(wmMaterial, material);
         return wmMaterialService.save(material);
+    }
+
+    /**
+     * 添加收藏。
+     *
+     * @param id 主键
+     */
+    @PutMapping("collection/{id}")
+    public AjaxResult collection(@PathVariable(name = "id") Serializable id) {
+        WmMaterial byId = wmMaterialService.getById(id);
+        if (ObjectUtils.isEmpty(byId)){
+            throw new LeadNewsException("图片错误 已经被移除");
+        }
+        WmMaterial material = new WmMaterial();
+        material.setId(byId.getId());
+        material.setIsCollection(!byId.getIsCollection());
+        wmMaterialService.updateById(material);
+        return AjaxResult.success();
     }
 
     /**
@@ -44,51 +64,25 @@ public class WmMaterialController {
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @DeleteMapping("remove/{id}")
-    public boolean remove(@PathVariable Serializable id) {
-        return wmMaterialService.removeById(id);
+    public AjaxResult remove(@PathVariable(name = "id") Serializable id) {
+        return AjaxResult.success(wmMaterialService.removeById(id));
     }
 
-    /**
-     * 根据主键更新自媒体图文素材信息。
-     *
-     * @param wmMaterial 自媒体图文素材信息
-     * @return {@code true} 更新成功，{@code false} 更新失败
-     */
-    @PutMapping("update")
-    public boolean update(@RequestBody WmMaterial wmMaterial) {
-        return wmMaterialService.updateById(wmMaterial);
-    }
 
     /**
-     * 查询所有自媒体图文素材信息。
-     *
-     * @return 所有数据
-     */
-    @GetMapping("list")
-    public List<WmMaterial> list() {
-        return wmMaterialService.list();
-    }
-
-    /**
-     * 根据自媒体图文素材信息主键获取详细信息。
-     *
-     * @param id 自媒体图文素材信息主键
-     * @return 自媒体图文素材信息详情
-     */
-    @GetMapping("getInfo/{id}")
-    public WmMaterial getInfo(@PathVariable Serializable id) {
-        return wmMaterialService.getById(id);
-    }
-
-    /**
-     * 分页查询自媒体图文素材信息。
-     *
-     * @param page 分页对象
-     * @return 分页对象
+     * @param type 0全部 1收藏
+     * @param page 页码
+     * @param size 页数
+     * @return
      */
     @GetMapping("page")
-    public Page<WmMaterial> page(Page<WmMaterial> page) {
-        return wmMaterialService.page(page);
+    public AjaxResult pageList(
+            @RequestParam(name = "type") Integer type,
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "size", defaultValue = "20") Integer size
+    ) {
+        Page<WmMaterial> result = wmMaterialService.pageList(type, page, size);
+        return AjaxResult.success(result);
     }
 
 }

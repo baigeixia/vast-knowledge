@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(contextId = "remoteClientWemediaService", value = ServiceNameConstants.ARTICLE_WEMEDIA, fallbackFactory = RemoteClientWemediaFallbackFactory.class)
 public interface RemoteClientWemediaService {
 
-    @PostMapping("/material/save/")
+    @PostMapping("/material/save")
     R<Boolean> saveMaterial(@RequestBody WmMaterialFeign materialFeign);
 
 }
