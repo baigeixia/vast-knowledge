@@ -24,7 +24,6 @@ import com.vk.wemedia.feign.RemoteClientWemediaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -56,7 +55,6 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
         return DFSType.TX;
     }
 
-    private final String bucketName = "test-1316786270";
 
     @Override
     public String uploadFile(BaseFileModel fileModel) {
@@ -67,9 +65,9 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
         byte[] content = fileModel.getContent();
 
         Long userId = RequestContextUtil.getUserId();
+        String bucketName = txDfsConfig.getBucket();
 
-
-        return TaskVirtualExecutorUtil.executeWith(() ->{
+        return TaskVirtualExecutorUtil.executeWith(() -> {
             try {
                 // 高级接口会返回一个异步结果Upload
                 // 可同步地调用 waitForUploadResult 方法等待上传完成，成功返回 UploadResult, 失败抛出异常
@@ -78,7 +76,7 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
 
                 UploadResult uploadResult = upload.waitForUploadResult();
                 String path = uploadResult.getKey();
-                TaskVirtualExecutorUtil.executeWith(() -> syncUpImag(origin, path,userId));
+                TaskVirtualExecutorUtil.executeWith(() -> syncUpImag(origin, path, userId));
 
                 return path;
             } catch (CosServiceException e) {
@@ -95,9 +93,9 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
 
     }
 
-    private void syncUpImag(String origin, String path,Long userId) {
+    private void syncUpImag(String origin, String path, Long userId) {
         String host = txDfsConfig.getHost();
-        path=host+path;
+        path = host + path;
 
         FilePosition filePosition = null;
         try {
@@ -109,11 +107,11 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
         switch (filePosition) {
             case ARTICLE -> {
                 // 文章
-                upArticle(path,userId);
+                upArticle(path, userId);
             }
             case AVATAR -> {
                 // 头像
-                upAvatar(path,userId);
+                upAvatar(path, userId);
             }
             case COMMENT -> {
                 // 评论
@@ -122,11 +120,11 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
         }
     }
 
-    private void upAvatar(String path,Long userId) {
-        remoteClientUserService.upImage(path,userId);
+    private void upAvatar(String path, Long userId) {
+        remoteClientUserService.upImage(path, userId);
     }
 
-    private void upArticle(String path,Long userId) {
+    private void upArticle(String path, Long userId) {
         WmMaterialFeign feign = new WmMaterialFeign();
         feign.setUrl(path);
         feign.setUserId(userId);
@@ -150,17 +148,18 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, inputStream, objectMetadata);
         // 设置存储类型（如有需要，不需要请忽略此行代码）, 默认是标准(Standard), 低频(standard_ia)
         // 更多存储类型请参见 https://cloud.tencent.com/document/product/436/33417
-        putObjectRequest.setStorageClass(StorageClass.Standard_IA);
+        putObjectRequest.setStorageClass(StorageClass.Standard);
         return putObjectRequest;
     }
 
     @Override
     public boolean delete(String fullPath) {
+        String bucketName = txDfsConfig.getBucket();
         COS cosClient = transferManager.getCOSClient();
         try {
             fullPath = getObjectKeyFromUrl(fullPath);
             cosClient.deleteObject(bucketName, fullPath);
-        }catch (CosServiceException e) {
+        } catch (CosServiceException e) {
             log.error("Cos 服务异常 - 文件：{} 上传失败，原因：{}", fullPath, e.getMessage());
             throw new LeadNewsException("网络异常 上传失败");
         } catch (CosClientException e) {
@@ -172,6 +171,7 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
 
     @Override
     public List<byte[]> download(Collection<String> fullPath) {
+        String bucketName = txDfsConfig.getBucket();
         COS cosClient = transferManager.getCOSClient();
         return fullPath.stream().map(p -> {
             String key = getObjectKeyFromUrl(p);
@@ -215,6 +215,7 @@ public class TxDfsTemplate extends AbstractDfsTemplate {
 
     @Override
     public void deleteList(Collection<String> urls) {
+        String bucketName = txDfsConfig.getBucket();
         COS cosClient = transferManager.getCOSClient();
 
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName);
