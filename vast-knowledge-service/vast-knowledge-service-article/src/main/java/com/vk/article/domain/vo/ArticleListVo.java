@@ -28,6 +28,6 @@ public class ArticleListVo {
      */
     private LocalDateTime updateTime;
 
-
+    private Integer status;
 
 }

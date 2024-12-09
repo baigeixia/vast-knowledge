@@ -42,6 +42,12 @@ public class ApArticleController {
         return AjaxResult.success(resultInfo) ;
     }
 
+    @GetMapping("authorInfo")
+    public AjaxResult authorInfo(@RequestParam(name = "id" ) Long id) {
+        ArticleInfoVo resultInfo=apArticleService.authorInfo(id);
+        return AjaxResult.success(resultInfo) ;
+    }
+
     /**
      * 查询 首页文章列表
      * @param page

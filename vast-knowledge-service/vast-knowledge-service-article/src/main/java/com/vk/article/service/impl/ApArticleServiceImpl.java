@@ -8,7 +8,6 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
-import com.vk.article.domain.table.ApArticleConfigTableDef;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
@@ -46,7 +45,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.vk.article.domain.table.ApArticleConfigTableDef.AP_ARTICLE_CONFIG;
 import static com.vk.article.domain.table.ApArticleTableDef.AP_ARTICLE;
@@ -160,20 +161,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         ApArticle article = mapper.selectOneById(articleId);
         ArticleInfoVo articleInfoVo = new ArticleInfoVo();
         if (article != null) {
-            BeanUtils.copyProperties(article, articleInfoVo);
-            Long authorId = article.getAuthorId();
-            R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(Set.of(authorId));
-            ValidationUtils.validateR(userList, "错误的用户");
-            Map<Long, AuthorInfo> data = userList.getData();
-
-            if (null != data) articleInfoVo.setAuthorName(data.get(authorId).getUsername());
-
-            ApArticleConfig config = apArticleConfigMapper.selectOneById(articleId);
-            if (config != null) {
-                articleInfoVo.setConfig(config);
-            } else {
-                log.error("文章配置信息为空");
-            }
+            getArticleInfo(articleId, article, articleInfoVo);
         } else {
             log.error("文章信息为空");
         }
@@ -297,10 +285,14 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             throw new LeadNewsException(401, "未登录");
         }
 
+        if (Stream.of(0,1,2,3,8,9).noneMatch(Predicate.isEqual(status))){
+            throw new LeadNewsException( "错误的查询参数");
+        }
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where(AP_ARTICLE.AUTHOR_ID.eq(userId))
                 .and(AP_ARTICLE.TITLE.like(title, StringUtils.isNotEmpty(title)))
                 .and(AP_ARTICLE.CHANNEL_ID.eq(channelId, !StringUtils.isLongEmpty(channelId)))
+                .and(AP_ARTICLE.STATUS.eq(status, !ObjectUtils.isEmpty(status) && status !=0))
                 .and(AP_ARTICLE.CREATED_TIME.between(startTime, endTime, !ObjectUtils.isEmpty(startTime) && !ObjectUtils.isEmpty(endTime)));
 
         return mapper.paginateAs(Page.of(page, size), wrapper, ArticleListVo.class);
@@ -428,5 +420,42 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         articleDocumentRepository.deleteById(articleId);
 
         apArticleConfigMapper.deleteByOne(articleId);
+    }
+
+    @Override
+    public ArticleInfoVo authorInfo(Long id) {
+
+        if (StringUtils.isLongEmpty(id)) {
+            throw new LeadNewsException("文章id不能为空");
+        }
+
+        Long userId = RequestContextUtil.getUserId();
+
+        ApArticle article = mapper.selectOneByQuery(QueryWrapper.create().where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE.ID.eq(id)));
+        if (ObjectUtils.isEmpty(article)){
+            throw new LeadNewsException("错误的文章");
+        }
+        ArticleInfoVo articleInfoVo = new ArticleInfoVo();
+        getArticleInfo(id, article, articleInfoVo);
+
+        return articleInfoVo;
+    }
+
+    private void getArticleInfo(Long id, ApArticle article, ArticleInfoVo articleInfoVo) {
+        BeanUtils.copyProperties(article, articleInfoVo);
+
+        Long authorId = article.getAuthorId();
+        R<Map<Long, AuthorInfo>> userList = remoteClientUserService.getUserList(Set.of(authorId));
+        ValidationUtils.validateR(userList, "错误的用户");
+        Map<Long, AuthorInfo> data = userList.getData();
+
+        if (null != data) articleInfoVo.setAuthorName(data.get(authorId).getUsername());
+
+        ApArticleConfig config = apArticleConfigMapper.selectOneById(id);
+        if (config != null) {
+            articleInfoVo.setConfig(config);
+        } else {
+            log.error("文章配置信息为空");
+        }
     }
 }

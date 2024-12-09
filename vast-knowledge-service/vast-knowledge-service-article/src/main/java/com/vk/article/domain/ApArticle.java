@@ -137,7 +137,7 @@ public class ApArticle implements Serializable {
     /**
      * 来源
      */
-    private Integer origin;
+    private Integer status;
 
 
 

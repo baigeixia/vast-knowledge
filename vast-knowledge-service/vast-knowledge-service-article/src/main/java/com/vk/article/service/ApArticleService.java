@@ -47,4 +47,6 @@ public interface ApArticleService extends IService<ApArticle> {
     void importAll(long page, Long size, CountDownLatch countDownLatch, LocalDateTime now);
 
     void deleteOne(Long id);
+
+    ArticleInfoVo authorInfo(Long id);
 }
