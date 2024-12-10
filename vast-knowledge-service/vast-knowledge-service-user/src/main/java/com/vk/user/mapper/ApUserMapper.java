@@ -23,7 +23,10 @@ public interface ApUserMapper extends BaseMapper<ApUser> {
 
 
     List<AuthorInfo> selectListOrInfo(@Param("ids") Set<Long> ids);
-    @Select("select name from ap_user where  id=#{id}")
+    // @Select("select name from ap_user where  id=#{id}")
+    // String getUserName(@Param("id") Long userId);
+
+    @Select("select name from ap_user_info where  user_id=#{id}")
     String getUserName(@Param("id") Long userId);
 
     @Select("select  u.*,i.* from ap_user u inner join  ap_user_info i ON u.id=i.user_id where u.id=#{id} and u.status=0")

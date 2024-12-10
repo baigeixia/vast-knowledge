@@ -178,8 +178,9 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             mapper.update(upInfo);
 
         }
-
         redisService.deleteObject(redisUserInfoKey(userid));
+        UserInfoVo userInfoVo = mapper.selectGetInfo(id);
+        redisService.setCacheObject(redisUserInfoKey(userid),userInfoVo,60*30L, TimeUnit.SECONDS);
     }
 
     @Override

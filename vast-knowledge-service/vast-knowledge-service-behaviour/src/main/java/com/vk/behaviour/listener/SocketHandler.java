@@ -34,6 +34,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -363,6 +364,9 @@ public class SocketHandler {
     }
 
     public void readUnloadLog(ApReadBehavior dto, Long userId, Long articleId) {
+        if (dto.getEntryId().equals(userId)) {
+            return;
+        }
         ApReadBehavior readBehavior = apReadBehaviorMapper.selectOneByQuery(
                 QueryWrapper.create().where(
                         AP_READ_BEHAVIOR.ENTRY_ID.eq(userId)
@@ -371,7 +375,8 @@ public class SocketHandler {
         );
 
         LocalDateTime dateTime = LocalDateTime.now();
-        if (null == readBehavior) {
+        if (ObjectUtils.isEmpty(readBehavior)) {
+            dto.setEntryId(userId);
             dto.setCount(1);
             dto.setMaxPosition(dto.getPercentage());
             dto.setCreatedTime(dateTime);
@@ -379,13 +384,12 @@ public class SocketHandler {
             apReadBehaviorMapper.insertSelective(dto);
             streamProcessingStandard(articleId, UpdateArticleMess.UpdateArticleType.VIEWS, 1);
         } else {
-            dto.setId(readBehavior.getId());
-            dto.setMaxPosition(dto.getPercentage() > readBehavior.getMaxPosition() ? dto.getPercentage() : readBehavior.getMaxPosition());
+            readBehavior.setMaxPosition(dto.getPercentage() > readBehavior.getMaxPosition() ? dto.getPercentage() : readBehavior.getMaxPosition());
             // dto.setMaxPosition(dto.getPercentage() > readBehavior.getPercentage() ? dto.getPercentage() : readBehavior.getPercentage());
-            dto.setCount(readBehavior.getCount() + 1);
-            dto.setReadDuration(readBehavior.getReadDuration().add(dto.getReadDuration()));
-            dto.setUpdatedTime(dateTime);
-            apReadBehaviorMapper.update(dto, true);
+            readBehavior.setCount(readBehavior.getCount() + 1);
+            readBehavior.setReadDuration(readBehavior.getReadDuration().add(dto.getReadDuration()));
+            readBehavior.setUpdatedTime(dateTime);
+            apReadBehaviorMapper.update(readBehavior, true);
         }
     }
 
