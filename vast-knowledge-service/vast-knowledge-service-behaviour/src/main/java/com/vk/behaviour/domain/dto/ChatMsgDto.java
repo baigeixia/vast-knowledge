@@ -25,6 +25,9 @@ public class ChatMsgDto implements Serializable {
      * 私信内容
      */
     private  String content;
-
+    /**
+     * 图片
+     */
+    private  String image;
 
 }

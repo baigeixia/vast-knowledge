@@ -29,14 +29,14 @@ public class IgnoreWhiteProperties
     private void initializeWhites() {
         whites.add("/dev-collection/analyze/channel/page");
         whites.add("/dev-core/article/article/homeList");
-        whites.add("/dev-collection/behaviour/likes/articleLike");
+//        whites.add("/dev-collection/behaviour/likes/articleLike");
         whites.add("/dev-core/search/search/searchInfo");
         whites.add("/dev-system/user/info/search");
         whites.add("/dev-core/article/Content/getInfo");
         whites.add("/dev-core/article/article/info");
         whites.add("/dev-core/comment/Comment/getCommentList");
         // whites.add("/dev-system/user/info/getInfo");
-        whites.add("/dev-collection/behaviour/likes/commentLike/**");
+//        whites.add("/dev-collection/behaviour/likes/commentLike/**");
         whites.add("/dev-collection/behaviour/behavior/list");
         // whites.add("/dev-system/user/info/InfoRelation");
         whites.add("/dev-core/article/article/posts");

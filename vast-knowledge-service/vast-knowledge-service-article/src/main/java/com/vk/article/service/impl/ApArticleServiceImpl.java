@@ -8,6 +8,8 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
+import com.vk.article.domain.vo.ArticleData;
+import com.vk.article.domain.vo.ArticleDataVo;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
@@ -439,6 +441,19 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         getArticleInfo(id, article, articleInfoVo);
 
         return articleInfoVo;
+    }
+
+    @Override
+    public ArticleDataVo getArticleData(Long page, Long size) {
+        Long userId = RequestContextUtil.getUserId();
+        ArticleDataVo vo = new ArticleDataVo();
+        ArticleDataVo articleDataVo = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleData(userId));
+        if (!ObjectUtils.isEmpty(articleDataVo)){
+            BeanUtils.copyProperties(articleDataVo,vo);
+        }
+        List<ArticleData> articleData = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleInfoData(userId,(page - 1) * size,size));
+        vo.setArticleDataList(articleData);
+        return vo;
     }
 
     private void getArticleInfo(Long id, ApArticle article, ArticleInfoVo articleInfoVo) {

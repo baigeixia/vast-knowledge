@@ -2,6 +2,8 @@ package com.vk.article.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.vo.ArticleData;
+import com.vk.article.domain.vo.ArticleDataVo;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -29,4 +31,9 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
 
     @Select("select count(1) from ap_article a inner join ap_article_config c ON a.id = c.article_id where a.author_id=#{localUserId} and a.id=#{articleId} and c.is_delete=0 ")
     Long selectCountOne(@Param(value = "articleId")Long articleId,@Param(value = "localUserId")Long localUserId);
+
+    ArticleDataVo getArticleData(@Param(value = "userId")Long userId);
+
+
+    List<ArticleData> getArticleInfoData(@Param(value = "userId")Long userId, @Param(value="page")Long page,  @Param(value="size")Long size);
 }

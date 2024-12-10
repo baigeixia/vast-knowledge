@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
+import com.vk.article.domain.vo.ArticleDataVo;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.service.ApArticleService;
@@ -173,5 +174,15 @@ public class ApArticleController {
         apArticleService.deleteOne(id);
         return AjaxResult.success();
     }
+
+    @GetMapping("/getArticleData")
+    public AjaxResult getArticleData(
+            @RequestParam(name = "page") Long page,
+            @RequestParam(name = "size") Long size
+    ){
+        ArticleDataVo result= apArticleService.getArticleData(page,size);
+        return AjaxResult.success(result);
+    }
+
 
 }

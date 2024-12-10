@@ -24,6 +24,27 @@
         <result property="isDelete" column="is_delete"/>
     </resultMap>
 
+    <select id="getArticleData" resultType="com.vk.article.domain.vo.ArticleDataVo">
+        SELECT
+            COALESCE(COUNT(CASE WHEN status = 9 THEN 1 END), 0) AS 'release',
+                COALESCE(SUM(likes), 0) AS 'like',
+                SUM(collection) AS 'collect',
+                SUM(views) AS 'views'
+        FROM ap_article
+        WHERE author_id = #{userId};
+    </select>
+
+    <select id="getArticleInfoData" resultType="com.vk.article.domain.vo.ArticleData">
+        SELECT
+            id,
+            title,
+            likes,
+            collection as collect,
+            views,
+            comment
+        FROM ap_article
+        WHERE author_id = 1 and status = 9  limit #{page}, #{size};
+    </select>
 
     <select id="selectByPage" resultMap="articleDocumentResultMap">
         select apa.id,
