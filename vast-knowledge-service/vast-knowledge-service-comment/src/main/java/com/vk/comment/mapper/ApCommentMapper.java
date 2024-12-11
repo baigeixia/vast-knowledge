@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.time.LocalDateTime;
+
 /**
  * APP评论信息 映射层。
  *
@@ -20,4 +22,5 @@ public interface ApCommentMapper extends BaseMapper<ApComment> {
     @Select("SELECT a.id id from  ap_comment a LEFT JOIN  ap_comment_repay b on a.id=b.comment_id WHERE a.id = #{id} or b.id=#{id} LIMIT 1")
     Long selectGetNotificationCommentId(@Param("id") Long notificationId);
 
+    Long getArticleCommentById(@Param("articleId")Long articleId, @Param("startTime")LocalDateTime startTime, @Param("endTime")LocalDateTime endTime);
 }

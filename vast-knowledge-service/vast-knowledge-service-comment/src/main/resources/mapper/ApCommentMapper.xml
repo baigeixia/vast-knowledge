@@ -4,4 +4,19 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vk.comment.mapper.ApCommentMapper">
 
+    <select id="getArticleCommentById" resultType="Long">
+        SELECT
+        (SELECT COUNT(*)
+        FROM ap_comment
+        WHERE entry_id = #{articleId}
+        AND created_time >= #{startTime}
+        AND created_time &lt;= #{endTime})
+        +
+        (SELECT COUNT(*)
+        FROM ap_comment_repay
+        WHERE entry_id = #{articleId}
+        AND created_time >= #{startTime}
+        AND created_time &lt;= #{endTime});
+    </select>
+
 </mapper>

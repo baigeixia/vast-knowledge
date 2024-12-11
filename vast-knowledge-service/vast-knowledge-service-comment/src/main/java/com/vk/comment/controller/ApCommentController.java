@@ -7,12 +7,14 @@ import com.vk.comment.domain.vo.CommentList;
 import com.vk.comment.domain.vo.CommentListVo;
 import com.vk.comment.domain.vo.NotificationListVo;
 import com.vk.comment.service.ApCommentService;
+import com.vk.common.core.domain.R;
 import com.vk.common.core.web.domain.AjaxResult;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.SocketHandler;
 
@@ -96,6 +98,16 @@ public class ApCommentController {
         List<NotificationListVo> result=apCommentService.getNotification(page,size);
 
         return AjaxResult.success(result);
+    }
+
+    @GetMapping("/getCommentTotalById")
+    R<Long> getArticleCommentById(
+            @RequestParam(name = "id") Long id,
+            @RequestParam(name = "startTime") LocalDateTime startTime,
+            @RequestParam(name = "endTime") LocalDateTime endTime
+    ){
+       Long  result= apCommentService.getArticleCommentById(id,startTime,endTime);
+        return R.ok(result);
     }
 
     @Resource

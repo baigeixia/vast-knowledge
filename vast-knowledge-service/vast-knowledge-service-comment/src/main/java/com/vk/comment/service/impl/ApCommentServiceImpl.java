@@ -462,6 +462,11 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         return listVos;
     }
 
+    @Override
+    public Long getArticleCommentById(Long articleId, LocalDateTime startTime, LocalDateTime endTime) {
+        return mapper.getArticleCommentById(articleId,startTime,endTime);
+    }
+
 
     private String localDatetimeFormat(LocalDateTime local) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");

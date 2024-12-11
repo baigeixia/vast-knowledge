@@ -19,6 +19,7 @@
         <module>vast-knowledge-api-behaviour</module>
         <module>vast-knowledge-api-search</module>
         <module>vast-knowledge-api-wemedia</module>
+        <module>vast-knowledge-api-comment</module>
     </modules>
 
     <properties>

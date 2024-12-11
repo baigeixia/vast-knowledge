@@ -9,6 +9,7 @@ import com.vk.comment.domain.vo.CommentListVo;
 import com.vk.comment.domain.vo.NotificationListVo;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -28,4 +29,6 @@ public interface ApCommentService extends IService<ApComment> {
     CommentListVo getCommentList(Long notificationId,Serializable entryId, Integer type,Long page, Long size);
 
     List<NotificationListVo> getNotification(Integer page, Integer size);
+
+    Long getArticleCommentById(Long id, LocalDateTime startTime, LocalDateTime endTime);
 }

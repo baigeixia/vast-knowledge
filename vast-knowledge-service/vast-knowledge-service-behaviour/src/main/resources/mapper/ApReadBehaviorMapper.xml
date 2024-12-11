@@ -24,4 +24,82 @@
         from ap_read_behavior
         where updated_time > #{redisTime} and updated_time &lt;= #{nowTime}
     </select>
+
+    <select id="getReadData"  resultType="com.vk.behaviour.domain.vo.ReadDataAnalysisVo">
+        SELECT
+        -- 收藏数量
+        IFNULL((SELECT COUNT(*)
+        FROM ap_collect_behavior ac
+        WHERE ac.article_id = rb.article_id
+        AND ac.operation = '0'
+        AND ac.created_time >= #{start}
+        AND ac.created_time &lt;= #{end}), 0) AS `collect`,
+
+        -- 转发数量
+        IFNULL((SELECT COUNT(*)
+        FROM ap_forward_behavior af
+        WHERE af.article_id = rb.article_id
+        AND af.created_time >= #{start}
+        AND af.created_time &lt;= #{end}), 0) AS `forward`,
+
+        -- 点赞数量
+        IFNULL((SELECT COUNT(*)
+        FROM ap_likes_behavior al
+        WHERE al.article_id = rb.article_id
+        AND al.operation = '0'
+        AND al.created_time >= #{start}
+        AND al.created_time &lt;= #{end}), 0) AS `like`,
+
+        -- 不喜欢数量
+        IFNULL((SELECT COUNT(*)
+        FROM ap_unlikes_behavior au
+        WHERE au.article_id = rb.article_id
+        AND au.type = '0'
+        AND au.created_time >= #{start}
+        AND au.created_time &lt;= #{end}), 0) AS `dislike`,
+
+        -- 总阅读量
+        IFNULL(COUNT(*), 0) AS `readTotal`,
+
+        -- 平均阅读进度
+        IFNULL(AVG(rb.percentage), 0) AS `averageRead`,
+
+        -- 平均阅读时间（秒）
+        IFNULL(AVG(rb.read_duration), 0) AS `averageReadTime`,
+
+        -- 计算5秒跳出率
+        IFNULL(COUNT(CASE WHEN rb.read_duration &lt; 5 THEN 1 END) / COUNT(*), 0) AS `bounceRate`
+
+        FROM ap_read_behavior rb
+        WHERE rb.article_id = #{articleId}
+        AND rb.created_time >= #{start}
+        AND rb.created_time &lt;= #{end};
+
+    </select>
+
+    <select id="getReadAnalysis" resultType="com.vk.behaviour.domain.vo.ReadCompletionAnalysis">
+        SELECT
+        CASE
+        WHEN percentage = 100 THEN '100%'
+        WHEN percentage >= 90 AND percentage &lt;  100 THEN '90% - 100%'
+        WHEN percentage >= 70 AND percentage &lt;  90 THEN '70% - 90%'
+        WHEN percentage >= 50 AND percentage &lt; 70 THEN '50% - 70%'
+        WHEN percentage >= 10 AND percentage &lt; 50 THEN '10% - 50%'
+        ELSE '小于 10%'
+        END AS `name`,
+        COUNT(*) AS `value`
+        FROM ap_read_behavior
+        WHERE article_id = #{articleId}
+        AND created_time >= #{start}
+        AND created_time &lt;= #{end}
+        GROUP BY `name`
+        ORDER BY FIELD(`name`,
+        '100%',
+        '90% - 100%',
+        '70% - 90%',
+        '50% - 70%',
+        '10% - 50%',
+        '小于 10%'),
+         `value` desc;
+    </select>
 </mapper>

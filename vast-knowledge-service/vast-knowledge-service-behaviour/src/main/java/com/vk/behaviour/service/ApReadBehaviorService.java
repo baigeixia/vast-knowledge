@@ -3,6 +3,7 @@ package com.vk.behaviour.service;
 import com.mybatisflex.core.service.IService;
 import com.vk.behaviour.domain.ApReadBehavior;
 import com.vk.behaviour.domain.vo.LocalReadSearchVo;
+import com.vk.behaviour.domain.vo.ReadDataAnalysisVo;
 import com.vk.behaviour.domain.vo.UserFootMarkListVo;
 import com.vk.common.es.domain.UserReadDocument;
 
@@ -31,4 +32,6 @@ public interface ApReadBehaviorService extends IService<ApReadBehavior> {
     LocalReadSearchVo searchRead(String query, Long page, Long size);
 
     void clearAll(Long userid);
+
+    ReadDataAnalysisVo readDataAnalysis(Long articleId,LocalDateTime startTime, LocalDateTime endTime, Integer cycle);
 }

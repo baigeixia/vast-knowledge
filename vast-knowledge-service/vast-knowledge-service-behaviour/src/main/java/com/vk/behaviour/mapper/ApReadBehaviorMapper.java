@@ -2,6 +2,8 @@ package com.vk.behaviour.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.behaviour.domain.ApReadBehavior;
+import com.vk.behaviour.domain.vo.ReadCompletionAnalysis;
+import com.vk.behaviour.domain.vo.ReadDataAnalysisVo;
 import com.vk.common.es.domain.UserInfoDocument;
 import com.vk.common.es.domain.UserReadDocument;
 import org.apache.ibatis.annotations.Delete;
@@ -34,4 +36,8 @@ public interface ApReadBehaviorMapper extends BaseMapper<ApReadBehavior> {
 
     @Delete("delete from  ap_read_behavior where  entry_id=#{localUserId}")
     void clearAll(@Param("localUserId")Long localUserId);
+
+    ReadDataAnalysisVo getReadData(@Param("articleId")Long articleId, @Param("start")LocalDateTime start, @Param("end")LocalDateTime end);
+
+    List<ReadCompletionAnalysis> getReadAnalysis(@Param("articleId")Long articleId, @Param("start")LocalDateTime start, @Param("end")LocalDateTime end);
 }

@@ -256,6 +256,13 @@
                 <artifactId>vast-knowledge-api-system</artifactId>
                 <version>${vk.version}</version>
             </dependency>
+            <!-- 评论接口 -->
+            <dependency>
+                <groupId>com.vk</groupId>
+                <artifactId>vast-knowledge-api-comment</artifactId>
+                <version>0.0.1</version>
+            </dependency>
+
 
 
             <dependency>
@@ -290,6 +297,7 @@
                 <artifactId>vast-knowledge-common-security</artifactId>
                 <version>${vk.version}</version>
             </dependency>
+
 
             <dependency>
                 <groupId>com.vk</groupId>

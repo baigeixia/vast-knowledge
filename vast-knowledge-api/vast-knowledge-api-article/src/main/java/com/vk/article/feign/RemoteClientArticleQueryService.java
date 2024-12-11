@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +19,7 @@ import java.util.Set;
 @FeignClient(contextId = "remoteClientArticleQueryService", value = ServiceNameConstants.ARTICLE_SERVICE, fallbackFactory = RemoteClientArticleQueryFallbackFactory.class)
 public interface RemoteClientArticleQueryService {
 
-    @GetMapping("/getOne")
+    @GetMapping("/article/getOne")
     R<ApArticle> getOneArticle(@RequestParam(name = "id") Long id);
 
     @PostMapping("article/getTitle")
@@ -49,4 +50,7 @@ public interface RemoteClientArticleQueryService {
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size
     );
+
+
+
 }
