@@ -10,6 +10,7 @@ import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
 import com.vk.article.domain.vo.ArticleData;
 import com.vk.article.domain.vo.ArticleDataVo;
+import com.vk.common.core.utils.DateUtils;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
@@ -295,7 +296,9 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 .and(AP_ARTICLE.TITLE.like(title, StringUtils.isNotEmpty(title)))
                 .and(AP_ARTICLE.CHANNEL_ID.eq(channelId, !StringUtils.isLongEmpty(channelId)))
                 .and(AP_ARTICLE.STATUS.eq(status, !ObjectUtils.isEmpty(status) && status !=0))
-                .and(AP_ARTICLE.CREATED_TIME.between(startTime, endTime, !ObjectUtils.isEmpty(startTime) && !ObjectUtils.isEmpty(endTime)));
+                .and(AP_ARTICLE.UPDATE_TIME.between(startTime, endTime, !ObjectUtils.isEmpty(startTime) && !ObjectUtils.isEmpty(endTime)))
+                .orderBy(AP_ARTICLE.UPDATE_TIME,false);
+
 
         return mapper.paginateAs(Page.of(page, size), wrapper, ArticleListVo.class);
     }
@@ -444,15 +447,63 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     }
 
     @Override
-    public ArticleDataVo getArticleData(Long page, Long size) {
+    public ArticleDataVo getArticleData(LocalDateTime startTime, LocalDateTime endTime, Integer cycle, Long page, Long size) {
+
+
+        if (Stream.of(0, 1, 2, 3).noneMatch(Predicate.isEqual(cycle))) {
+            throw new LeadNewsException("错误的日期");
+        }
+
+        if (!org.apache.commons.lang3.ObjectUtils.isEmpty(startTime) && !org.apache.commons.lang3.ObjectUtils.isEmpty(endTime)) {
+            return getArticleData(startTime, endTime,page,size);
+        }
+
+        LocalDateTime cycleStartTime = null;
+        LocalDateTime cycleEndTime = null;
+
+        // 如果 startTime 和 endTime 为空，根据其他时间参数进行处理
+        switch (cycle) {
+            case 0 -> {
+                // 今天
+                cycleStartTime = DateUtils.getStartOfDay();
+                cycleEndTime = DateUtils.getEndOfDay();
+            }
+            case 1 -> {
+                // 本周
+                cycleStartTime = DateUtils.getStartOfWeek();
+                cycleEndTime = DateUtils.getEndOfWeek();
+            }
+            case 2 -> {
+                // 整周
+                cycleStartTime = DateUtils.getStartOfWholeWeek();
+                cycleEndTime = DateUtils.getEndOfWholeWeek();
+            }
+            case 3 -> {
+                // 整月
+                cycleStartTime = DateUtils.getStartOfWholeMonth();
+                cycleEndTime = DateUtils.getEndOfWholeMonth();
+            }
+        }
+
+        return getArticleData(cycleStartTime, cycleEndTime,page,size);
+    }
+
+    private  ArticleDataVo getArticleData(LocalDateTime startTime, LocalDateTime endTime,Long page, Long size){
         Long userId = RequestContextUtil.getUserId();
         ArticleDataVo vo = new ArticleDataVo();
-        ArticleDataVo articleDataVo = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleData(userId));
+
+        ArticleDataVo articleDataVo = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleData(userId,startTime,endTime));
+        List<ArticleData> articleData = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleInfoData(userId,(page - 1) * size,size,startTime,endTime));
+        Long total=TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleDataTotal(userId,startTime,endTime));
+
         if (!ObjectUtils.isEmpty(articleDataVo)){
             BeanUtils.copyProperties(articleDataVo,vo);
         }
-        List<ArticleData> articleData = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleInfoData(userId,(page - 1) * size,size));
+
         vo.setArticleDataList(articleData);
+        vo.setPage(page);
+        vo.setSize(size);
+        vo.setTotal(total);
         return vo;
     }
 

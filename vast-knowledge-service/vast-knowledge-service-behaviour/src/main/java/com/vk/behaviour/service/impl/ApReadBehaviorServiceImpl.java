@@ -15,6 +15,7 @@ import com.vk.comment.feign.RemoteClientCommentQueryService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.DateUtils;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.es.domain.UserReadDocument;
@@ -230,7 +231,7 @@ public class ApReadBehaviorServiceImpl extends ServiceImpl<ApReadBehaviorMapper,
 
     @Override
     public ReadDataAnalysisVo readDataAnalysis(
-            Long articleId, LocalDateTime startTime, LocalDateTime endTime, Integer cycle) {
+        Long articleId, LocalDateTime startTime, LocalDateTime endTime, Integer cycle) {
         if (StringUtils.isLongEmpty(articleId)) {
             throw new LeadNewsException("文章错误");
         }
@@ -248,23 +249,23 @@ public class ApReadBehaviorServiceImpl extends ServiceImpl<ApReadBehaviorMapper,
         switch (cycle) {
             case 0 -> {
                 // 今天
-                cycleStartTime = getStartOfDay();
-                cycleEndTime = getEndOfDay();
+                cycleStartTime = DateUtils.getStartOfDay();
+                cycleEndTime = DateUtils.getEndOfDay();
             }
             case 1 -> {
                 // 本周
-                cycleStartTime = getStartOfWeek();
-                cycleEndTime = getEndOfWeek();
+                cycleStartTime = DateUtils.getStartOfWeek();
+                cycleEndTime = DateUtils.getEndOfWeek();
             }
             case 2 -> {
                 // 整周
-                cycleStartTime = getStartOfWholeWeek();
-                cycleEndTime = getEndOfWholeWeek();
+                cycleStartTime = DateUtils.getStartOfWholeWeek();
+                cycleEndTime = DateUtils.getEndOfWholeWeek();
             }
             case 3 -> {
                 // 整月
-                cycleStartTime = getStartOfWholeMonth();
-                cycleEndTime = getEndOfWholeMonth();
+                cycleStartTime = DateUtils.getStartOfWholeMonth();
+                cycleEndTime = DateUtils.getEndOfWholeMonth();
             }
         }
 
@@ -298,48 +299,6 @@ public class ApReadBehaviorServiceImpl extends ServiceImpl<ApReadBehaviorMapper,
     }
 
     // 获取当天的开始时间
-    private LocalDateTime getStartOfDay() {
-        return LocalDateTime.now().toLocalDate().atStartOfDay();
-    }
-
-    // 获取当天的结束时间
-    private LocalDateTime getEndOfDay() {
-        return LocalDateTime.now().toLocalDate().atTime(23, 59, 59, 999999);
-    }
-
-
-    // 获取本周的开始时间（星期一）
-    private LocalDateTime getStartOfWeek() {
-        return LocalDateTime.now().with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
-    }
-
-    // 获取本周的结束时间（星期日）
-    private LocalDateTime getEndOfWeek() {
-        return LocalDateTime.now().with(DayOfWeek.SUNDAY).toLocalDate().atTime(23, 59, 59, 999999);
-    }
-
-
-    // 获取最近7天的开始时间（wholeWeek）
-    private LocalDateTime getStartOfWholeWeek() {
-        return LocalDateTime.now().minusDays(7).toLocalDate().atStartOfDay();
-    }
-
-    // 获取最近7天的结束时间（wholeWeek）
-    private LocalDateTime getEndOfWholeWeek() {
-        return LocalDateTime.now().toLocalDate().atTime(23, 59, 59, 999999);
-    }
-
-
-    // 获取最近30天的开始时间（wholeMoon）
-    private LocalDateTime getStartOfWholeMonth() {
-        return LocalDateTime.now().minusDays(30).toLocalDate().atStartOfDay();
-    }
-
-    // 获取最近30天的结束时间（wholeMoon）
-    private LocalDateTime getEndOfWholeMonth() {
-        return LocalDateTime.now().toLocalDate().atTime(23, 59, 59, 999999);
-    }
-
 
     /**
      * 查询文章返回 List<UserFootMarkListVo>

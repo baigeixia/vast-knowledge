@@ -11,8 +11,10 @@ import com.vk.article.service.ApArticleService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -177,10 +179,13 @@ public class ApArticleController {
 
     @GetMapping("/getArticleData")
     public AjaxResult getArticleData(
-            @RequestParam(name = "page") Long page,
-            @RequestParam(name = "size") Long size
+            @RequestParam(name = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
+            @RequestParam(name = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime,
+            @RequestParam(name = "cycle", required = false, defaultValue = "0") Integer cycle,
+            @RequestParam(name = "page",defaultValue = "1") Long page,
+            @RequestParam(name = "size",defaultValue = "10") Long size
     ){
-        ArticleDataVo result= apArticleService.getArticleData(page,size);
+        ArticleDataVo result= apArticleService.getArticleData(startTime,endTime,cycle,page,size);
         return AjaxResult.success(result);
     }
 

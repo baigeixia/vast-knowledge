@@ -177,4 +177,50 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
     }
+
+    public static LocalDateTime getStartOfDay() {
+        return LocalDateTime.now().toLocalDate().atStartOfDay();
+    }
+
+    // 获取当天的结束时间
+    public static LocalDateTime getEndOfDay() {
+        return LocalDateTime.now().toLocalDate().atTime(23, 59, 59, 999999);
+    }
+
+
+    // 获取本周的开始时间（星期一）
+    public static LocalDateTime getStartOfWeek() {
+        return LocalDateTime.now().with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
+    }
+
+    // 获取本周的结束时间（星期日）
+    public static LocalDateTime getEndOfWeek() {
+        return LocalDateTime.now().with(DayOfWeek.SUNDAY).toLocalDate().atTime(23, 59, 59, 999999);
+    }
+
+
+    // 获取最近7天的开始时间（wholeWeek）
+    public static LocalDateTime getStartOfWholeWeek() {
+        return LocalDateTime.now().minusDays(7).toLocalDate().atStartOfDay();
+    }
+
+    // 获取最近7天的结束时间（wholeWeek）
+    public static LocalDateTime getEndOfWholeWeek() {
+        return LocalDateTime.now().toLocalDate().atTime(23, 59, 59, 999999);
+    }
+
+
+    // 获取最近30天的开始时间（wholeMoon）
+    public static LocalDateTime getStartOfWholeMonth() {
+        return LocalDateTime.now().minusDays(30).toLocalDate().atStartOfDay();
+    }
+
+    // 获取最近30天的结束时间（wholeMoon）
+    public static LocalDateTime getEndOfWholeMonth() {
+        return LocalDateTime.now().toLocalDate().atTime(23, 59, 59, 999999);
+    }
+
+
+
+
 }

@@ -32,8 +32,11 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
     @Select("select count(1) from ap_article a inner join ap_article_config c ON a.id = c.article_id where a.author_id=#{localUserId} and a.id=#{articleId} and c.is_delete=0 ")
     Long selectCountOne(@Param(value = "articleId")Long articleId,@Param(value = "localUserId")Long localUserId);
 
-    ArticleDataVo getArticleData(@Param(value = "userId")Long userId);
+    ArticleDataVo getArticleData(@Param(value = "userId")Long userId,@Param(value="startTime") LocalDateTime startTime,@Param(value="endTime") LocalDateTime endTime);
 
 
-    List<ArticleData> getArticleInfoData(@Param(value = "userId")Long userId, @Param(value="page")Long page,  @Param(value="size")Long size);
+    List<ArticleData> getArticleInfoData(@Param(value = "userId")Long userId, @Param(value="page")Long page,  @Param(value="size")Long size,@Param(value="startTime") LocalDateTime startTime,@Param(value="endTime") LocalDateTime endTime);
+
+    @Select("select count(*) from ap_article where author_id = #{userId} and status = 9  ")
+    Long getArticleDataTotal(@Param(value = "userId")Long userId, @Param(value="startTime")LocalDateTime startTime, @Param(value="endTime")LocalDateTime endTime);
 }

@@ -444,6 +444,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
                     actors.setVerb(n.getStatus() == 1 ? "评论已经被删除" : (commentId == null ? "评论了您的文章" : "回复了您的评论"));
                     actors.setUsername(n.getAuthorName());
                     actors.setReplyContent(n.getContent());
+                    actors.setImage(n.getImage());
                     actors.setReplyContentTime(localDatetimeFormat(n.getCreatedTime()));
 
                     info.setActors(actors);
