@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
+import com.vk.article.domain.vo.ArticleDataListVo;
 import com.vk.article.domain.vo.ArticleDataVo;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
@@ -181,11 +182,19 @@ public class ApArticleController {
     public AjaxResult getArticleData(
             @RequestParam(name = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
             @RequestParam(name = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime,
-            @RequestParam(name = "cycle", required = false, defaultValue = "0") Integer cycle,
+            @RequestParam(name = "cycle", required = false, defaultValue = "0") Integer cycle
+    ){
+        ArticleDataVo result= apArticleService.getArticleData(startTime,endTime,cycle);
+        return AjaxResult.success(result);
+    }
+
+
+    @GetMapping("/getArticleInfoData")
+    public AjaxResult getArticleInfoData(
             @RequestParam(name = "page",defaultValue = "1") Long page,
             @RequestParam(name = "size",defaultValue = "10") Long size
     ){
-        ArticleDataVo result= apArticleService.getArticleData(startTime,endTime,cycle,page,size);
+        ArticleDataListVo result= apArticleService.getArticleInfoData(page,size);
         return AjaxResult.success(result);
     }
 

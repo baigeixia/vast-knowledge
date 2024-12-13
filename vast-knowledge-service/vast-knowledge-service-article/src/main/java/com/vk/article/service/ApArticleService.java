@@ -5,6 +5,7 @@ import com.mybatisflex.core.service.IService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
+import com.vk.article.domain.vo.ArticleDataListVo;
 import com.vk.article.domain.vo.ArticleDataVo;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
@@ -52,5 +53,7 @@ public interface ApArticleService extends IService<ApArticle> {
     ArticleInfoVo authorInfo(Long id);
 
 
-    ArticleDataVo getArticleData(LocalDateTime startTime, LocalDateTime endTime, Integer cycle, Long page, Long size);
+    ArticleDataVo getArticleData(LocalDateTime startTime, LocalDateTime endTime, Integer cycle);
+
+    ArticleDataListVo getArticleInfoData(Long page, Long size);
 }

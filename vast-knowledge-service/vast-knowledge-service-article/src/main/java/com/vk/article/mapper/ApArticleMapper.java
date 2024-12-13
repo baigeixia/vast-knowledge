@@ -2,6 +2,7 @@ package com.vk.article.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.ApArticleConfig;
 import com.vk.article.domain.vo.ArticleData;
 import com.vk.article.domain.vo.ArticleDataVo;
 import com.vk.common.es.domain.ArticleInfoDocument;
@@ -35,8 +36,13 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
     ArticleDataVo getArticleData(@Param(value = "userId")Long userId,@Param(value="startTime") LocalDateTime startTime,@Param(value="endTime") LocalDateTime endTime);
 
 
-    List<ArticleData> getArticleInfoData(@Param(value = "userId")Long userId, @Param(value="page")Long page,  @Param(value="size")Long size,@Param(value="startTime") LocalDateTime startTime,@Param(value="endTime") LocalDateTime endTime);
+    // List<ArticleData> getArticleInfoData(@Param(value = "userId")Long userId, @Param(value="page")Long page,  @Param(value="size")Long size,@Param(value="startTime") LocalDateTime startTime,@Param(value="endTime") LocalDateTime endTime);
+    List<ArticleData> getArticleInfoData(@Param(value = "userId")Long userId, @Param(value="page")Long page,  @Param(value="size")Long size);
 
     @Select("select count(*) from ap_article where author_id = #{userId} and status = 9  ")
-    Long getArticleDataTotal(@Param(value = "userId")Long userId, @Param(value="startTime")LocalDateTime startTime, @Param(value="endTime")LocalDateTime endTime);
+    Long getArticleDataTotal(@Param(value = "userId")Long userId);
+
+
+    @Select("SELECT `id`, `article_id`, `is_comment`, `is_forward`, `is_down`, `is_delete` FROM `ap_article_config` where article_id =#{articleId} LIMIT 1")
+    ApArticleConfig selectOne(@Param(value = "articleId")Long articleId);
 }

@@ -16,9 +16,5 @@ public class ArticleDataVo {
     private  Long like;
     private  Long collect;
     private  Long views;
-    private  Long page;
-    private  Long size;
-    private  Long total;
-    private List<ArticleData> articleDataList=new ArrayList<>();
 
 }

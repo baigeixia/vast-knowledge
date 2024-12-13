@@ -43,7 +43,7 @@ public class ApArticle implements Serializable {
     // /**
     //  * 作者昵称
     //  */
-    // private String authorName;
+    private String authorName;
 
     // /**
     //  * 文章内容id
