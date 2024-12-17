@@ -438,6 +438,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
                     info.setTitle(titleMap.get(entryId) == null ? "文章已经被删除" : titleMap.get(entryId));
                     // info.setCommentId(commentId == null ? n.getId() : commentId);
                     info.setCommentId(n.getId());
+                    info.setHide(titleMap.get(entryId) == null);
 
                     Actors actors = new Actors();
                     actors.setId(n.getAuthorId());

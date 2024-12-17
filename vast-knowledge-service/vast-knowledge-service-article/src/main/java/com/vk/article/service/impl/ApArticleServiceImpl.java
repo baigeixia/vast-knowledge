@@ -230,7 +230,8 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         Page<HomeArticleListVo> listVoPage;
 
         QueryWrapper wrapper = QueryWrapper.create();
-        wrapper.innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID)).where(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0)));
+        wrapper.innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID))
+                .where(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(1)));
         if (null != tag && tag != 0) {
             wrapper.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
         }
@@ -357,7 +358,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 select(AP_ARTICLE.DEFAULT_COLUMNS).from(AP_ARTICLE)
                 .leftJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(AP_ARTICLE.ID))
                 .where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0))
-                .and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0));
+                .and(AP_ARTICLE_CONFIG.IS_DOWN.eq(1));
 
         if (type == 1) {
             wrapper.orderBy(AP_ARTICLE.CREATED_TIME, false);
@@ -503,6 +504,21 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         listVo.setTotal(total);
         listVo.setArticleDataList(articleData);
         return listVo;
+    }
+
+    @Override
+    public void pushArticle(Long articleId) {
+        Long userId = RequestContextUtil.getUserId();
+        ApArticle localAr=  mapper.getLocalArticle(userId,articleId);
+        if (ObjectUtils.isEmpty(localAr)) {
+            throw new LeadNewsException("权限不足,或文章被删除");
+        }
+        Integer status = localAr.getStatus();
+        if (!status.equals(1)){
+            throw new LeadNewsException("错误的文章状态");
+        }
+
+        mapper.upArticleStatus(articleId,LocalDateTime.now(),2);
     }
 
 

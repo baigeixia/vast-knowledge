@@ -8,6 +8,8 @@ import com.vk.article.domain.vo.ArticleDataVo;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,4 +47,32 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
 
     @Select("SELECT `id`, `article_id`, `is_comment`, `is_forward`, `is_down`, `is_delete` FROM `ap_article_config` where article_id =#{articleId} LIMIT 1")
     ApArticleConfig selectOne(@Param(value = "articleId")Long articleId);
+
+    @Select("SELECT a.`id`, a.`status` FROM `ap_article` a inner join ap_article_config c on a.id=c.article_id where a.author_id=#{userId} and  a.id = #{articleId} and c.is_delete=0 ")
+    ApArticle getLocalArticle(@Param(value = "userId")Long userId, @Param(value = "articleId")Long articleId);
+
+    // @Update({
+    //         "UPDATE ap_article",
+    //         "SET status = #{status} ,update_time=#{updateTime}",
+    //         "WHERE id = #{articleId};",
+    //
+    //         "UPDATE ap_article_config",
+    //         "SET is_down = 0",
+    //         "WHERE article_id = #{articleId};"
+    // })
+    // void upArticleStatus(@Param(value = "articleId")Long articleId,@Param(value = "updateTime")LocalDateTime updateTime,@Param(value = "status")Integer status);
+
+    @Transactional
+    default void upArticleStatus(Long articleId, LocalDateTime updateTime, Integer status) {
+        updateArticleStatus(articleId, updateTime, status);  // 更新文章状态
+        updateArticleConfigStatus(articleId);                // 更新文章配置
+    }
+
+    @Update("UPDATE ap_article SET status = #{status}, update_time = #{updateTime} WHERE id = #{articleId}")
+    void updateArticleStatus(@Param("articleId") Long articleId,
+                             @Param("updateTime") LocalDateTime updateTime,
+                             @Param("status") Integer status);
+
+    @Update("UPDATE ap_article_config SET is_down = 0 WHERE article_id = #{articleId}")
+    void updateArticleConfigStatus(@Param("articleId") Long articleId);
 }

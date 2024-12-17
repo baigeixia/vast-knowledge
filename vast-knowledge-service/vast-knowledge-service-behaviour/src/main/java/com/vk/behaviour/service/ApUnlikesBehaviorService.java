@@ -11,4 +11,5 @@ import com.vk.behaviour.domain.ApUnlikesBehavior;
  */
 public interface ApUnlikesBehaviorService extends IService<ApUnlikesBehavior> {
 
+    void saveUnlike(Long id);
 }

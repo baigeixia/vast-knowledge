@@ -56,4 +56,6 @@ public interface ApArticleService extends IService<ApArticle> {
     ArticleDataVo getArticleData(LocalDateTime startTime, LocalDateTime endTime, Integer cycle);
 
     ArticleDataListVo getArticleInfoData(Long page, Long size);
+
+    void pushArticle(Long id);
 }

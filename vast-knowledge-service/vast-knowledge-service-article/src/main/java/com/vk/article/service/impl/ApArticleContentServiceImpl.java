@@ -65,6 +65,7 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
                 initContentInset(dto);
             } else {
                 ArticleMg sevenMg = new ArticleMg();
+
                 BeanUtils.copyProperties(dto, sevenMg);
 
                 articleMgRepository.insert(sevenMg);

@@ -21,11 +21,12 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class CorsConfig
 {
-    private static final String ALLOWED_HEADERS = "*";
+    // private static final String ALLOWED_HEADERS = "*";
     private static final String ALLOWED_METHODS = "GET,POST,PUT,DELETE,OPTIONS,HEAD";
     private static final String ALLOWED_ORIGIN = "*";
     private static final String ALLOWED_EXPOSE = "*";
     private static final String MAX_AGE = "18000";
+    private static final String ALLOWED_HEADERS = "Content-Type, Authorization";
 
     @Bean
     public WebFilter corsFilter()

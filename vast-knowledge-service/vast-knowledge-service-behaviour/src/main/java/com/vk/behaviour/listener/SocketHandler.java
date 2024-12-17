@@ -357,10 +357,11 @@ public class SocketHandler {
         Long articleId = dto.getArticleId();
         validaParameter(ackRequest, articleId, "文章id不能为空");
         Long userId = clientGetUserId(socketIOClient);
-        validaParameter(ackRequest, userId, "未登录");
+        // validaParameter(ackRequest, userId, "未登录");
+        if (!StringUtils.isLongEmpty(userId)){
+            readUnloadLog(dto, userId, articleId);
+        }
 
-
-        readUnloadLog(dto, userId, articleId);
     }
 
     public void readUnloadLog(ApReadBehavior dto, Long userId, Long articleId) {

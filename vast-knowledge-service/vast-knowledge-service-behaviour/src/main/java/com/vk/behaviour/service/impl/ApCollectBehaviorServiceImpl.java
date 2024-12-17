@@ -6,6 +6,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.feign.RemoteClientArticleQueryService;
 import com.vk.behaviour.domain.ApCollectBehavior;
+import com.vk.behaviour.domain.entity.CollectArticleList;
 import com.vk.behaviour.mapper.ApCollectBehaviorMapper;
 import com.vk.behaviour.service.ApCollectBehaviorService;
 import com.vk.common.core.domain.R;
@@ -15,10 +16,10 @@ import com.vk.common.core.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * APP收藏行为 服务层实现。
@@ -38,10 +39,16 @@ public class ApCollectBehaviorServiceImpl extends ServiceImpl<ApCollectBehaviorM
         }
         List<HomeArticleListVo> result= new ArrayList<>();
         page=(page-1)*size;
-        Set<Long> articleIds= mapper.selectUserCollectIdS(userId,page,size);
-        R<Map<Long, HomeArticleListVo>> idList = remoteClientArticleQueryService.getArticleIdList(articleIds);
+        Set<CollectArticleList> resultList = mapper.selectUserCollectIdS(userId, page, size);
+        Map<Long, LocalDateTime> resultMap = resultList.stream()
+                .collect(Collectors.toMap(CollectArticleList::getArticleId, CollectArticleList::getCreatedTime));
+        R<Map<Long, HomeArticleListVo>> idList = remoteClientArticleQueryService.getArticleIdList(resultMap.keySet());
         if (ValidationUtils.validateRSuccess(idList)) {
-            return  idList.getData().values().stream().toList();
+            Collection<HomeArticleListVo> articleListVos = idList.getData().values();
+            articleListVos.forEach(i ->
+                    i.setCreatedTime(resultMap.get(i.getId()))
+            );
+            return  new ArrayList<>(articleListVos);
         }
         return result;
     }

@@ -199,4 +199,12 @@ public class ApArticleController {
     }
 
 
+    @GetMapping("/push")
+    public AjaxResult pushArticle(
+            @RequestParam(name = "id") Long id
+    ){
+        apArticleService.pushArticle(id);
+        return AjaxResult.success();
+    }
+
 }

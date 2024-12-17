@@ -3,6 +3,7 @@ package com.vk.behaviour.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.vk.behaviour.domain.ApUnlikesBehavior;
 import com.vk.behaviour.service.ApUnlikesBehaviorService;
+import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/UnlikesBehavior")
+@RequestMapping("/unlike")
 public class ApUnlikesBehaviorController {
 
     @Autowired
@@ -31,6 +32,11 @@ public class ApUnlikesBehaviorController {
     @PostMapping("save")
     public boolean save(@RequestBody ApUnlikesBehavior apUnlikesBehavior) {
         return apUnlikesBehaviorService.save(apUnlikesBehavior);
+    }
+    @GetMapping("saveUnlike")
+    public AjaxResult saveUnlike(@RequestParam(name = "id") Long id) {
+        apUnlikesBehaviorService.saveUnlike(id);
+        return AjaxResult.success();
     }
 
     /**
