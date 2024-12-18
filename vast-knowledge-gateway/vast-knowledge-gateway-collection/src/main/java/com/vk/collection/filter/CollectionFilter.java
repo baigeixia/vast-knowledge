@@ -79,7 +79,6 @@ public class CollectionFilter implements GlobalFilter, Ordered  {
         removeHeader(mutate, SecurityConstants.FROM_SOURCE);
         return chain.filter(exchange.mutate().request(mutate.build()).build());
 
-
     }
 
     @Override
