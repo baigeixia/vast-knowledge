@@ -23,16 +23,13 @@ public class ApArticleConfigController {
     @Autowired
     private ApArticleConfigService apArticleConfigService;
 
-    /**
-     * 文章配置
-     * @param id
-     * @return
-     */
-    @GetMapping("/getArticle")
-    public AjaxResult getArticle(
+
+    @DeleteMapping("/deleteArticle")
+    public AjaxResult deleteArticle(
             @RequestParam("id") Long id
     ){
-        return AjaxResult.success("");
+        apArticleConfigService.deleteArticle(id);
+        return AjaxResult.success();
     }
 
 }

@@ -92,4 +92,32 @@
         where publish_time > #{redisTime}
           and publish_time &lt;= #{nowTime}
     </select>
+
+    <update id="approvedS">
+        UPDATE ap_article
+        SET status = 3
+        WHERE id IN
+        <foreach collection="articleIds" item="articleId" open="(" close=")" separator=",">
+            #{articleId}
+        </foreach>
+    </update>
+
+    <update id="upStatus">
+        UPDATE ap_article
+        SET status = #{status}
+        WHERE id IN
+        <foreach collection="articleIds" item="articleId" open="(" close=")" separator=",">
+            #{articleId}
+        </foreach>
+    </update>
+
+
+    <update id="pushArticle">
+        UPDATE ap_article
+        SET status = #{status} ,publish_time=#{pushTime}
+        WHERE id IN
+        <foreach collection="articleIds" item="articleId" open="(" close=")" separator=",">
+            #{articleId}
+        </foreach>
+    </update>
 </mapper>

@@ -11,4 +11,5 @@ import com.vk.article.domain.ApArticleConfig;
  */
 public interface ApArticleConfigService extends IService<ApArticleConfig> {
 
+    void deleteArticle(Long id);
 }

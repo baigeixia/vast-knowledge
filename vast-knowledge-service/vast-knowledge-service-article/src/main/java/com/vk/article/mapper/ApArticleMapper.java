@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 已发布的文章信息 映射层。
@@ -51,17 +52,6 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
     @Select("SELECT a.`id`, a.`status` FROM `ap_article` a inner join ap_article_config c on a.id=c.article_id where a.author_id=#{userId} and  a.id = #{articleId} and c.is_delete=0 ")
     ApArticle getLocalArticle(@Param(value = "userId")Long userId, @Param(value = "articleId")Long articleId);
 
-    // @Update({
-    //         "UPDATE ap_article",
-    //         "SET status = #{status} ,update_time=#{updateTime}",
-    //         "WHERE id = #{articleId};",
-    //
-    //         "UPDATE ap_article_config",
-    //         "SET is_down = 0",
-    //         "WHERE article_id = #{articleId};"
-    // })
-    // void upArticleStatus(@Param(value = "articleId")Long articleId,@Param(value = "updateTime")LocalDateTime updateTime,@Param(value = "status")Integer status);
-
     @Transactional
     default void upArticleStatus(Long articleId, LocalDateTime updateTime, Integer status) {
         updateArticleStatus(articleId, updateTime, status);  // 更新文章状态
@@ -75,4 +65,17 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
 
     @Update("UPDATE ap_article_config SET is_down = 0 WHERE article_id = #{articleId}")
     void updateArticleConfigStatus(@Param("articleId") Long articleId);
+
+    @Select("select  COUNT(*) from ap_article where  status = 2")
+    Long getAuditCount();
+
+    @Select("select  id from ap_article where  status = 2 LIMIT #{startIndex},#{endIndex} ")
+    List<Long> getAuditArticleId(@Param("startIndex")long startIndex, @Param("endIndex")long endIndex);
+
+    void upStatus(@Param("articleIds") Set<Long> approvedIds, @Param("status") int i);
+
+    void pushArticle(@Param("articleIds")Set<Long> approvedIds,@Param("status") int i,@Param("pushTime")LocalDateTime pushTime);
+
+    @Select("select count(*) from ap_article where  author_id = #{userId} and id=#{id}  ")
+    Long userArticle(@Param("userId")Long userId, @Param("id")Long id);
 }

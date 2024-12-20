@@ -195,9 +195,9 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         article.setAuthorId(userId);
         String userName = RequestContextUtil.getUserName();
         article.setAuthorName(userName);
-
         article.setLabels(dto.getLabels());
         article.setUpdateTime(dateTime);
+        article.setStatus(2);
 
         // ApArticleConfig dbConfig = apArticleConfigMapper.selectOneByQuery(QueryWrapper.create().where(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(articleId)));
         ApArticleConfig dbConfig= mapper.selectOne(articleId);
@@ -231,7 +231,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID))
-                .where(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(1)));
+                .where(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0)).and(AP_ARTICLE.STATUS.eq(9)));
         if (null != tag && tag != 0) {
             wrapper.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
         }
@@ -358,7 +358,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 select(AP_ARTICLE.DEFAULT_COLUMNS).from(AP_ARTICLE)
                 .leftJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(AP_ARTICLE.ID))
                 .where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0))
-                .and(AP_ARTICLE_CONFIG.IS_DOWN.eq(1));
+                .and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0));
 
         if (type == 1) {
             wrapper.orderBy(AP_ARTICLE.CREATED_TIME, false);
@@ -514,11 +514,20 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             throw new LeadNewsException("权限不足,或文章被删除");
         }
         Integer status = localAr.getStatus();
-        if (!status.equals(1)){
-            throw new LeadNewsException("错误的文章状态");
-        }
 
-        mapper.upArticleStatus(articleId,LocalDateTime.now(),2);
+        if(status.equals(1)){
+            mapper.upArticleStatus(articleId,LocalDateTime.now(),2);
+        }else if (status.equals(9)){
+            Db.tx(()->{
+                mapper.upArticleStatus(articleId,LocalDateTime.now(),1);
+                ApArticleConfig config = new ApArticleConfig();
+                config.setArticleId(articleId);
+                config.setIsDown(true);
+                apArticleConfigMapper.update(config);
+                return true;
+            });
+
+        }
     }
 
 
