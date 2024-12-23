@@ -1,6 +1,7 @@
 package com.vk.auth.controller.user;
 
 
+import com.vk.auth.form.system.SystemRegisterBody;
 import com.vk.auth.form.user.UserLoginBody;
 import com.vk.auth.service.system.SysLoginService;
 import com.vk.auth.service.user.UserLoginService;
@@ -11,6 +12,7 @@ import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.service.ClientTokenService;
 import com.vk.common.security.utils.SecurityUtils;
+import com.vk.system.model.LoginUser;
 import com.vk.user.model.LoginApUser;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,6 +58,27 @@ public class UserSecurityController {
             // 记录用户退出日志
             // sysLoginService.logout(username);
         }
+        return R.ok();
+    }
+
+    @PostMapping("refresh")
+    public R<?> refresh(HttpServletRequest request)
+    {
+        LoginApUser loginApUser = clientTokenService.getLoginApUser(request);
+        if (StringUtils.isNotNull(loginApUser))
+        {
+            // 刷新令牌有效期
+            clientTokenService.refreshToken(loginApUser);
+            return R.ok();
+        }
+        return R.ok();
+    }
+
+    @PostMapping("register")
+    public R<?> register(@RequestBody SystemRegisterBody registerBody)
+    {
+        // 用户注册
+        sysLoginService.register(registerBody.getUsername(), registerBody.getPassword());
         return R.ok();
     }
 }
