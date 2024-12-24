@@ -15,4 +15,6 @@ public interface ApArticleConfigMapper extends BaseMapper<ApArticleConfig> {
 
     @Update("update ap_article_config SET is_delete = 1  WHERE article_id = #{articleId} AND is_delete = 0;")
     void deleteByOne(@Param("articleId") Long articleId);
+
+
 }

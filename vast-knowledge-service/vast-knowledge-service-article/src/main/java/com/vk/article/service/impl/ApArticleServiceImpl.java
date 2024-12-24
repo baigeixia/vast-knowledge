@@ -8,13 +8,11 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
-import com.vk.article.domain.vo.ArticleData;
-import com.vk.article.domain.vo.ArticleDataVo;
+import com.vk.article.domain.vo.*;
+import com.vk.common.core.utils.DateUtils;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
-import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.vo.ArticleListVo;
 import com.vk.article.mapper.ApArticleConfigMapper;
 import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.mapper.ApArticleLabelMapper;
@@ -195,13 +193,14 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
         Long userId = RequestContextUtil.getUserId();
         article.setAuthorId(userId);
-        // String userName = RequestContextUtil.getUserName();
-        // article.setAuthorName(userName);
-
+        String userName = RequestContextUtil.getUserName();
+        article.setAuthorName(userName);
         article.setLabels(dto.getLabels());
         article.setUpdateTime(dateTime);
+        article.setStatus(2);
 
-        ApArticleConfig dbConfig = apArticleConfigMapper.selectOneByQuery(QueryWrapper.create().where(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(articleId)));
+        // ApArticleConfig dbConfig = apArticleConfigMapper.selectOneByQuery(QueryWrapper.create().where(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(articleId)));
+        ApArticleConfig dbConfig= mapper.selectOne(articleId);
 
         Db.tx(() -> {
             mapper.insertOrUpdateSelective(article);
@@ -210,7 +209,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             ApArticleConfig config = new ApArticleConfig();
             ApArticleConfig dtoConfig = dto.getConfig();
             BeanUtils.copyProperties(dtoConfig, config);
-            if (null!=dbConfig){
+            if (null != dbConfig){
                 config.setId(dbConfig.getId());
             }
             config.setArticleId(article.getId());
@@ -231,7 +230,8 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         Page<HomeArticleListVo> listVoPage;
 
         QueryWrapper wrapper = QueryWrapper.create();
-        wrapper.innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID)).where(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0)));
+        wrapper.innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID))
+                .where(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0)).and(AP_ARTICLE.STATUS.eq(9)));
         if (null != tag && tag != 0) {
             wrapper.where(AP_ARTICLE.CHANNEL_ID.eq(tag));
         }
@@ -295,7 +295,9 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                 .and(AP_ARTICLE.TITLE.like(title, StringUtils.isNotEmpty(title)))
                 .and(AP_ARTICLE.CHANNEL_ID.eq(channelId, !StringUtils.isLongEmpty(channelId)))
                 .and(AP_ARTICLE.STATUS.eq(status, !ObjectUtils.isEmpty(status) && status !=0))
-                .and(AP_ARTICLE.CREATED_TIME.between(startTime, endTime, !ObjectUtils.isEmpty(startTime) && !ObjectUtils.isEmpty(endTime)));
+                .and(AP_ARTICLE.UPDATE_TIME.between(startTime, endTime, !ObjectUtils.isEmpty(startTime) && !ObjectUtils.isEmpty(endTime)))
+                .orderBy(AP_ARTICLE.UPDATE_TIME,false);
+
 
         return mapper.paginateAs(Page.of(page, size), wrapper, ArticleListVo.class);
     }
@@ -444,17 +446,90 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     }
 
     @Override
-    public ArticleDataVo getArticleData(Long page, Long size) {
-        Long userId = RequestContextUtil.getUserId();
-        ArticleDataVo vo = new ArticleDataVo();
-        ArticleDataVo articleDataVo = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleData(userId));
-        if (!ObjectUtils.isEmpty(articleDataVo)){
-            BeanUtils.copyProperties(articleDataVo,vo);
+    public ArticleDataVo getArticleData(LocalDateTime startTime, LocalDateTime endTime, Integer cycle) {
+        if (Stream.of(0, 1, 2, 3).noneMatch(Predicate.isEqual(cycle))) {
+            throw new LeadNewsException("错误的日期");
         }
-        List<ArticleData> articleData = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleInfoData(userId,(page - 1) * size,size));
-        vo.setArticleDataList(articleData);
-        return vo;
+
+        if (!ObjectUtils.isEmpty(startTime) && !ObjectUtils.isEmpty(endTime)) {
+            return timeData(startTime, endTime);
+        }
+
+        LocalDateTime cycleStartTime = null;
+        LocalDateTime cycleEndTime = null;
+
+        // 如果 startTime 和 endTime 为空，根据其他时间参数进行处理
+        switch (cycle) {
+            case 0 -> {
+                // 今天
+                cycleStartTime = DateUtils.getStartOfDay();
+                cycleEndTime = DateUtils.getEndOfDay();
+            }
+            case 1 -> {
+                // 本周
+                cycleStartTime = DateUtils.getStartOfWeek();
+                cycleEndTime = DateUtils.getEndOfWeek();
+            }
+            case 2 -> {
+                // 整周
+                cycleStartTime = DateUtils.getStartOfWholeWeek();
+                cycleEndTime = DateUtils.getEndOfWholeWeek();
+            }
+            case 3 -> {
+                // 整月
+                cycleStartTime = DateUtils.getStartOfWholeMonth();
+                cycleEndTime = DateUtils.getEndOfWholeMonth();
+            }
+        }
+
+        return timeData(cycleStartTime, cycleEndTime);
     }
+
+    private ArticleDataVo timeData(LocalDateTime startTime, LocalDateTime endTime) {
+        Long userId = RequestContextUtil.getUserId();
+
+        return TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleData(userId, startTime, endTime));
+    }
+
+    @Override
+    public ArticleDataListVo getArticleInfoData(Long page, Long size) {
+        Long userId = RequestContextUtil.getUserId();
+        ArticleDataListVo listVo = new ArticleDataListVo();
+
+        List<ArticleData> articleData = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleInfoData(userId,(page - 1) * size,size));
+        Long total=TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleDataTotal(userId));
+
+        listVo.setPage(page);
+        listVo.setSize(size);
+        listVo.setTotal(total);
+        listVo.setArticleDataList(articleData);
+        return listVo;
+    }
+
+    @Override
+    public void pushArticle(Long articleId) {
+        Long userId = RequestContextUtil.getUserId();
+        ApArticle localAr=  mapper.getLocalArticle(userId,articleId);
+        if (ObjectUtils.isEmpty(localAr)) {
+            throw new LeadNewsException("权限不足,或文章被删除");
+        }
+        Integer status = localAr.getStatus();
+
+        if(status.equals(1)){
+            mapper.upArticleStatus(articleId,LocalDateTime.now(),2);
+        }else if (status.equals(9)){
+            Db.tx(()->{
+                mapper.upArticleStatus(articleId,LocalDateTime.now(),1);
+                ApArticleConfig config = new ApArticleConfig();
+                config.setArticleId(articleId);
+                config.setIsDown(true);
+                apArticleConfigMapper.update(config);
+                return true;
+            });
+
+        }
+    }
+
 
     private void getArticleInfo(Long id, ApArticle article, ArticleInfoVo articleInfoVo) {
         BeanUtils.copyProperties(article, articleInfoVo);

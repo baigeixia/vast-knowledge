@@ -20,6 +20,11 @@ public class LikeNotificationInfo {
      * 统计结束时间
      */
     private  String commentEndTime;
+    /**
+     * 是否隐藏
+     */
+    // private Boolean hide;
+
 
     /**
      * 对应用户

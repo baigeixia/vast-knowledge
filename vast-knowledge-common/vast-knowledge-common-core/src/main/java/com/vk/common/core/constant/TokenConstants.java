@@ -12,6 +12,9 @@ public class TokenConstants
      */
     public static final String AUTHENTICATION = "Authorization";
 
+
+    public static final String USER_AUTHORIZATION_HEADER = "user-authorization";
+    public static final String ADMIN_AUTHORIZATION_HEADER = "admin-authorization";
     /**
      * 令牌前缀
      */
@@ -19,7 +22,7 @@ public class TokenConstants
     /**
      * 作者
      */
-    public static final String SUBJECT = "zhangsan ";
+    public static final String SUBJECT = "zhangsan";
 
     /**
      * 令牌秘钥

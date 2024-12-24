@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
+import com.vk.article.domain.vo.ArticleDataListVo;
 import com.vk.article.domain.vo.ArticleDataVo;
 import com.vk.article.domain.vo.ArticleInfoVo;
 import com.vk.article.domain.vo.ArticleListVo;
@@ -11,8 +12,10 @@ import com.vk.article.service.ApArticleService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -177,12 +180,31 @@ public class ApArticleController {
 
     @GetMapping("/getArticleData")
     public AjaxResult getArticleData(
-            @RequestParam(name = "page") Long page,
-            @RequestParam(name = "size") Long size
+            @RequestParam(name = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
+            @RequestParam(name = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime,
+            @RequestParam(name = "cycle", required = false, defaultValue = "0") Integer cycle
     ){
-        ArticleDataVo result= apArticleService.getArticleData(page,size);
+        ArticleDataVo result= apArticleService.getArticleData(startTime,endTime,cycle);
         return AjaxResult.success(result);
     }
 
+
+    @GetMapping("/getArticleInfoData")
+    public AjaxResult getArticleInfoData(
+            @RequestParam(name = "page",defaultValue = "1") Long page,
+            @RequestParam(name = "size",defaultValue = "10") Long size
+    ){
+        ArticleDataListVo result= apArticleService.getArticleInfoData(page,size);
+        return AjaxResult.success(result);
+    }
+
+
+    @GetMapping("/push")
+    public AjaxResult pushArticle(
+            @RequestParam(name = "id") Long id
+    ){
+        apArticleService.pushArticle(id);
+        return AjaxResult.success();
+    }
 
 }

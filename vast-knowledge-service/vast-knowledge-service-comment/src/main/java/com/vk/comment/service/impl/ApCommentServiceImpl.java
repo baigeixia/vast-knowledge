@@ -25,6 +25,7 @@ import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
+import com.vk.common.core.utils.SensitiveWord;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
@@ -50,6 +51,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_HOT;
@@ -85,6 +87,8 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
     @Autowired
     private RemoteClientArticleQueryService remoteClientArticleQueryService;
 
+    @Autowired
+    private SensitiveWord sensitiveWord;
     @Override
     public CommentList saveComment(CommentSaveDto dto) {
         Long userId = RequestContextUtil.getUserId();
@@ -102,6 +106,7 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         if (StringUtils.isEmpty(content) && StringUtils.isEmpty(image)) {
             throw new RuntimeException("评论内容不能为空");
         }
+
         Long arAuthorId = dto.getArAuthorId();
 
         ApComment comment = new ApComment();
@@ -438,12 +443,14 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
                     info.setTitle(titleMap.get(entryId) == null ? "文章已经被删除" : titleMap.get(entryId));
                     // info.setCommentId(commentId == null ? n.getId() : commentId);
                     info.setCommentId(n.getId());
+                    info.setHide(titleMap.get(entryId) == null);
 
                     Actors actors = new Actors();
                     actors.setId(n.getAuthorId());
                     actors.setVerb(n.getStatus() == 1 ? "评论已经被删除" : (commentId == null ? "评论了您的文章" : "回复了您的评论"));
                     actors.setUsername(n.getAuthorName());
                     actors.setReplyContent(n.getContent());
+                    actors.setImage(n.getImage());
                     actors.setReplyContentTime(localDatetimeFormat(n.getCreatedTime()));
 
                     info.setActors(actors);

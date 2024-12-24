@@ -357,22 +357,27 @@ public class SocketHandler {
         Long articleId = dto.getArticleId();
         validaParameter(ackRequest, articleId, "文章id不能为空");
         Long userId = clientGetUserId(socketIOClient);
-        validaParameter(ackRequest, userId, "未登录");
+        // validaParameter(ackRequest, userId, "未登录");
+        if (!StringUtils.isLongEmpty(userId)){
+            readUnloadLog(dto, userId, articleId);
+        }
 
-
-        readUnloadLog(dto, userId, articleId);
     }
 
     public void readUnloadLog(ApReadBehavior dto, Long userId, Long articleId) {
         if (dto.getEntryId().equals(userId)) {
             return;
         }
+        Integer count = dto.getCount();
         ApReadBehavior readBehavior = apReadBehaviorMapper.selectOneByQuery(
                 QueryWrapper.create().where(
                         AP_READ_BEHAVIOR.ENTRY_ID.eq(userId)
                                 .and(AP_READ_BEHAVIOR.ARTICLE_ID.eq(articleId))
                 )
         );
+        if (ObjectUtils.isEmpty(count)) {
+            count = 0;
+        }
 
         LocalDateTime dateTime = LocalDateTime.now();
         if (ObjectUtils.isEmpty(readBehavior)) {
@@ -384,9 +389,11 @@ public class SocketHandler {
             apReadBehaviorMapper.insertSelective(dto);
             streamProcessingStandard(articleId, UpdateArticleMess.UpdateArticleType.VIEWS, 1);
         } else {
+            if (count == 1) {
+                readBehavior.setCount(readBehavior.getCount() + 1);
+            }
             readBehavior.setMaxPosition(dto.getPercentage() > readBehavior.getMaxPosition() ? dto.getPercentage() : readBehavior.getMaxPosition());
             // dto.setMaxPosition(dto.getPercentage() > readBehavior.getPercentage() ? dto.getPercentage() : readBehavior.getPercentage());
-            readBehavior.setCount(readBehavior.getCount() + 1);
             readBehavior.setReadDuration(readBehavior.getReadDuration().add(dto.getReadDuration()));
             readBehavior.setUpdatedTime(dateTime);
             apReadBehaviorMapper.update(readBehavior, true);

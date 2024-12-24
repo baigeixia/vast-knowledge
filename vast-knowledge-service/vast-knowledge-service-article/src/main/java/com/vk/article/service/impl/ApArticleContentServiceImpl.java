@@ -48,7 +48,6 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
         Long userId = RequestContextUtil.getUserId();
         dto.setAuthorId(userId);
 
-
         if (ObjectUtils.isEmpty(articleId)) {
             // 第一次 保存
             initContentInset(dto);
@@ -66,6 +65,7 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
                 initContentInset(dto);
             } else {
                 ArticleMg sevenMg = new ArticleMg();
+
                 BeanUtils.copyProperties(dto, sevenMg);
 
                 articleMgRepository.insert(sevenMg);
@@ -108,17 +108,26 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
         Long userId = RequestContextUtil.getUserId();
         // String userName = RequestContextUtil.getUserName();
         LocalDateTime dateTime = LocalDateTime.now();
+        Long articleId = insetContent.getArticleId();
         Db.tx(() -> {
             // 文章表初始化
-            ApArticle article = new ApArticle();
-            article.setAuthorId(userId);
-            // article.setAuthorName(userName);
-            article.setUpdateTime(dateTime);
-            article.setCreatedTime(dateTime);
-            apArticleMapper.insertSelective(article);
+            if(StringUtils.isLongEmpty(articleId)){
+                ApArticle article = new ApArticle();
+                article.setAuthorId(userId);
+                // article.setAuthorName(userName);
+                article.setUpdateTime(dateTime);
+                article.setCreatedTime(dateTime);
+                apArticleMapper.insertSelective(article);
 
-            insetContent.setArticleId(article.getId());
-            mapper.insertSelective(insetContent);
+                insetContent.setArticleId(article.getId());
+                mapper.insertSelective(insetContent);
+            }else {
+                insetContent.setArticleId(articleId);
+                mapper.insertSelective(insetContent);
+            }
+
+
+
 
             return true;
         });

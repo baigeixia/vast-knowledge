@@ -45,11 +45,11 @@ public class SecurityUtils
     }
 
     /**
-     * 获取登录用户信息
+     * 获取登录 管理 用户信息
      */
     public static LoginUser getLoginUser()
     {
-        return SecurityContextHolder.get(SecurityConstants.LOGIN_USER, LoginUser.class);
+        return SecurityContextHolder.get(SecurityConstants.LOGIN_ADMIN, LoginUser.class);
     }
 
     /**
@@ -65,9 +65,19 @@ public class SecurityUtils
      */
     public static String getToken(HttpServletRequest request)
     {
-        // 从header获取token标识
-        String token = request.getHeader(TokenConstants.AUTHENTICATION);
+        boolean isAdmin = verificationAdmin(request);
+        String token;
+        if (isAdmin){
+            token = request.getHeader(TokenConstants.ADMIN_AUTHORIZATION_HEADER);
+        }else {
+            token = request.getHeader(TokenConstants.USER_AUTHORIZATION_HEADER);
+        }
         return replaceTokenPrefix(token);
+    }
+    public static boolean verificationAdmin(HttpServletRequest request){
+        //从header获取admin标识
+        String adminOpen = request.getHeader(SecurityConstants.ADMIN_OPEN);
+        return Boolean.parseBoolean(adminOpen);
     }
 
     /**

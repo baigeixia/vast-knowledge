@@ -26,12 +26,12 @@
 
     <select id="getArticleData" resultType="com.vk.article.domain.vo.ArticleDataVo">
         SELECT
-            COALESCE(COUNT(CASE WHEN status = 9 THEN 1 END), 0) AS 'release',
+            COALESCE(COUNT(*), 0) AS 'release',
                 COALESCE(SUM(likes), 0) AS 'like',
-                SUM(collection) AS 'collect',
-                SUM(views) AS 'views'
+                COALESCE(SUM(collection), 0)   AS 'collect',
+                COALESCE(SUM(views), 0) AS 'views'
         FROM ap_article
-        WHERE author_id = #{userId};
+        WHERE author_id = #{userId} and  status = 9 and update_time >= #{startTime} and update_time &lt;= #{endTime}  ;
     </select>
 
     <select id="getArticleInfoData" resultType="com.vk.article.domain.vo.ArticleData">
@@ -43,7 +43,7 @@
             views,
             comment
         FROM ap_article
-        WHERE author_id = 1 and status = 9  limit #{page}, #{size};
+        WHERE author_id = #{userId}  and status = 9  ORDER BY update_time desc limit #{page}, #{size} ;
     </select>
 
     <select id="selectByPage" resultMap="articleDocumentResultMap">
@@ -92,4 +92,32 @@
         where publish_time > #{redisTime}
           and publish_time &lt;= #{nowTime}
     </select>
+
+    <update id="approvedS">
+        UPDATE ap_article
+        SET status = 3
+        WHERE id IN
+        <foreach collection="articleIds" item="articleId" open="(" close=")" separator=",">
+            #{articleId}
+        </foreach>
+    </update>
+
+    <update id="upStatus">
+        UPDATE ap_article
+        SET status = #{status}
+        WHERE id IN
+        <foreach collection="articleIds" item="articleId" open="(" close=")" separator=",">
+            #{articleId}
+        </foreach>
+    </update>
+
+
+    <update id="pushArticle">
+        UPDATE ap_article
+        SET status = #{status} ,publish_time=#{pushTime}
+        WHERE id IN
+        <foreach collection="articleIds" item="articleId" open="(" close=")" separator=",">
+            #{articleId}
+        </foreach>
+    </update>
 </mapper>

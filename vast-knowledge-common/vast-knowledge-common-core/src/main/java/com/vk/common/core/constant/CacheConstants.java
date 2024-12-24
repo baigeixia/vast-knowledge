@@ -28,12 +28,12 @@ public class CacheConstants
     public final static long PASSWORD_LOCK_TIME = 10;
 
     /**
-     * 权限缓存前缀
+     * 管理端 缓存
      */
     public final static String LOGIN_TOKEN_KEY = "login_tokens:";
 
     /**
-     * 权限缓存客户端前缀
+     * 用户 缓存
      */
     public final static String LOGIN_CLIENT_TOKEN_KEY = "login_client_tokens:";
 

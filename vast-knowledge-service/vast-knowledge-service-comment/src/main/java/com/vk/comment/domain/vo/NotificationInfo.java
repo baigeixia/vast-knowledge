@@ -20,6 +20,10 @@ public class NotificationInfo {
      */
     private  Long commentId;
     /**
+     * 是否删除
+     */
+    private  Boolean hide;
+    /**
      * 对应用户
      */
     private Actors actors;

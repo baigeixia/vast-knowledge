@@ -16,10 +16,17 @@ public class SecurityConstants
      * 用户名字段
      */
     public static final String DETAILS_USERNAME = "username";
+    public static final String ADMIN_PATH = "/dev-system/system/**";
+    /**
+     * 是否是管理端
+     */
+    public static final String ADMIN_OPEN= "adminOpen";
     /**
      * 授权信息字段
      */
-    public static final String AUTHORIZATION_HEADER = "authorization";
+    public static final String USER_AUTHORIZATION_HEADER = "user-authorization";
+    public static final String ADMIN_AUTHORIZATION_HEADER = "admin-authorization";
+
 
     /**
      * 请求来源
@@ -36,10 +43,17 @@ public class SecurityConstants
      */
     public static final String USER_KEY = "user_key";
 
+
     /**
      * 登录用户
      */
     public static final String LOGIN_USER = "login_user";
+
+    /**
+     * 登录管理
+     */
+    public static final String LOGIN_ADMIN = "login_admin";
+
 
     /**
      * 角色权限

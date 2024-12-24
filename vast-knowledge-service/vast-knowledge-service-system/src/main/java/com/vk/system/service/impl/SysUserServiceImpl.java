@@ -1,6 +1,7 @@
 package com.vk.system.service.impl;
 
 import com.vk.common.core.constant.UserConstants;
+import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.ServiceException;
 import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.SpringUtils;
@@ -14,6 +15,9 @@ import com.vk.system.domain.SysPost;
 import com.vk.system.domain.SysUserPost;
 import com.vk.system.domain.SysUserRole;
 import com.vk.system.mapper.*;
+import com.vk.system.model.LoginUser;
+import com.vk.system.service.ISysPermissionService;
+import com.vk.system.service.ISysPostService;
 import com.vk.system.service.ISysUserService;
 import jakarta.validation.Validator;
 import org.slf4j.Logger;
@@ -26,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -538,6 +543,32 @@ public class SysUserServiceImpl implements ISysUserService
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }
         return successMsg.toString();
+    }
+
+
+    @Autowired
+    private ISysPostService postService;
+
+    @Autowired
+    private ISysPermissionService permissionService;
+
+    @Override
+    public LoginUser getUser(String username){
+        SysUser sysUser = userMapper.selectUserByUserName(username);
+        if (StringUtils.isNull(sysUser))
+        {
+            return null;
+        }
+        // 角色集合
+        Set<String> roles = permissionService.getRolePermission(sysUser);
+        // 权限集合
+        Set<String> permissions = permissionService.getMenuPermission(sysUser);
+        LoginUser sysUserVo = new LoginUser();
+        sysUserVo.setSysUser(sysUser);
+        sysUserVo.setRolesLocal(roles);
+        sysUserVo.setPermissions(permissions);
+
+        return sysUserVo;
     }
 
 }

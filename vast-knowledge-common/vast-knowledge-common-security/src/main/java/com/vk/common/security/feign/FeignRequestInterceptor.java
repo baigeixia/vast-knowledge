@@ -43,12 +43,24 @@ public class FeignRequestInterceptor implements RequestInterceptor
             {
                 requestTemplate.header(SecurityConstants.DETAILS_USERNAME, userName);
             }
-            String authentication = headers.get(SecurityConstants.AUTHORIZATION_HEADER);
-            if (StringUtils.isNotEmpty(authentication))
+            String userAuthentication = headers.get(SecurityConstants.USER_AUTHORIZATION_HEADER);
+            if (StringUtils.isNotEmpty(userAuthentication))
             {
-                requestTemplate.header(SecurityConstants.AUTHORIZATION_HEADER, authentication);
+                requestTemplate.header(SecurityConstants.USER_AUTHORIZATION_HEADER, userAuthentication);
             }
 
+            String authentication = headers.get(SecurityConstants.ADMIN_AUTHORIZATION_HEADER);
+            if (StringUtils.isNotEmpty(authentication))
+            {
+                requestTemplate.header(SecurityConstants.ADMIN_AUTHORIZATION_HEADER, authentication);
+            }
+
+            String admin = headers.get(SecurityConstants.ADMIN_OPEN);
+            if (StringUtils.isNotEmpty(admin))
+            {
+                requestTemplate.header( SecurityConstants.ADMIN_OPEN, admin);
+            }
+            
             // 配置客户端IP
             requestTemplate.header("X-Forwarded-For", IpUtils.getIpAddr());
         }

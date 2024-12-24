@@ -23,13 +23,13 @@ public class IgnoreWhiteProperties
      */
     private List<String> whites ;
     @PostConstruct
-    private  void init(){
+    private void init(){
         initializeWhites();
     }
     private void initializeWhites() {
         whites.add("/dev-collection/analyze/channel/page");
         whites.add("/dev-core/article/article/homeList");
-//        whites.add("/dev-collection/behaviour/likes/articleLike");
+        // whites.add("/dev-collection/behaviour/likes/articleLike");
         whites.add("/dev-core/search/search/searchInfo");
         whites.add("/dev-system/user/info/search");
         whites.add("/dev-core/article/Content/getInfo");
@@ -43,6 +43,8 @@ public class IgnoreWhiteProperties
         whites.add("/dev-collection/behaviour/collect/list");
         whites.add("/dev-system/user/follow/list");
         whites.add("/dev-system/user/fan/list");
+        whites.add("/dev-system/user/login");
+        whites.add("/dev-system/system/login");
     }
 
     public void setWhites(List<String> whites)

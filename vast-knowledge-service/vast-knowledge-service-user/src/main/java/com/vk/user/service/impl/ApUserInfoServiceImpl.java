@@ -197,7 +197,8 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
             return new InfoRelationVo(false);
         }
 
-        long countByQuery = apUserFollowMapper.selectCountByQuery(QueryWrapper.create().where(AP_USER_FOLLOW.USER_ID.eq(userid).and(AP_USER_FOLLOW.FOLLOW_ID.eq(id))));
+        long countByQuery = apUserFollowMapper.selectCountByQuery(QueryWrapper.create()
+                .where(AP_USER_FOLLOW.USER_ID.eq(userid).and(AP_USER_FOLLOW.FOLLOW_ID.eq(id))));
         if (countByQuery>0){
             return new InfoRelationVo(true);
         }

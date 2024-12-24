@@ -25,6 +25,7 @@ public class FollowNotificationInfo {
      * 统计结束时间
      */
     private String followEndTime;
+    // private Boolean hide;
 
     /**
      * 对应用户

@@ -26,6 +26,10 @@ public class Actors {
      */
     private  String replyContent;
     /**
+     * 回复图片
+     */
+    private String image;
+    /**
      * 回复内容 时间
      */
     private String replyContentTime;
