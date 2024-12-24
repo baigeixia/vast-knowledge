@@ -7,10 +7,6 @@ package com.vk.common.core.constant;
  */
 public class ServiceNameConstants
 {
-    /**
-     * 认证服务的serviceid
-     */
-    public static final String AUTH_SERVICE = "vk-service-auth";
 
     /**
      * 系统模块的serviceid

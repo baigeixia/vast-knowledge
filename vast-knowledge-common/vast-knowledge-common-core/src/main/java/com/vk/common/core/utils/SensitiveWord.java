@@ -25,7 +25,7 @@ public class SensitiveWord {
 
     // 在Spring启动后，异步加载敏感词
     @PostConstruct
-    public void init() {
+    private void init() {
         loadSensitiveWordsAsync();  // 使用虚拟线程异步加载敏感词
     }
 

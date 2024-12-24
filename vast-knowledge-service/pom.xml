@@ -13,7 +13,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>vast-knowledge-service-auth</module>
         <module>vast-knowledge-service-system</module>
         <module>vast-knowledge-service-article</module>
         <module>vast-knowledge-service-user</module>

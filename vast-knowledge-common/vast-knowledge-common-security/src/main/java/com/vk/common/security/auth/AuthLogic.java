@@ -11,7 +11,6 @@ import com.vk.common.security.annotation.Logical;
 import com.vk.common.security.annotation.RequiresLogin;
 import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.annotation.RequiresRoles;
-import com.vk.common.security.service.ClientTokenService;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.model.LoginUser;
@@ -36,7 +35,7 @@ public class AuthLogic
     private static final String SUPER_ADMIN = "admin";
 
     public TokenService tokenService = SpringUtils.getBean(TokenService.class);
-    public ClientTokenService clientTokenService = SpringUtils.getBean(ClientTokenService.class);
+    // public UserTokenService userTokenService = SpringUtils.getBean(UserTokenService.class);
 
     /**
      * 会话注销
@@ -98,10 +97,10 @@ public class AuthLogic
         return tokenService.getLoginUser(token);
     }
 
-    public LoginApUser getLoginApUser(String token)
-    {
-        return clientTokenService.getLoginApUser(token);
-    }
+    // public LoginApUser getLoginApUser(String token)
+    // {
+    //     return userTokenService.getLoginApUser(token);
+    // }
 
 
     /**

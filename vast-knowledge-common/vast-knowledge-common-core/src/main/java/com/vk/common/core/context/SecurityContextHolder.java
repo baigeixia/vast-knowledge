@@ -93,8 +93,19 @@ public class SecurityContextHolder
         set(SecurityConstants.ROLE_PERMISSION, permissions);
     }
 
+    // public static String getAdminOpen()
+    // {
+    //     return get(SecurityConstants.ADMIN_OPEN);
+    // }
+    //
+    // public static void setAdminOpen(Boolean admin)
+    // {
+    //     set(SecurityConstants.ADMIN_OPEN, admin);
+    // }
+
     public static void remove()
     {
         THREAD_LOCAL.remove();
     }
+
 }

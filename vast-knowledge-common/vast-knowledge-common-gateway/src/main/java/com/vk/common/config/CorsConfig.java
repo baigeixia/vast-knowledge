@@ -26,7 +26,7 @@ public class CorsConfig
     private static final String ALLOWED_ORIGIN = "*";
     private static final String ALLOWED_EXPOSE = "*";
     private static final String MAX_AGE = "18000";
-    private static final String ALLOWED_HEADERS = "Content-Type,Authorization,from,X-Refresh-Token,istoken,repeatsubmit";
+    private static final String ALLOWED_HEADERS = "Content-Type,user-authorization,admin-authorization,from,X-Refresh-Token,istoken,repeatsubmit";
 
     @Bean
     public WebFilter corsFilter()

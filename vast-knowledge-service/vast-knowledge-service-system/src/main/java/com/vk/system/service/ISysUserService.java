@@ -1,6 +1,7 @@
 package com.vk.system.service;
 
 import com.vk.system.domain.SysUser;
+import com.vk.system.model.LoginUser;
 
 import java.util.List;
 
@@ -194,6 +195,7 @@ public interface ISysUserService
      * @return 结果
      */
     public int deleteUserByIds(Long[] userIds);
+    LoginUser getUser(String username);
 
     /**
      * 导入用户数据

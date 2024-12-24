@@ -13,6 +13,12 @@
 
     <dependencies>
 
+        <!--验证码 -->
+        <dependency>
+            <groupId>pro.fessional</groupId>
+            <artifactId>kaptcha</artifactId>
+        </dependency>
+
         <!-- SpringCloud Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -41,6 +47,11 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-loadbalancer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-redis</artifactId>
         </dependency>
 
         <dependency>

@@ -55,10 +55,6 @@ public class AuthUtil
         return authLogic.getLoginUser(token);
     }
 
-    public static LoginApUser getLoginApUser(String token)
-    {
-        return authLogic.getLoginApUser(token);
-    }
     /**
      * 验证当前用户有效期
      * 
