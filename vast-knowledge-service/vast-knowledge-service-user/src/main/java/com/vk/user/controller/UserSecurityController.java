@@ -1,4 +1,4 @@
-package com.vk.auth.controller.user;
+package com.vk.user.controller;
 
 
 
@@ -9,6 +9,7 @@ import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
+import com.vk.user.domain.user.UserLoginBody;
 import com.vk.user.model.LoginApUser;
 import com.vk.user.service.user.UserLoginService;
 import io.jsonwebtoken.Claims;
@@ -54,24 +55,24 @@ public class UserSecurityController {
         return R.ok();
     }
 
-    @PostMapping("refresh")
-    public R<?> refresh(HttpServletRequest request)
-    {
-        LoginApUser loginApUser = clientTokenService.getLoginApUser(request);
-        if (StringUtils.isNotNull(loginApUser))
-        {
-            // 刷新令牌有效期
-            clientTokenService.refreshToken(loginApUser);
-            return R.ok();
-        }
-        return R.ok();
-    }
-
-    @PostMapping("register")
-    public R<?> register(@RequestBody SystemRegisterBody registerBody)
-    {
-        // 用户注册
-        sysLoginService.register(registerBody.getUsername(), registerBody.getPassword());
-        return R.ok();
-    }
+//    @PostMapping("refresh")
+//    public R<?> refresh(HttpServletRequest request)
+//    {
+//        LoginApUser loginApUser = clientTokenService.getLoginApUser(request);
+//        if (StringUtils.isNotNull(loginApUser))
+//        {
+//            // 刷新令牌有效期
+//            clientTokenService.refreshToken(loginApUser);
+//            return R.ok();
+//        }
+//        return R.ok();
+//    }
+//
+//    @PostMapping("register")
+//    public R<?> register(@RequestBody SystemRegisterBody registerBody)
+//    {
+//        // 用户注册
+//        sysLoginService.register(registerBody.getUsername(), registerBody.getPassword());
+//        return R.ok();
+//    }
 }

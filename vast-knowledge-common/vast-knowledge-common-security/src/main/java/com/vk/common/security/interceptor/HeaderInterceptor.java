@@ -35,7 +35,7 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
         SecurityContextHolder.setUserId(ServletUtils.getHeader(request, SecurityConstants.DETAILS_USER_ID));
         SecurityContextHolder.setUserName(ServletUtils.getHeader(request, SecurityConstants.DETAILS_USERNAME));
         SecurityContextHolder.setUserKey(ServletUtils.getHeader(request, SecurityConstants.USER_KEY));
-        SecurityContextHolder.set(SecurityConstants.LOGIN_ADMIN, Boolean.parseBoolean(ServletUtils.getHeader(request, SecurityConstants.ADMIN_OPEN)));
+        SecurityContextHolder.set(SecurityConstants.ADMIN_OPEN, Boolean.parseBoolean(ServletUtils.getHeader(request, SecurityConstants.ADMIN_OPEN)));
 
         String token = SecurityUtils.getToken();
         if (StringUtils.isNotEmpty(token))
@@ -43,6 +43,7 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
             boolean isAdmin = SecurityUtils.verificationAdmin(request);
             if (isAdmin){
                 LoginUser loginApUser = AuthUtil.getLoginUser(token);
+
                 contextSet(loginApUser);
             }
             // else {
@@ -57,7 +58,7 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
         if (!ObjectUtils.isEmpty(userinfo))
         {
             AuthUtil.verifyLoginUserExpire(userinfo);
-
+            SecurityContextHolder.set(SecurityConstants.LOGIN_ADMIN,userinfo);
         }
     }
 
@@ -65,7 +66,7 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
         if (!ObjectUtils.isEmpty(userinfo))
         {
             AuthUtil.verifyLoginUserExpire(userinfo);
-            SecurityContextHolder.set(SecurityConstants.LOGIN_USER, userinfo);
+//            SecurityContextHolder.set(SecurityConstants.LOGIN_USER, userinfo);
         }
     }
 

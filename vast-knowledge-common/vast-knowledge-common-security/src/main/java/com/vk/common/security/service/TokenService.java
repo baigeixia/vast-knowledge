@@ -207,7 +207,7 @@ public class TokenService
 
     private String getTokenKey(String token)
     {
-        String adminInfo = SecurityContextHolder.get(SecurityConstants.LOGIN_ADMIN);
+        String adminInfo = SecurityContextHolder.get(SecurityConstants.ADMIN_OPEN);
         if (Boolean.parseBoolean(adminInfo)){
             return LOGIN_TOKEN_KEY + token;
         }else {

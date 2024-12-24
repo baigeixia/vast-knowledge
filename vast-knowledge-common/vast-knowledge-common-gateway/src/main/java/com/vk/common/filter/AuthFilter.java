@@ -44,7 +44,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
     @Autowired
     private RedisService redisService;
 
-    public Boolean adminOpen = false;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -52,18 +51,18 @@ public class AuthFilter implements GlobalFilter, Ordered {
         ServerHttpRequest.Builder mutate = request.mutate();
 
         String url = request.getURI().getPath();
-        //访问管理路径
-        if (StringUtils.matches(url, List.of(SecurityConstants.ADMIN_PATH))){
+        //是否管理员登录
+        boolean adminOpen = false;
+        if (StringUtils.isNotEmpty(request.getHeaders().getFirst(TokenConstants.ADMIN_AUTHORIZATION_HEADER))){
             adminOpen = true;
         }
-
         // 跳过不需要验证的路径
         if (StringUtils.matches(url, ignoreWhite.getWhites())) {
             addHeader(mutate, SecurityConstants.ADMIN_OPEN, adminOpen);
             return chain.filter(exchange.mutate().request(mutate.build()).build());
+//            return chain.filter(exchange);
         }
-        // String token = getToken(request);
-        String token = getToken(request);
+        String token = getToken(request,adminOpen);
         if (StringUtils.isEmpty(token)) {
             return unauthorizedResponse(exchange, "令牌不能为空");
         }
@@ -72,7 +71,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
             return unauthorizedResponse(exchange, "令牌已过期或验证不正确！");
         }
         String userkey = TokenUtils.getUserKey(token);
-        boolean islogin = redisService.hasKey(getTokenKey(userkey));
+        boolean islogin = redisService.hasKey(getTokenKey(userkey,adminOpen));
         if (!islogin) {
             return unauthorizedResponse(exchange, "登录状态已过期");
         }
@@ -82,10 +81,13 @@ public class AuthFilter implements GlobalFilter, Ordered {
             return unauthorizedResponse(exchange, "令牌验证失败");
         }
 
+
+
         // 设置用户信息到请求
         addHeader(mutate, SecurityConstants.USER_KEY, userkey);
         addHeader(mutate, SecurityConstants.DETAILS_USER_ID, userid);
         addHeader(mutate, SecurityConstants.DETAILS_USERNAME, username);
+        addHeader(mutate, SecurityConstants.ADMIN_OPEN, adminOpen);
 
         // 内部请求来源参数清除
         removeHeader(mutate, SecurityConstants.FROM_SOURCE);
@@ -95,7 +97,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
     /**
      * 获取请求token
      */
-    private String getToken(ServerHttpRequest request) {
+    private String getToken(ServerHttpRequest request,boolean adminOpen) {
         String token;
         if (adminOpen) {
             token = request.getHeaders().getFirst(TokenConstants.ADMIN_AUTHORIZATION_HEADER);
@@ -129,8 +131,12 @@ public class AuthFilter implements GlobalFilter, Ordered {
     /**
      * 获取缓存key
      */
-    private String getTokenKey(String token) {
-        return CacheConstants.LOGIN_CLIENT_TOKEN_KEY + token;
+    private String getTokenKey(String token,boolean adminOpen) {
+        if (adminOpen) {
+            return CacheConstants.LOGIN_TOKEN_KEY + token;
+        } else {
+            return CacheConstants.LOGIN_CLIENT_TOKEN_KEY + token;
+        }
     }
 
 
