@@ -10,11 +10,9 @@ public class TokenConstants
     /**
      * 令牌自定义标识
      */
-    public static final String AUTHENTICATION = "Authorization";
-
-
     public static final String USER_AUTHORIZATION_HEADER = "user-authorization";
     public static final String ADMIN_AUTHORIZATION_HEADER = "admin-authorization";
+    public static final String REFRESH_TOKEN = "refresh_token";
     /**
      * 令牌前缀
      */
@@ -30,13 +28,13 @@ public class TokenConstants
     public final static String SECRET = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
 
     /**
-     * TOKEN的有效期一天 s
+     * TOKEN的有效期一天 s 1小时
      */
-    public final static int TOKEN_TIME_OUT =  3600*24*100;
+    public final static long  TOKEN_TIME_OUT = 60 * 60 * 1000; // 1小时
 
     /**
-     *最小刷新间隔(S)
+     *最小刷新间隔(S) 2天
      */
-    private static final int REFRESH_TIME = 300;
+    public static final long  REFRESH_TIME = 2 * 24 * 60 * 60 * 1000; //2天
 
 }

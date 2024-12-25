@@ -7,10 +7,13 @@ import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.system.model.LoginUser;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 
 /**
@@ -65,14 +68,28 @@ public class SecurityUtils
      */
     public static String getToken(HttpServletRequest request)
     {
-        boolean isAdmin = verificationAdmin(request);
-        String token;
-        if (isAdmin){
-            token = request.getHeader(TokenConstants.ADMIN_AUTHORIZATION_HEADER);
-        }else {
-            token = request.getHeader(TokenConstants.USER_AUTHORIZATION_HEADER);
-        }
+        String headerName = verificationAdmin(request) ? TokenConstants.ADMIN_AUTHORIZATION_HEADER : TokenConstants.USER_AUTHORIZATION_HEADER;
+
+        String token = request.getHeader(headerName);
+
         return replaceTokenPrefix(token);
+    }
+
+    public static String getRefreshToken(HttpServletRequest request)
+    {
+        Cookie[] cookies = request.getCookies();
+        // 如果 cookies 为 null 或者长度为 0，则返回 null
+        if (cookies == null) {
+            return null;
+        }
+
+        for (Cookie cookie : cookies) {
+            if (TokenConstants.REFRESH_TOKEN.equals(cookie.getName())) {
+                // 找到对应名称的 cookie，返回其值
+                return   replaceTokenPrefix(cookie.getValue());
+            }
+        }
+        return null;
     }
     public static boolean verificationAdmin(HttpServletRequest request){
         //从header获取admin标识

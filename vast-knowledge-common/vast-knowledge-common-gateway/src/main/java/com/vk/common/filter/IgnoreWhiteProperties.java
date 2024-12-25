@@ -44,6 +44,7 @@ public class IgnoreWhiteProperties
         whites.add("/dev-system/user/follow/list");
         whites.add("/dev-system/user/fan/list");
         whites.add("/dev-system/user/login");
+        whites.add("/dev-system/user/refresh");
         whites.add("/dev-system/system/login");
     }
 

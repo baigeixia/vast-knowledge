@@ -63,7 +63,24 @@ public class TokenUtils {
                 .issuedAt(new Date(currentTime))
                 .subject(TokenConstants.SUBJECT)
                 .signWith(getSigningKey(),Jwts.SIG.HS256)
-                .compressWith(GZIP)
+                .compact();
+    }
+
+    /**
+     * 从数据声明生成刷新令牌
+     *
+     * @param claims 数据声明
+     * @return 令牌
+     */
+    public static String createRefreshToken(Map<String, Object> claims)
+    {
+        long currentTime = System.currentTimeMillis();
+        return Jwts.builder()
+                .claims(claims)
+                .expiration(new Date(currentTime + TokenConstants.REFRESH_TIME))
+                .issuedAt(new Date(currentTime))
+                .subject(TokenConstants.SUBJECT)
+                .signWith(getSigningKey(),Jwts.SIG.HS256)
                 .compact();
     }
 

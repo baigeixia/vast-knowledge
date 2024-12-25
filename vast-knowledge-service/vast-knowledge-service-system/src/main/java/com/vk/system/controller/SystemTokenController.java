@@ -13,6 +13,7 @@ import com.vk.system.model.LoginUser;
 import com.vk.system.service.system.SysLoginService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,12 +36,12 @@ public class SystemTokenController
     private SysLoginService sysLoginService;
 
     @PostMapping("login")
-    public R<?> login(@RequestBody SystemLoginBody form)
+    public R<?> login(@RequestBody SystemLoginBody form, HttpServletResponse response)
     {
         // 用户登录
         LoginUser userInfo = sysLoginService.login(form.getUsername(), form.getPassword());
         // 获取登录token
-        return R.ok(tokenService.createToken(userInfo));
+        return R.ok(tokenService.createToken(userInfo,response));
     }
 
     @DeleteMapping("logout")
@@ -63,13 +64,14 @@ public class SystemTokenController
     }
 
     @PostMapping("refresh")
-    public R<?> refresh(HttpServletRequest request)
+    public R<?> refresh(HttpServletRequest request, HttpServletResponse response)
     {
         LoginUser loginUser = tokenService.getLoginUser(request);
         if (StringUtils.isNotNull(loginUser))
         {
             // 刷新令牌有效期
-            tokenService.refreshToken(loginUser);
+            tokenService.refreshTokenRedis(loginUser);
+            tokenService.refreshToken(response,loginUser.getToken());
             return R.ok();
         }
         return R.ok();

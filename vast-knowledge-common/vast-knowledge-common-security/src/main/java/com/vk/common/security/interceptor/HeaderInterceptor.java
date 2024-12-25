@@ -5,6 +5,7 @@ import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
+import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.model.LoginUser;
@@ -40,16 +41,13 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
         String token = SecurityUtils.getToken();
         if (StringUtils.isNotEmpty(token))
         {
-            boolean isAdmin = SecurityUtils.verificationAdmin(request);
-            if (isAdmin){
+            if (SecurityUtils.verificationAdmin(request)){
                 LoginUser loginApUser = AuthUtil.getLoginUser(token);
-
+                contextSet(loginApUser);
+            }else {
+                LoginApUser loginApUser = AuthUtil.getLoginApUser(token);
                 contextSet(loginApUser);
             }
-            // else {
-            //     LoginApUser loginApUser = AuthUtil.getLoginApUser(token);
-            //     contextSet(loginApUser);
-            // }
         }
         return true;
     }
@@ -66,7 +64,7 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor
         if (!ObjectUtils.isEmpty(userinfo))
         {
             AuthUtil.verifyLoginUserExpire(userinfo);
-//            SecurityContextHolder.set(SecurityConstants.LOGIN_USER, userinfo);
+           SecurityContextHolder.set(SecurityConstants.LOGIN_USER, userinfo);
         }
     }
 

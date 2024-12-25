@@ -101,6 +101,11 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-security</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

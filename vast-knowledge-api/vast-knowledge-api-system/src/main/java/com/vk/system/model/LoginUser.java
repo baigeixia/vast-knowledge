@@ -31,7 +31,7 @@ public class LoginUser implements Serializable
     private String username;
 
     /**
-     * 登录时间
+     * 登录时间 也是 刷新时间点
      */
     private Long loginTime;
 

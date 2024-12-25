@@ -2,6 +2,7 @@ package com.vk.user.controller;
 
 
 
+import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
@@ -14,8 +15,13 @@ import com.vk.user.model.LoginApUser;
 import com.vk.user.service.user.UserLoginService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 // @RequestMapping("")
@@ -28,12 +34,12 @@ public class UserSecurityController {
     private TokenService tokenService;
 
     @PostMapping("login")
-    public AjaxResult login(@RequestBody UserLoginBody form)
+    public AjaxResult login(@RequestBody UserLoginBody form, HttpServletResponse response)
     {
         // 用户登录
         LoginApUser userInfo = userLoginService.login(form.getEmail(), form.getPassword(),form.getWaitCode(),form.getCodeOrPas());
         // 获取登录token
-        return AjaxResult.success(tokenService.createToken(userInfo));
+        return AjaxResult.success(tokenService.createToken(userInfo,response));
     }
 
     @DeleteMapping("logout")
@@ -55,24 +61,28 @@ public class UserSecurityController {
         return R.ok();
     }
 
-//    @PostMapping("refresh")
-//    public R<?> refresh(HttpServletRequest request)
-//    {
-//        LoginApUser loginApUser = clientTokenService.getLoginApUser(request);
-//        if (StringUtils.isNotNull(loginApUser))
-//        {
-//            // 刷新令牌有效期
-//            clientTokenService.refreshToken(loginApUser);
-//            return R.ok();
-//        }
-//        return R.ok();
-//    }
-//
-//    @PostMapping("register")
-//    public R<?> register(@RequestBody SystemRegisterBody registerBody)
-//    {
-//        // 用户注册
-//        sysLoginService.register(registerBody.getUsername(), registerBody.getPassword());
-//        return R.ok();
-//    }
+   @PostMapping("refresh")
+   public R<?> refresh(HttpServletRequest request, HttpServletResponse response)
+   {
+       LoginApUser loginApUser = tokenService.getLoginApUser(request);
+       if (!ObjectUtils.isEmpty(loginApUser))
+       {
+           String token = loginApUser.getToken();
+           String username = loginApUser.getUsername();
+           Long userId = loginApUser.getClientApUser().getId();
+
+           Map<String, Object> claimsMap = new HashMap<>();
+           claimsMap.put(SecurityConstants.USER_KEY, token);
+           claimsMap.put(SecurityConstants.DETAILS_USER_ID, userId);
+           claimsMap.put(SecurityConstants.DETAILS_USERNAME, username);
+
+           String serviceToken = TokenUtils.createToken(claimsMap);
+           // 刷新redis有效期
+           tokenService.refreshTokenRedis(loginApUser);
+           tokenService.refreshToken(response,loginApUser.getToken());
+           return R.ok(serviceToken);
+       }
+       return R.fail(401,"请重新登录");
+   }
+
 }

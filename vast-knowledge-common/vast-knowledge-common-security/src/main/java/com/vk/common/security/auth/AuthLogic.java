@@ -15,6 +15,7 @@ import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.model.LoginUser;
 import com.vk.user.model.LoginApUser;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.PatternMatchUtils;
 
 import java.util.Collection;
@@ -94,13 +95,13 @@ public class AuthLogic
      */
     public LoginUser getLoginUser(String token)
     {
-        return tokenService.getLoginUser(token);
+        return tokenService.getLoginUserInfo(token);
     }
 
-    // public LoginApUser getLoginApUser(String token)
-    // {
-    //     return userTokenService.getLoginApUser(token);
-    // }
+    public LoginApUser getLoginApUser(String token)
+    {
+        return tokenService.getLoginUserInfo(token);
+    }
 
 
     /**
@@ -110,11 +111,13 @@ public class AuthLogic
      */
     public void verifyLoginUserExpire(LoginUser loginUser)
     {
-        tokenService.verifyToken(loginUser);
+        // tokenService.verifyToken(loginUser);
+        tokenService.verifyTokenAndRefreshToken(loginUser);
     }
     public void verifyLoginUserExpire(LoginApUser LoginApUser)
     {
-        tokenService.verifyToken(LoginApUser);
+        // tokenService.verifyToken(LoginApUser);
+        tokenService.verifyTokenAndRefreshToken(LoginApUser);
     }
 
     /**

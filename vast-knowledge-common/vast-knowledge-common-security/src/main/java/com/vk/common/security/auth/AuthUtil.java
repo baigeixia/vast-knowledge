@@ -5,6 +5,7 @@ import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.annotation.RequiresRoles;
 import com.vk.system.model.LoginUser;
 import com.vk.user.model.LoginApUser;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Token 权限验证工具类
@@ -53,6 +54,11 @@ public class AuthUtil
     public static LoginUser getLoginUser(String token)
     {
         return authLogic.getLoginUser(token);
+    }
+
+    public static LoginApUser getLoginApUser(String token)
+    {
+        return authLogic.getLoginApUser(token);
     }
 
     /**
