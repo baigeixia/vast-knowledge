@@ -56,15 +56,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
         ServerHttpRequest.Builder mutate = request.mutate();
 
         String url = request.getURI().getPath();
-        //是否管理员登录
-        // boolean adminOpen=false;
-        // if(StringUtils.isNotEmpty(request.getHeaders().getFirst(TokenConstants.ADMIN_AUTHORIZATION_HEADER)) || url.equals("/dev-system/system/login")){
-        //     adminOpen =true;
-        // }
-        // String authHeader = request.getHeaders().getFirst(TokenConstants.ADMIN_AUTHORIZATION_HEADER);
-        // boolean adminOpen = StringUtils.isNotEmpty(authHeader) || url.equals("/dev-system/system/login");
-        // boolean adminOpen = StringUtils.isNotEmpty(request.getHeaders().getFirst(TokenConstants.ADMIN_AUTHORIZATION_HEADER));
-
         //是否有管理身份 管理登录先给身份
         boolean adminOpen = isAuthorized(request,url);
 

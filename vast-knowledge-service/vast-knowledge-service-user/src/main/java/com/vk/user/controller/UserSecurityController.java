@@ -1,8 +1,6 @@
 package com.vk.user.controller;
 
 
-
-import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
@@ -18,13 +16,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-// @RequestMapping("")
 public class UserSecurityController {
 
     @Autowired
@@ -37,7 +34,7 @@ public class UserSecurityController {
     public AjaxResult login(@RequestBody UserLoginBody form, HttpServletResponse response)
     {
         // 用户登录
-        LoginApUser userInfo = userLoginService.login(form.getEmail(), form.getPassword(),form.getWaitCode(),form.getCodeOrPas());
+        LoginApUser userInfo = userLoginService.login(form.getEmail(), form.getPassword(),form.getCodeOrPas());
         // 获取登录token
         return AjaxResult.success(tokenService.createToken(userInfo,response));
     }
@@ -45,18 +42,15 @@ public class UserSecurityController {
     @DeleteMapping("logout")
     public R<?> logout(HttpServletRequest request)
     {
-        String token = SecurityUtils.getToken(request);
+        String token = SecurityUtils.getRefreshToken(request);
         if (StringUtils.isNotEmpty(token))
         {
             Claims claims = TokenUtils.parseToken(token);
             if (null==claims){
                 return R.ok();
             }
-            String username = TokenUtils.getUserName(token);
             // 删除用户缓存记录
             AuthUtil.logoutByToken(token);
-            // 记录用户退出日志
-            // sysLoginService.logout(username);
         }
         return R.ok();
     }
@@ -67,20 +61,15 @@ public class UserSecurityController {
        LoginApUser loginApUser = tokenService.getLoginApUser(request);
        if (!ObjectUtils.isEmpty(loginApUser))
        {
-           String token = loginApUser.getToken();
+           String key = loginApUser.getToken();
            String username = loginApUser.getUsername();
            Long userId = loginApUser.getClientApUser().getId();
 
-           Map<String, Object> claimsMap = new HashMap<>();
-           claimsMap.put(SecurityConstants.USER_KEY, token);
-           claimsMap.put(SecurityConstants.DETAILS_USER_ID, userId);
-           claimsMap.put(SecurityConstants.DETAILS_USERNAME, username);
-
-           String serviceToken = TokenUtils.createToken(claimsMap);
+           String token = tokenService.createToken(key, userId, username);
            // 刷新redis有效期
            tokenService.refreshTokenRedis(loginApUser);
-           tokenService.refreshToken(response,loginApUser.getToken());
-           return R.ok(serviceToken);
+           tokenService.refreshToken(response,key);
+           return R.ok(token);
        }
        return R.fail(401,"请重新登录");
    }

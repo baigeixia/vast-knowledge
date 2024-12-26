@@ -22,6 +22,7 @@ public class IgnoreWhiteProperties
      * 放行白名单配置，网关不校验此处的白名单
      */
     private List<String> whites ;
+    private List<String> checkCode=new ArrayList<>() ;
     @PostConstruct
     private void init(){
         initializeWhites();
@@ -45,7 +46,23 @@ public class IgnoreWhiteProperties
         whites.add("/dev-system/user/fan/list");
         whites.add("/dev-system/user/login");
         whites.add("/dev-system/user/refresh");
+        whites.add("/dev-system/user/logout");
+        whites.add("/dev-system/user/refresh");
         whites.add("/dev-system/system/login");
+        whites.add("/dev-system/system/logout");
+        whites.add("/dev-system/system/refresh");
+
+
+        checkCode.add("/dev-system/system/login");
+        checkCode.add("/dev-system/user/login");
+    }
+
+    public List<String> getCheckCode() {
+        return this.checkCode;
+    }
+
+    public void setCheckCode(List<String> checkCode) {
+        this.checkCode = checkCode;
     }
 
     public void setWhites(List<String> whites)

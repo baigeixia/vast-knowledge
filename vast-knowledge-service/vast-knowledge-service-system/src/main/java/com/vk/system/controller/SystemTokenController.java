@@ -47,7 +47,7 @@ public class SystemTokenController
     @DeleteMapping("logout")
     public R<?> logout(HttpServletRequest request)
     {
-        String token = SecurityUtils.getToken(request);
+        String token = SecurityUtils.getRefreshToken(request);
         if (StringUtils.isNotEmpty(token))
         {
             Claims claims = TokenUtils.parseToken(token);
@@ -69,10 +69,15 @@ public class SystemTokenController
         LoginUser loginUser = tokenService.getLoginUser(request);
         if (StringUtils.isNotNull(loginUser))
         {
+            String key = loginUser.getToken();
+            String username = loginUser.getUsername();
+            Long userId = loginUser.getSysUser().getUserId();
+
+            String token = tokenService.createToken(key, userId, username);
             // 刷新令牌有效期
             tokenService.refreshTokenRedis(loginUser);
-            tokenService.refreshToken(response,loginUser.getToken());
-            return R.ok();
+            tokenService.refreshToken(response,key);
+            return R.ok(token);
         }
         return R.ok();
     }

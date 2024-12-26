@@ -20,8 +20,8 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static com.vk.common.core.constant.Constants.REGISTER;
 import static com.vk.common.core.constant.UserConstants.PASSWORD_LOGIN;
-import static com.vk.common.core.constant.UserConstants.VERIFICATION_CODE_LOGIN;
 
 @Component
 public class UserLoginService {
@@ -32,27 +32,18 @@ public class UserLoginService {
     @Autowired
     private ApUserMapper apUserMapper;
 
-    private int maxRetryCount = CacheConstants.PASSWORD_MAX_RETRY_COUNT;
-    private Long lockTime = CacheConstants.PASSWORD_LOCK_TIME;
+    public LoginApUser login(String email, String password, Integer codeOrPas) {
 
-    public LoginApUser login(String email, String password, String waitCode, Integer codeOrPas) {
-
-        if (VERIFICATION_CODE_LOGIN == codeOrPas) {
-            if (StringUtils.isAnyBlank(email, waitCode)) {
-                throw new ServiceException("用户/验证码 必须填写");
-            }
+        if (StringUtils.isAnyBlank(email, password)) {
+            throw new ServiceException("用户/密码 必须填写");
         }
 
-        if (PASSWORD_LOGIN == codeOrPas) {
-            if (StringUtils.isAnyBlank(email, password)) {
-                throw new ServiceException("用户/密码 必须填写");
-            }
-        }
+
 
         // IP黑名单校验
         String blackStr = Convert.toStr(redisService.getCacheObject(CacheConstants.SYS_LOGIN_BLACKIPLIST));
         if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr())) {
-            throw new ServiceException("很遗憾，访问IP已被列入系统黑名单");
+            throw new ServiceException("访问IP已被列入系统黑名单");
         }
 
         // 查询用户信息
@@ -85,6 +76,8 @@ public class UserLoginService {
             retryCount = 0;
         }
 
+        int maxRetryCount = CacheConstants.PASSWORD_MAX_RETRY_COUNT;
+        Long lockTime = CacheConstants.PASSWORD_LOCK_TIME;
         if (retryCount >= maxRetryCount) {
             String errMsg = String.format("密码输入错误%s次，帐户锁定%s分钟", maxRetryCount, lockTime);
             throw new ServiceException(errMsg);

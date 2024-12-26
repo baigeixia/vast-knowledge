@@ -5,7 +5,6 @@ package com.vk.system.domain.system;
  *
  * @author vk
  */
-
 public class SystemLoginBody {
     /**
      * 用户名

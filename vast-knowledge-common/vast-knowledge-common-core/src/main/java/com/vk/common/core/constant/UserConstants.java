@@ -87,7 +87,7 @@ public class UserConstants
     /**
      * 验证码登录
      */
-    public static final int VERIFICATION_CODE_LOGIN = 1;
+    public static final int REGISTER = 1;
     /**
      * 密码登录
      */

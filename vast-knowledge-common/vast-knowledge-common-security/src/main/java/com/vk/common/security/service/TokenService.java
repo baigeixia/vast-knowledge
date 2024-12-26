@@ -66,36 +66,38 @@ public class TokenService {
     }
 
     private Map<String, Object> createTokenForUser(Long userId, String username, Object loginUser, HttpServletResponse response) {
-        String token = IdUtils.fastUUID();
+        String key = IdUtils.fastUUID();
 
         // Set common token info
         if (loginUser instanceof LoginUser) {
-            ((LoginUser) loginUser).setToken(token);
+            ((LoginUser) loginUser).setToken(key);
             ((LoginUser) loginUser).setUserid(userId);
             ((LoginUser) loginUser).setUsername(username);
             ((LoginUser) loginUser).setIpaddr(IpUtils.getIpAddr());
         } else if (loginUser instanceof LoginApUser) {
-            ((LoginApUser) loginUser).setToken(token);
+            ((LoginApUser) loginUser).setToken(key);
             ((LoginApUser) loginUser).setUserid(userId);
             ((LoginApUser) loginUser).setIpaddr(IpUtils.getIpAddr());
         }
 
-        refreshTokenRedis(response, loginUser);
-
-        // Create JWT claims
-        Map<String, Object> claimsMap = new HashMap<>();
-        claimsMap.put(SecurityConstants.USER_KEY, token);
-        claimsMap.put(SecurityConstants.DETAILS_USER_ID, userId);
-        claimsMap.put(SecurityConstants.DETAILS_USERNAME, username);
-
-        // refreshToken(response, token);
+        refreshTokenRedis(loginUser);
+        refreshToken(response, key);
+        String token = createToken(key, userId, username);
 
         // Return the response map with token and expiration time
         Map<String, Object> rspMap = new HashMap<>();
-        rspMap.put("access_token", TokenUtils.createToken(claimsMap));
+        rspMap.put("access_token", token);
         // rspMap.put("refresh_token", TokenUtils.createRefreshToken(claimsMap));
         rspMap.put("expires_in", TokenConstants.REFRESH_TIME);
         return rspMap;
+    }
+
+    public String createToken(String key, Long userId, String username) {
+        Map<String, Object> claimsMap = new HashMap<>();
+        claimsMap.put(SecurityConstants.USER_KEY, key);
+        claimsMap.put(SecurityConstants.DETAILS_USER_ID, userId);
+        claimsMap.put(SecurityConstants.DETAILS_USERNAME, username);
+        return TokenUtils.createToken(claimsMap);
     }
 
 
@@ -149,15 +151,10 @@ public class TokenService {
      * @param user 登录信息
      */
     public <T> void refreshTokenRedis(T user) {
-        refreshTokenInRedis(user, null);
+        refreshTokenInRedis(user);
     }
 
-    public <T> void refreshTokenRedis(HttpServletResponse response, T user) {
-        refreshTokenInRedis(user, response);
-    }
-
-
-    private <T> void refreshTokenInRedis(T user, HttpServletResponse response) {
+    private <T> void refreshTokenInRedis(T user) {
         // 获取当前时间
         long currentTime = System.currentTimeMillis();
         // 设置登录时间和过期时间
@@ -167,24 +164,12 @@ public class TokenService {
             String key = loginUser.getToken();
             String userKey = getTokenKey(key);
             redisService.setCacheObject(userKey, loginUser, EXPIRE_TIME / MILLIS_MINUTE, TimeUnit.MINUTES);
-
-            if (response != null) {
-                refreshToken(response, key);
-            } else {
-                refreshTokenWeb(key);
-            }
-
         } else if (user instanceof LoginApUser loginApUser) {
             loginApUser.setLoginTime(currentTime);
             loginApUser.setExpireTime(currentTime + EXPIRE_TIME);
             String key = loginApUser.getToken();
             String userKey = getTokenKey(key);
             redisService.setCacheObject(userKey, loginApUser, EXPIRE_TIME / MILLIS_MINUTE, TimeUnit.MINUTES);
-            if (response != null) {
-                refreshToken(response, key);
-            } else {
-                refreshTokenWeb(key);
-            }
         }
     }
 
@@ -205,7 +190,7 @@ public class TokenService {
      */
     public LoginUser getLoginUser(HttpServletRequest request) {
         // 获取请求携带的令牌
-        String token = SecurityUtils.getToken(request);
+        String token = SecurityUtils.getRefreshToken(request);
         return getLoginUserInfo(token);
     }
 
@@ -245,13 +230,14 @@ public class TokenService {
      */
     public LoginApUser getLoginApUser(HttpServletRequest request) {
         // 获取请求携带的令牌
-        String token = SecurityUtils.getToken(request);
-        LoginApUser user= getLoginUserInfo(token);
-        if(ObjectUtils.isEmpty(user)){
-            String refreshToken = SecurityUtils.getRefreshToken(request);
-           return getLoginUserInfo(refreshToken);
-        }
-        return user;
+        // String token = SecurityUtils.getToken(request);
+        // LoginApUser user= getLoginUserInfo(token);
+        // if(ObjectUtils.isEmpty(user)){
+        //
+        // }
+        // return user;
+        String refreshToken = SecurityUtils.getRefreshToken(request);
+        return getLoginUserInfo(refreshToken);
     }
 
     /**
