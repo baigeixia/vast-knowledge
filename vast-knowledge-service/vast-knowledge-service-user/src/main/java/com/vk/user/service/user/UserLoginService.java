@@ -1,29 +1,36 @@
 package com.vk.user.service.user;
 
 
+import com.mybatisflex.core.row.Db;
 import com.vk.common.core.constant.CacheConstants;
+import com.vk.common.core.constant.UserBehaviourConstants;
 import com.vk.common.core.enums.ClientUserStatus;
+import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.exception.ServiceException;
 import com.vk.common.core.text.Convert;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.ip.IpUtils;
+import com.vk.common.core.utils.uuid.UUID;
 import com.vk.common.redis.service.RedisService;
 import com.vk.common.security.utils.SecurityUtils;
+import com.vk.user.domain.ApUser;
+import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.ClientApUser;
 import com.vk.user.domain.UserAndInfo;
+import com.vk.user.mapper.ApUserInfoMapper;
 import com.vk.user.mapper.ApUserMapper;
 import com.vk.user.model.LoginApUser;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.vk.common.core.constant.Constants.REGISTER;
-import static com.vk.common.core.constant.UserConstants.PASSWORD_LOGIN;
-
 @Component
+@Slf4j
 public class UserLoginService {
 
     @Autowired
@@ -31,45 +38,118 @@ public class UserLoginService {
 
     @Autowired
     private ApUserMapper apUserMapper;
+    @Autowired
+    private ApUserInfoMapper apUserInfoMapper;
 
-    public LoginApUser login(String email, String password, Integer codeOrPas) {
-
-        if (StringUtils.isAnyBlank(email, password)) {
-            throw new ServiceException("用户/密码 必须填写");
+    public LoginApUser login(String token, String email, String password, Integer codeOrPas) {
+        String redisToken = redisService.getCacheObject(getCacheTokenKey(token));
+        if (StringUtils.isNotEmpty(redisToken)) {
+            throw new ServiceException("重复提交");
         }
 
-
-
+        boolean isTokenSet = redisService.setIfAbsent(getCacheTokenKey(token), token, CacheConstants.PAGE_TOKEN_TIME, TimeUnit.SECONDS);
+        if (!isTokenSet) {
+            throw new ServiceException("重复提交");
+        }
         // IP黑名单校验
         String blackStr = Convert.toStr(redisService.getCacheObject(CacheConstants.SYS_LOGIN_BLACKIPLIST));
         if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr())) {
             throw new ServiceException("访问IP已被列入系统黑名单");
         }
-
-        // 查询用户信息
-        UserAndInfo byName = apUserMapper.getUserinfoByName(email);
-        if (StringUtils.isNull(byName)) {
-            throw new ServiceException("登录用户：" + email + " 不存在");
-        }
-
-        if (Objects.equals(ClientUserStatus.CLIENT_DISABLE.getCode(), byName.getStatus())) {
-            throw new ServiceException("对不起，您的账号：" + email + " 已停用");
-        }
-
-       validate(byName.getId(), byName.getPassword(), password,byName.getSalt());
-
         LoginApUser resultVo = new LoginApUser();
-        ClientApUser user = new ClientApUser();
-        BeanUtils.copyProperties(byName,user);
-        resultVo.setUsername(byName.getName());
-        resultVo.setClientApUser(user);
 
-        return resultVo;
+        if (UserBehaviourConstants.LOGIN.equals(codeOrPas)) {
+            // 查询用户信息
+            UserAndInfo byName = apUserMapper.getUserinfoByName(email);
+            // 登录
+            if (StringUtils.isNull(byName)) {
+                throw new ServiceException("登录用户：" + email + " 不存在");
+            }
+
+            if (Objects.equals(ClientUserStatus.CLIENT_DISABLE.getCode(), byName.getStatus())) {
+                throw new ServiceException("对不起，您的账号：" + email + " 已停用");
+            }
+
+            validate(byName.getId(), byName.getPassword(), password, byName.getSalt());
+
+            ClientApUser user = new ClientApUser();
+            BeanUtils.copyProperties(byName, user);
+            resultVo.setUsername(byName.getName());
+            resultVo.setClientApUser(user);
+
+
+            // redisAddUser(byName, resultVo);
+
+            return resultVo;
+        } else if (UserBehaviourConstants.REGISTER.equals(codeOrPas)) {
+            ApUser user = apUserMapper.getUser(email);
+
+            if (!StringUtils.isNull(user)) {
+                throw new ServiceException("用户：" + email + " 已存在");
+            }
+
+            createNewUser(email, password,resultVo);
+
+            // redisAddUser(newUser, resultVo);
+            return resultVo;
+        } else {
+            throw new LeadNewsException("错误请求");
+        }
+    }
+
+    private void createNewUser(String email, String password,LoginApUser resultVo) {
+        // UserAndInfo userAndInfo = new UserAndInfo();
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        ApUser user = new ApUser();
+        user.setEmail(email);
+        String salt = getSalt();
+        user.setSalt(salt);
+        user.setFlag(0);
+        user.setImage("https://test-1316786270.cos.ap-guangzhou.myqcloud.com/article/406b9f3bc8914a60a4369acc7e77e03a.jpg");
+        user.setCreatedTime(dateTime);
+        user.setIsCertification(0);
+        user.setIsIdentityAuthentication(0);
+        user.setIsIdentityAuthentication(0);
+        user.setStatus(0);
+        String encryptPassword = SecurityUtils.encryptPassword(password, salt);
+        user.setPassword(encryptPassword);
+
+        ApUserInfo info = new ApUserInfo();
+
+        Db.tx(() -> {
+            try {
+                apUserMapper.insert(user);
+                Long id = user.getId();
+                info.setUserId(id);
+                info.setName("MOMO");
+                info.setSex(2);
+                info.setUpdatedTime(dateTime);
+                apUserInfoMapper.insert(info);
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        });
+        try {
+            ClientApUser clientApUser = new ClientApUser();
+            BeanUtils.copyProperties(user,clientApUser);
+            resultVo.setUsername(info.getName());
+            resultVo.setClientApUser(clientApUser);
+            // BeanUtils.copyProperties(userAndInfo, user);
+            // BeanUtils.copyProperties(userAndInfo, info);
+        } catch (Exception e) {
+            log.error("复制用户失败");
+        }
     }
 
 
+    private String getSalt() {
+        return UUID.generateCustomUUID(10, false);
+    }
 
-    private  void validate(Long id,String oldPassword,String password,String salt){
+
+    private void validate(Long id, String oldPassword, String password, String salt) {
         Integer retryCount = redisService.getCacheObject(getCacheKey(id));
 
         if (retryCount == null) {
@@ -127,6 +207,10 @@ public class UserLoginService {
      */
     private String getCacheKey(Long id) {
         return CacheConstants.PWD_ERR_CNT_KEY + id;
+    }
+
+    private String getCacheTokenKey(String token) {
+        return CacheConstants.PAGE_TOKEN + token;
     }
 
 }

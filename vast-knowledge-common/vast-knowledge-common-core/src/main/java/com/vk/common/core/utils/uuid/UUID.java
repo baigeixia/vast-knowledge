@@ -109,6 +109,18 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
     }
 
     /**
+     * 指定获取uuid长度 --> 去掉分隔符
+     * @param length 长度
+     * @param isSecure  否使用{@link SecureRandom}如果是可以获得更安全的随机码，否则可以得到更好的性能
+     * @return uuid
+     */
+    public static String generateCustomUUID(int length, boolean isSecure) {
+        UUID uuid = randomUUID(isSecure);
+        String uuidStr = uuid.toString().replace("-", "");  // 去掉分隔符
+        return uuidStr.substring(0, Math.min(length, uuidStr.length()));  // 截断为所需长度
+    }
+
+    /**
      * 根据指定的字节数组获取类型 3（基于名称的）UUID 的静态工厂。
      *
      * @param name 用于构造 UUID 的字节数组。

@@ -134,9 +134,9 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private String getRefreshToken(ServerHttpRequest request) {
         MultiValueMap<String, HttpCookie> cookies = request.getCookies();
         // 检查是否包含 refresh_token
-        if (cookies.containsKey("refresh_token")) {
+        if (cookies.containsKey(TokenConstants.REFRESH_TOKEN)) {
             // 返回 refresh_token 的值
-            HttpCookie refreshTokenCookie = cookies.getFirst("refresh_token");
+            HttpCookie refreshTokenCookie = cookies.getFirst(TokenConstants.REFRESH_TOKEN);
             // 确保 refreshTokenCookie 不为 null
             if (refreshTokenCookie != null) {
                 return refreshTokenCookie.getValue();

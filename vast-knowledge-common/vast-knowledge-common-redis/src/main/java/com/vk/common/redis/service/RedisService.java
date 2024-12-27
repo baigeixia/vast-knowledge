@@ -2,10 +2,7 @@ package com.vk.common.redis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -22,6 +19,44 @@ public class RedisService
 {
     @Autowired
     public RedisTemplate redisTemplate;
+
+
+
+    /**
+     * 基于 Redis 实现令牌桶限流
+     * @param key 限流key
+     * @param maxTokens 最大令牌数
+     * @param refillTimeInSeconds 每秒生成速度
+     * @return 是否限流
+     */
+    public boolean tryAcquire(String key, int maxTokens, long refillTimeInSeconds) {
+        String currentTokens = getCacheObject(key);
+
+        if (currentTokens == null || Integer.parseInt(currentTokens) < maxTokens) {
+            // 如果没有令牌或令牌数小于最大值，则尝试增加令牌
+            redisTemplate.opsForValue().increment(key, 1);
+            redisTemplate.expire(key, refillTimeInSeconds, TimeUnit.SECONDS);
+            return true; // 可以继续执行
+        }
+
+        // 令牌已满，拒绝请求
+        return false;
+    }
+
+    /**
+     * key：要存储的键。
+     * value：键对应的值。
+     * timeout：键值对的过期时间。
+     * unit：时间单位（如 TimeUnit.SECONDS）
+     */
+    public boolean setIfAbsent(String key, String value, long timeout, TimeUnit unit) {
+        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+        // 使用 setIfAbsent 方法尝试设置键值对
+        Boolean result = valueOps.setIfAbsent(key, value, timeout, unit);
+        // 返回是否成功设置（只有当 key 不存在时，才会设置成功）
+        return Boolean.TRUE.equals(result);
+    }
+
 
     /**
      * 缓存基本的对象，Integer、String、实体类等

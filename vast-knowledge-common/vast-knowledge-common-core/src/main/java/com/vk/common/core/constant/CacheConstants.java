@@ -41,6 +41,14 @@ public class CacheConstants
      * 验证码 redis key
      */
     public static final String CAPTCHA_CODE_KEY = "captcha_codes:";
+    /**
+     * 页面唯一token
+     */
+    public static final String PAGE_TOKEN = "page_token:";
+    /**
+     * 缓存时间（秒）
+     */
+    public static final long PAGE_TOKEN_TIME = 1;
 
     /**
      * 参数管理 cache key

@@ -86,7 +86,7 @@ public class SecurityUtils
         for (Cookie cookie : cookies) {
             if (TokenConstants.REFRESH_TOKEN.equals(cookie.getName())) {
                 // 找到对应名称的 cookie，返回其值
-                return   replaceTokenPrefix(cookie.getValue());
+                return replaceTokenPrefix(cookie.getValue());
             }
         }
         return null;

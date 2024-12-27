@@ -29,8 +29,8 @@ public class GlobalCorsFilter implements WebFilter, Ordered {
      */
     private static final String ALLOWED_HEADERS =
         "X-Requested-With, Content-Language, Content-Type,content-type,Authorization, clientid, credential, X-XSRF-TOKEN, " +
-        "isToken,isToken, token, Admin-Token, App-Token, Encrypt-Key, isEncrypt," +
-                "user-authorization, admin-authorization,uuid-token,longin-code";
+        "isToken,isToken, token, Admin-Token, App-Token, Encrypt-Key, isEncrypt,from," +
+                "user-authorization, admin-authorization,uuid-token,longin-code,repeatsubmit";
 
     /**
      * 允许的请求方法
@@ -69,7 +69,7 @@ public class GlobalCorsFilter implements WebFilter, Ordered {
 
             String origin = request.getHeaders().getOrigin();
             // 允许的域名列表
-            List<String> allowedOrigins = List.of("http://localhost:8080", "http://localhost:8081");
+            List<String> allowedOrigins = List.of("http://localhost:8080", "http://localhost:8081","http://localhost:8082");
 
             // 如果 Origin 在允许的域名列表中，则设置 Access-Control-Allow-Origin
             if (origin != null && allowedOrigins.contains(origin)) {

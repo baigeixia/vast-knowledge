@@ -1,5 +1,8 @@
 package com.vk.common.core.constant;
 
+/**
+ * 用户行为常量
+ */
 public class UserBehaviourConstants {
     /**
      * 是否阅读  阅读
@@ -9,6 +12,14 @@ public class UserBehaviourConstants {
      * 是否阅读  未阅读
      */
     public static final Integer USER_READ_NO = 0;
+    /**
+     * 注册
+     */
+    public static final Integer REGISTER = 1;
+    /**
+     * 登录
+     */
+    public static final Integer LOGIN = 2;
 
 
     /**

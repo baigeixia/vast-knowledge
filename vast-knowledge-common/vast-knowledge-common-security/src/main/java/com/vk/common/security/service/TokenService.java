@@ -61,8 +61,8 @@ public class TokenService {
     /**
      * 创建LoginApUser令牌
      */
-    public Map<String, Object> createToken(LoginApUser loginUser, HttpServletResponse response) {
-        return createTokenForUser(loginUser.getClientApUser().getId(), loginUser.getUsername(), loginUser, response);
+    public Map<String, Object> createToken(LoginApUser loginApUser, HttpServletResponse response) {
+        return createTokenForUser(loginApUser.getClientApUser().getId(), loginApUser.getUsername(), loginApUser, response);
     }
 
     private Map<String, Object> createTokenForUser(Long userId, String username, Object loginUser, HttpServletResponse response) {
@@ -77,6 +77,7 @@ public class TokenService {
         } else if (loginUser instanceof LoginApUser) {
             ((LoginApUser) loginUser).setToken(key);
             ((LoginApUser) loginUser).setUserid(userId);
+            ((LoginApUser) loginUser).setUsername(username);
             ((LoginApUser) loginUser).setIpaddr(IpUtils.getIpAddr());
         }
 
@@ -126,7 +127,7 @@ public class TokenService {
      * @return
      */
     private void addRefreshToken(HttpServletResponse response, String refreshToken) {
-        Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
+        Cookie refreshTokenCookie = new Cookie(TokenConstants.REFRESH_TOKEN, refreshToken);
         refreshTokenCookie.setHttpOnly(true);  // Prevent client-side access to the cookie
         refreshTokenCookie.setSecure(true);    // Ensure it's only sent over HTTPS
         refreshTokenCookie.setAttribute("SameSite", "None");

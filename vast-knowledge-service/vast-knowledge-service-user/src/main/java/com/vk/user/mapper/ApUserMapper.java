@@ -34,4 +34,7 @@ public interface ApUserMapper extends BaseMapper<ApUser> {
 
     @Select("select  u.*,i.* from ap_user u inner join  ap_user_info i ON u.id=i.user_id where u.email=#{email} and u.status=0")
     UserAndInfo getUserinfoByName(@Param("email") String email);
+
+    @Select("select  * from ap_user where email=#{email} and status=0")
+    ApUser getUser(@Param("email") String email);
 }

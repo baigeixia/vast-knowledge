@@ -34,13 +34,13 @@ public class UserSecurityController {
     public AjaxResult login(@RequestBody UserLoginBody form, HttpServletResponse response)
     {
         // 用户登录
-        LoginApUser userInfo = userLoginService.login(form.getEmail(), form.getPassword(),form.getCodeOrPas());
+        LoginApUser userInfo = userLoginService.login(form.getToken(),form.getEmail(), form.getPassword(),form.getCodeOrPas());
         // 获取登录token
         return AjaxResult.success(tokenService.createToken(userInfo,response));
     }
 
     @DeleteMapping("logout")
-    public R<?> logout(HttpServletRequest request)
+    public R<?> logout(HttpServletRequest request,HttpServletResponse response)
     {
         String token = SecurityUtils.getRefreshToken(request);
         if (StringUtils.isNotEmpty(token))
@@ -51,6 +51,7 @@ public class UserSecurityController {
             }
             // 删除用户缓存记录
             AuthUtil.logoutByToken(token);
+            // AuthUtil.logoutRefreshToken(response);
         }
         return R.ok();
     }

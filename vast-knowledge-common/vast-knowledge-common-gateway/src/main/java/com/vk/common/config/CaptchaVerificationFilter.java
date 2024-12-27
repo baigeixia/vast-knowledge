@@ -5,27 +5,17 @@ import com.vk.common.core.exception.CaptchaException;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.filter.IgnoreWhiteProperties;
-import com.vk.common.handler.ValidateCodeHandler;
 import com.vk.common.service.ValidateCodeService;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.HandlerFunction;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilterChain;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -49,9 +39,7 @@ public class CaptchaVerificationFilter implements GlobalFilter, Ordered {
 
             if (StringUtils.isEmpty(code) && StringUtils.isEmpty(uuid)){
                 // return exchange.getResponse().setComplete();  // 停止请求链
-                response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                DataBuffer dataBuffer = response.bufferFactory().wrap(JSON.toJSONString(AjaxResult.error(422,"Code Verification Error")).getBytes());
-                return response.writeWith(Mono.just(dataBuffer));
+                return errorAjax(response);
             }
 
             try {
@@ -60,15 +48,18 @@ public class CaptchaVerificationFilter implements GlobalFilter, Ordered {
             } catch (CaptchaException e) {
                 // 如果验证码验证失败，返回错误响应
                 // response.setStatusCode(HttpStatus.BAD_REQUEST);
-                response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                DataBuffer dataBuffer = response.bufferFactory().wrap(JSON.toJSONString(AjaxResult.error(422,"Code Verification Error")).getBytes());
-                // return response.setComplete();  // 停止请求链
-                return response.writeWith(Mono.just(dataBuffer));
+                return errorAjax(response);
             }
         }
 
         // 验证通过，继续执行后续的处理
         return chain.filter(exchange);
+    }
+
+    private static Mono<Void> errorAjax(ServerHttpResponse response) {
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        DataBuffer dataBuffer = response.bufferFactory().wrap(JSON.toJSONString(AjaxResult.error(422,"验证码错误")).getBytes());
+        return response.writeWith(Mono.just(dataBuffer));
     }
 
     @Override
