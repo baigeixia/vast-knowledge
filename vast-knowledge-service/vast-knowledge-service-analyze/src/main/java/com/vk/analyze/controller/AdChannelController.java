@@ -203,7 +203,7 @@ public class AdChannelController  {
     @GetMapping("page")
     public AjaxResult page(
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
-            @RequestParam(name = "size" ,defaultValue = "5",required = false) Long size,
+            @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size,
             @RequestParam(name = "status" ,required = false) Integer status,
             @RequestParam(name = "name" ,required = false) String name
     ) {

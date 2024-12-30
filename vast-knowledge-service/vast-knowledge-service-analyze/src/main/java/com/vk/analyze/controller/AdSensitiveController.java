@@ -1,16 +1,24 @@
 package com.vk.analyze.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.analyze.domain.AdSensitive;
+import com.vk.analyze.domain.table.AdSensitiveTableDef;
 import com.vk.analyze.service.AdSensitiveService;
+import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.controller.BaseController;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.core.web.page.TableDataInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.vk.analyze.domain.table.AdSensitiveTableDef.AD_SENSITIVE;
 
 /**
  * 敏感词信息 控制层。
@@ -19,7 +27,7 @@ import java.util.List;
  * @since 2024-05-13
  */
 @RestController
-@RequestMapping("/Sensitive")
+@RequestMapping("/sensitive")
 public class AdSensitiveController   {
 
     @Autowired
@@ -32,8 +40,18 @@ public class AdSensitiveController   {
      * @return {@code true} 添加成功，{@code false} 添加失败
      */
     @PostMapping("save")
-    public boolean save(@RequestBody AdSensitive adSensitive) {
-        return adSensitiveService.save(adSensitive);
+    public AjaxResult save(@RequestBody AdSensitive adSensitive) {
+        String sensitives = adSensitive.getSensitives();
+        if (StringUtils.isEmpty(sensitives)){
+            throw new LeadNewsException("敏感词不能为空");
+        }
+
+        AdSensitive addSensitive = new AdSensitive();
+        addSensitive.setSensitives(adSensitive.getSensitives());
+        addSensitive.setCreatedTime(LocalDateTime.now());
+
+        adSensitiveService.save(addSensitive);
+        return AjaxResult.success();
     }
 
     /**
@@ -43,19 +61,38 @@ public class AdSensitiveController   {
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @DeleteMapping("remove/{id}")
-    public boolean remove(@PathVariable Serializable id) {
-        return adSensitiveService.removeById(id);
+    public AjaxResult remove(
+            @PathVariable(name = "id") Serializable id
+    ) {
+        AdSensitive byId = adSensitiveService.getById(id);
+        if (ObjectUtils.isEmpty(byId)){
+            throw new LeadNewsException("敏感词不存在,已经被移除");
+        }
+        return AjaxResult.success(adSensitiveService.removeById(id)) ;
     }
 
     /**
      * 根据主键更新敏感词信息。
      *
-     * @param adSensitive 敏感词信息
      * @return {@code true} 更新成功，{@code false} 更新失败
      */
     @PutMapping("update")
-    public boolean update(@RequestBody AdSensitive adSensitive) {
-        return adSensitiveService.updateById(adSensitive);
+    public AjaxResult update(
+            @RequestParam(name = "id") Long id,
+            @RequestParam(name = "name") String name
+    ) {
+        if (StringUtils.isEmpty(name)){
+            throw new LeadNewsException("敏感词修改不能为空");
+        }
+        AdSensitive byId = adSensitiveService.getById(id);
+        if (ObjectUtils.isEmpty(byId)){
+            throw new LeadNewsException("敏感词不存在,已经被移除");
+        }
+        AdSensitive adSensitive = new AdSensitive();
+        adSensitive.setId(id);
+        adSensitive.setSensitives(name);
+        adSensitiveService.updateById(adSensitive);
+        return AjaxResult.success();
     }
 
     /**
@@ -64,31 +101,15 @@ public class AdSensitiveController   {
      * @return 所有数据
      */
     @PostMapping("list")
-    public AjaxResult getlist(@RequestBody AdSensitive adSensitive) {
-        List<AdSensitive> list= adSensitiveService.getlist(adSensitive);
-        return AjaxResult.success(list);
+    public AjaxResult getlist(
+            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
+            @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size,
+            @RequestParam(name = "name" ,required = false) String name
+    ) {
+        Page<AdSensitive> paged = adSensitiveService.page(Page.of(page, size),
+                QueryWrapper.create().where(AD_SENSITIVE.SENSITIVES.like(name, StringUtils.isNotEmpty(name))).orderBy(AD_SENSITIVE.CREATED_TIME,false));
+        return AjaxResult.success(paged);
     }
 
-    /**
-     * 根据敏感词信息主键获取详细信息。
-     *
-     * @param id 敏感词信息主键
-     * @return 敏感词信息详情
-     */
-    @GetMapping("getInfo/{id}")
-    public AdSensitive getInfo(@PathVariable Serializable id) {
-        return adSensitiveService.getById(id);
-    }
-
-    /**
-     * 分页查询敏感词信息。
-     *
-     * @param page 分页对象
-     * @return 分页对象
-     */
-    @GetMapping("page")
-    public Page<AdSensitive> page(Page<AdSensitive> page) {
-        return adSensitiveService.page(page);
-    }
 
 }
