@@ -6,6 +6,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.mapper.AdChannelMapper;
 import com.vk.analyze.service.AdChannelService;
+import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.redis.constants.BusinessConstants;
@@ -13,6 +14,9 @@ import com.vk.common.redis.service.RedisService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
+import java.io.Serializable;
 
 import static com.vk.analyze.domain.table.AdChannelTableDef.AD_CHANNEL;
 import static com.vk.common.core.constant.DatabaseConstants.DB_ROW_STATUS_YES;
@@ -47,6 +51,15 @@ public class AdChannelServiceImpl extends ServiceImpl<AdChannelMapper, AdChannel
                 );
     }
 
+    @Override
+    public void removeByIdone(Serializable id) {
+        AdChannel adChannel = mapper.selectOneById(id);
+        if (ObjectUtils.isEmpty(adChannel)){
+            throw new LeadNewsException("频道不存在 可能已被移除");
+        }
+
+        mapper.deleteById(id);
+    }
 
 
     @Override

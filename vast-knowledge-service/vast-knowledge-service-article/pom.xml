@@ -66,6 +66,7 @@
         </dependency>
 
 
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -76,6 +77,7 @@
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-swagger</artifactId>
         </dependency>
+
 
         <dependency>
             <groupId>com.vk</groupId>
@@ -95,6 +97,11 @@
         <dependency>
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-security</artifactId>
         </dependency>
 
 

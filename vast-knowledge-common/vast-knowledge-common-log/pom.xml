@@ -13,6 +13,7 @@
 
 
     <dependencies>
+
         <dependency>
             <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-common-security</artifactId>

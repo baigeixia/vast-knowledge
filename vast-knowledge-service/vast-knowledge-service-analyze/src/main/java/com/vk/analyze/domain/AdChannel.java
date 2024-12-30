@@ -4,6 +4,7 @@ import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import com.mybatisflex.core.keygen.KeyGenerators;
 import com.vk.common.core.web.domain.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +27,7 @@ import java.time.LocalDateTime;
 @Table(value = "ad_channel")
 public class AdChannel implements Serializable {
 
-    @Id(keyType = KeyType.Auto)
+    @Id(keyType= KeyType.Auto)
     private Long id;
 
     /**
@@ -45,7 +46,6 @@ public class AdChannel implements Serializable {
     private Integer isDefault;
 
 
-    @Column(isLogicDelete = true)
     private Integer status;
 
     /**
@@ -57,5 +57,8 @@ public class AdChannel implements Serializable {
      * 创建时间
      */
     private LocalDateTime createdTime;
+
+    @Column(isLogicDelete = true)
+    private Integer del;
 
 }
