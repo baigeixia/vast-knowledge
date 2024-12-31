@@ -5,11 +5,9 @@ import com.mybatisflex.core.service.IService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
-import com.vk.article.domain.vo.ArticleDataListVo;
-import com.vk.article.domain.vo.ArticleDataVo;
-import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.vo.ArticleListVo;
+import com.vk.article.domain.vo.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -58,4 +56,6 @@ public interface ApArticleService extends IService<ApArticle> {
     ArticleDataListVo getArticleInfoData(Long page, Long size);
 
     void pushArticle(Long id);
+
+    Page<NewsPushVo> newsPush(String title, LocalDate beginDate, LocalDate endDate, Integer status, Integer pageNum, Integer pageSize);
 }

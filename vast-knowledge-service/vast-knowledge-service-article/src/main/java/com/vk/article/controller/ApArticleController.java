@@ -4,10 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
-import com.vk.article.domain.vo.ArticleDataListVo;
-import com.vk.article.domain.vo.ArticleDataVo;
-import com.vk.article.domain.vo.ArticleInfoVo;
-import com.vk.article.domain.vo.ArticleListVo;
+import com.vk.article.domain.vo.*;
 import com.vk.article.service.ApArticleService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.web.domain.AjaxResult;
@@ -16,13 +13,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * 已发布的文章信息 控制层。
+ * 文章信息 控制层。
  *
  * @author 张三
  * @since 2024-07-11
@@ -207,5 +205,20 @@ public class ApArticleController {
         apArticleService.pushArticle(id);
         return AjaxResult.success();
     }
+
+    @GetMapping("/newsPush")
+    public AjaxResult newsPush(
+            @RequestParam(name = "title",required = false) String title,
+            @RequestParam(name = "beginDate",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate beginDate,
+            @RequestParam(name = "endDate",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam(name = "status",required = false) Integer status,
+            @RequestParam(name = "pageNum",required = false,defaultValue = "1") Integer pageNum,
+            @RequestParam(name = "pageSize",required = false,defaultValue = "10") Integer pageSize
+    ){
+       Page<NewsPushVo> voPage= apArticleService.newsPush(title,beginDate,endDate,status,pageNum,pageSize);
+        return AjaxResult.success(voPage);
+    }
+
+
 
 }

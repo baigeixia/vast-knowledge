@@ -8,6 +8,7 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
+import com.vk.article.domain.table.ApArticleTableDef;
 import com.vk.article.domain.vo.*;
 import com.vk.common.core.utils.DateUtils;
 import com.vk.common.es.domain.ArticleInfoDocument;
@@ -38,6 +39,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -528,6 +530,25 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             });
 
         }
+    }
+
+    @Override
+    public Page<NewsPushVo> newsPush(String title, LocalDate beginDate, LocalDate endDate, Integer status, Integer pageNum, Integer pageSize) {
+
+        if (status != null && Stream.of(2,3,8,9).noneMatch(Predicate.isEqual(status))) {
+            throw new LeadNewsException("类型错误");
+        }
+
+        QueryWrapper wrapper = QueryWrapper.create();
+        wrapper.select(AP_ARTICLE.DEFAULT_COLUMNS,AP_ARTICLE_CONFIG.IS_DOWN,AP_ARTICLE_CONFIG.IS_DELETE).from(AP_ARTICLE).innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID))
+                .where(AP_ARTICLE.TITLE.like(title,StringUtils.isNotEmpty(title)))
+                .and(AP_ARTICLE.STATUS.eq(status,status!=null))
+                .and(AP_ARTICLE.STATUS.ne(1))//不需要草稿显示
+                // .and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0)))
+                .and(AP_ARTICLE.UPDATE_TIME.between(beginDate, endDate, !ObjectUtils.isEmpty(beginDate) && !ObjectUtils.isEmpty(endDate)))
+                .orderBy(AP_ARTICLE.UPDATE_TIME,false);
+
+        return mapper.paginateAs(Page.of(pageNum, pageSize), wrapper, NewsPushVo.class);
     }
 
 
