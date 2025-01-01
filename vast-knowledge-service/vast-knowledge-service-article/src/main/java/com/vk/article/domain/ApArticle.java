@@ -135,7 +135,7 @@ public class ApArticle implements Serializable {
     private Boolean syncStatus;
 
     /**
-     * 来源
+     * 当前状态 1:草稿 2:提交（待审核） 3:审核失败 8:审核通过  9:已发布
      */
     private Integer status;
 
