@@ -4,7 +4,6 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 敏感词过滤
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SensitiveWord {
     private static final Logger log = LoggerFactory.getLogger(SensitiveWord.class);
 
-    private final Set<String> sensitiveWordSet = new HashSet<>();
+    private final Set<String> sensitiveWordSet = new CopyOnWriteArraySet<>();
     private final Map<String, AtomicInteger> sensitiveWordCountMap = new ConcurrentHashMap<>();
     private final TrieNode root = new TrieNode();
 
@@ -34,7 +35,7 @@ public class SensitiveWord {
     }
 
     // 使用虚拟线程异步加载敏感词
-    private void loadSensitiveWordsAsync() {
+    public void loadSensitiveWordsAsync() {
         // 创建虚拟线程池
         ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -44,22 +45,41 @@ public class SensitiveWord {
                 loadWordsFromFile();
                 buildTrie();
             } catch (IOException e) {
-                log.error("初始化敏感词失败：{}",e.getMessage());
+                log.error("初始化敏感词失败：{}", e.getMessage());
                 // e.printStackTrace();
 
             }
+            log.info("初始化敏感词完成");
         });
 
         executor.shutdown();  // 关闭线程池
     }
-    public void addSensitive(Set<String> addSensitive){
-        if (ObjectUtils.isEmpty(sensitiveWordSet)){
-            log.error("敏感词未初始化");
-            return;
-        }
-        if (!ObjectUtils.isEmpty(addSensitive)){
-            sensitiveWordSet.addAll(addSensitive);
-        }
+
+    public void addSensitive(Set<String> addSensitive) {
+
+            if (sensitiveWordSet.isEmpty()) {
+                log.error("敏感词未初始化");
+                return;
+            }
+            if (addSensitive != null && !addSensitive.isEmpty()) {
+                sensitiveWordSet.addAll(addSensitive);
+            }
+            log.info("数据库敏感词添加部分完成");
+
+
+    }
+
+    public void removeSensitive(Set<String> addSensitive) {
+            if (sensitiveWordSet.isEmpty()) {
+                log.error("敏感词未初始化");
+                return;
+            }
+            if (addSensitive != null && !addSensitive.isEmpty()) {
+                sensitiveWordSet.removeAll(addSensitive);
+            }
+            log.info("数据库敏感词排除部分完成");
+
+
     }
 
     // 从文件加载敏感词

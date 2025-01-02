@@ -6,6 +6,7 @@ import com.vk.analyze.domain.AdSensitive;
 import com.vk.analyze.domain.table.AdSensitiveTableDef;
 import com.vk.analyze.service.AdSensitiveService;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.SensitiveWord;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.controller.BaseController;
 import com.vk.common.core.web.domain.AjaxResult;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static com.vk.analyze.domain.table.AdSensitiveTableDef.AD_SENSITIVE;
 
@@ -33,6 +35,9 @@ public class AdSensitiveController   {
     @Autowired
     private AdSensitiveService adSensitiveService;
 
+    @Autowired
+    private SensitiveWord sensitiveWord;
+
     /**
      * 添加敏感词信息。
      *
@@ -45,13 +50,15 @@ public class AdSensitiveController   {
         if (StringUtils.isEmpty(sensitives)){
             throw new LeadNewsException("敏感词不能为空");
         }
-
         AdSensitive addSensitive = new AdSensitive();
-        addSensitive.setSensitives(adSensitive.getSensitives());
+        addSensitive.setSensitives(sensitives);
         addSensitive.setType(adSensitive.getType());
         addSensitive.setCreatedTime(LocalDateTime.now());
 
-        adSensitiveService.save(addSensitive);
+        boolean save = adSensitiveService.save(addSensitive);
+        if (save){
+            sensitiveWord.addSensitive(Set.of(sensitives));
+        }
         return AjaxResult.success();
     }
 
@@ -66,10 +73,15 @@ public class AdSensitiveController   {
             @PathVariable(name = "id") Serializable id
     ) {
         AdSensitive byId = adSensitiveService.getById(id);
+        String sensitives = byId.getSensitives();
         if (ObjectUtils.isEmpty(byId)){
             throw new LeadNewsException("敏感词不存在,已经被移除");
         }
-        return AjaxResult.success(adSensitiveService.removeById(id)) ;
+        boolean removeById = adSensitiveService.removeById(id);
+        if (removeById){
+            sensitiveWord.removeSensitive(Set.of(sensitives));
+        }
+        return AjaxResult.success() ;
     }
 
     /**
@@ -90,11 +102,23 @@ public class AdSensitiveController   {
         if (ObjectUtils.isEmpty(byId)){
             throw new LeadNewsException("敏感词不存在,已经被移除");
         }
+        Boolean idType = byId.getType();
+        if (idType.equals(type)){
+            throw new LeadNewsException("敏感词已经是："+(type?"不匹配":"匹配"));
+        }
         AdSensitive adSensitive = new AdSensitive();
         adSensitive.setId(id);
         adSensitive.setSensitives(name);
         adSensitive.setType(type);
-        adSensitiveService.updateById(adSensitive);
+        boolean updateById = adSensitiveService.updateById(adSensitive);
+
+        if (updateById){
+            if (type){
+                sensitiveWord.removeSensitive(Set.of(name));
+            }else {
+                sensitiveWord.addSensitive(Set.of(name));
+            }
+        }
         return AjaxResult.success();
     }
 
