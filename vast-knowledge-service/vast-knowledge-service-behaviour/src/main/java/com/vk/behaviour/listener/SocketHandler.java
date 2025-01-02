@@ -19,6 +19,7 @@ import com.vk.behaviour.domain.dto.FanMsgDto;
 import com.vk.behaviour.domain.vo.AckDataMsg;
 import com.vk.behaviour.mapper.*;
 import com.vk.behaviour.notifications.PushNotificationsHandler;
+import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
@@ -41,6 +42,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static com.vk.behaviour.common.BeCommonConstants.BASE_LiKE;
 import static com.vk.behaviour.common.BeCommonConstants.BASE_LiKE_NO;
@@ -106,7 +108,7 @@ public class SocketHandler {
             Long userId = clientGetUserId(socketIOClient);
             if (!StringUtils.isLongEmpty(userId)) {
                 String userIdKey = SocketConstants.getRedisUserIdKey(userId);
-                redisService.setCacheObject(userIdKey, sessionId);
+                redisService.setCacheObject(userIdKey, sessionId, CacheConstants.SOCKET_ONLINE, TimeUnit.MINUTES);
             } else {
                 log.error("错误的用户： {}", sessionId);
             }

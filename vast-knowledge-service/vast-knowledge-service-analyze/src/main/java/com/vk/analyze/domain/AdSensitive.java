@@ -36,6 +36,8 @@ public class AdSensitive implements Serializable {
      */
     private String sensitives;
 
+    private Boolean type;
+
     /**
      * 创建时间
      */

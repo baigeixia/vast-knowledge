@@ -48,6 +48,7 @@ public class AdSensitiveController   {
 
         AdSensitive addSensitive = new AdSensitive();
         addSensitive.setSensitives(adSensitive.getSensitives());
+        addSensitive.setType(adSensitive.getType());
         addSensitive.setCreatedTime(LocalDateTime.now());
 
         adSensitiveService.save(addSensitive);
@@ -79,7 +80,8 @@ public class AdSensitiveController   {
     @PutMapping("update")
     public AjaxResult update(
             @RequestParam(name = "id") Long id,
-            @RequestParam(name = "name") String name
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "type") Boolean type
     ) {
         if (StringUtils.isEmpty(name)){
             throw new LeadNewsException("敏感词修改不能为空");
@@ -91,6 +93,7 @@ public class AdSensitiveController   {
         AdSensitive adSensitive = new AdSensitive();
         adSensitive.setId(id);
         adSensitive.setSensitives(name);
+        adSensitive.setType(type);
         adSensitiveService.updateById(adSensitive);
         return AjaxResult.success();
     }
@@ -101,13 +104,14 @@ public class AdSensitiveController   {
      * @return 所有数据
      */
     @PostMapping("list")
-    public AjaxResult getlist(
+    public AjaxResult getList(
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
             @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size,
             @RequestParam(name = "name" ,required = false) String name
     ) {
         Page<AdSensitive> paged = adSensitiveService.page(Page.of(page, size),
-                QueryWrapper.create().where(AD_SENSITIVE.SENSITIVES.like(name, StringUtils.isNotEmpty(name))).orderBy(AD_SENSITIVE.CREATED_TIME,false));
+                QueryWrapper.create().where(AD_SENSITIVE.SENSITIVES.like(name, StringUtils.isNotEmpty(name)))
+                        .orderBy(AD_SENSITIVE.CREATED_TIME,false));
         return AjaxResult.success(paged);
     }
 

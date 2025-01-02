@@ -69,7 +69,7 @@ public class ApUser implements Serializable {
     /**
      * 0:正常 1:锁定
      */
-    private Integer status;
+    private Boolean status;
 
     /**
      * 0:普通用户 1:自媒体人 2:大V

@@ -4,6 +4,7 @@ package com.vk.behaviour.notifications;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.vk.behaviour.common.utils.ws.SocketConstants;
+import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.mq.domain.NewUserMsg;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static com.vk.common.mq.common.MqConstants.SocketType.*;
 
@@ -134,7 +136,11 @@ public class PushNotificationsHandler {
         if (StringUtils.isEmpty(clientId)){
             log.error("uuid ： {} => 发送消息 clientId 为空 type： {}", uuid, type);
             return null;
+        }else {
+            //刷新时间
+            redisService.setCacheObject(userIdKey, clientId, CacheConstants.SOCKET_ONLINE, TimeUnit.MINUTES);
         }
+
         return clientId;
     }
 

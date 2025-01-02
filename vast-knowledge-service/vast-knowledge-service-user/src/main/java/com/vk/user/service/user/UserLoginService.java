@@ -111,7 +111,7 @@ public class UserLoginService {
         user.setIsCertification(0);
         user.setIsIdentityAuthentication(0);
         user.setIsIdentityAuthentication(0);
-        user.setStatus(0);
+        user.setStatus(false);
         String encryptPassword = SecurityUtils.encryptPassword(password, salt);
         user.setPassword(encryptPassword);
 

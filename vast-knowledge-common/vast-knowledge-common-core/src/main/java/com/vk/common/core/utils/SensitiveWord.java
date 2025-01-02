@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,11 +14,14 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 敏感词过滤
+ */
 @Component
 public class SensitiveWord {
     private static final Logger log = LoggerFactory.getLogger(SensitiveWord.class);
 
-    private final List<String> sensitiveWordList = new ArrayList<>();
+    private final Set<String> sensitiveWordSet = new HashSet<>();
     private final Map<String, AtomicInteger> sensitiveWordCountMap = new ConcurrentHashMap<>();
     private final TrieNode root = new TrieNode();
 
@@ -30,7 +34,7 @@ public class SensitiveWord {
     }
 
     // 使用虚拟线程异步加载敏感词
-    public void loadSensitiveWordsAsync() {
+    private void loadSensitiveWordsAsync() {
         // 创建虚拟线程池
         ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -48,6 +52,15 @@ public class SensitiveWord {
 
         executor.shutdown();  // 关闭线程池
     }
+    public void addSensitive(Set<String> addSensitive){
+        if (ObjectUtils.isEmpty(sensitiveWordSet)){
+            log.error("敏感词未初始化");
+            return;
+        }
+        if (!ObjectUtils.isEmpty(addSensitive)){
+            sensitiveWordSet.addAll(addSensitive);
+        }
+    }
 
     // 从文件加载敏感词
     private void loadWordsFromFile() throws IOException {
@@ -57,14 +70,14 @@ public class SensitiveWord {
 
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                sensitiveWordList.add(line);
+                sensitiveWordSet.add(line);
             }
         }
     }
 
     // 构建 Trie 树
     private void buildTrie() {
-        for (String word : sensitiveWordList) {
+        for (String word : sensitiveWordSet) {
             TrieNode node = root;
             for (char c : word.toCharArray()) {
                 node = node.children.computeIfAbsent(c, k -> new TrieNode());

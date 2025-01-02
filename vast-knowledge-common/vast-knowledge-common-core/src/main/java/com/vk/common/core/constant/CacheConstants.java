@@ -18,6 +18,11 @@ public class CacheConstants
     public final static long REFRESH_TIME = 120;
 
     /**
+     * 缓存刷新时间，默认120（分钟）
+     */
+    public final static long SOCKET_ONLINE = 30;
+
+    /**
      * 密码最大错误次数
      */
     public final static int PASSWORD_MAX_RETRY_COUNT = 5;
