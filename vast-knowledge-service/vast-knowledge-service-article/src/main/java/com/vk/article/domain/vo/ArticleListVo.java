@@ -30,4 +30,24 @@ public class ArticleListVo {
 
     private Integer status;
 
+    /**
+     * 是否可评论
+     */
+    private Boolean isComment;
+
+    /**
+     * 是否转发
+     */
+    private Boolean isForward;
+
+    /**
+     * 是否下架
+     */
+    private Boolean isDown;
+
+    /**
+     * 是否已删除
+     */
+    private Boolean isDelete;
+
 }

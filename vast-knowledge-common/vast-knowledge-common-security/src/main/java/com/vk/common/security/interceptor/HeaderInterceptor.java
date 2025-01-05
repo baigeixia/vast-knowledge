@@ -5,16 +5,12 @@ import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.model.LoginUser;
-import com.vk.user.model.LoginApUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -24,55 +20,33 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
  *
  * @author vk
  */
-public class HeaderInterceptor implements AsyncHandlerInterceptor
-{
+public class HeaderInterceptor implements AsyncHandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-    {
-        if (!(handler instanceof HandlerMethod))
-        {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (!(handler instanceof HandlerMethod)) {
             return true;
         }
         SecurityContextHolder.setUserId(ServletUtils.getHeader(request, SecurityConstants.DETAILS_USER_ID));
         SecurityContextHolder.setUserName(ServletUtils.getHeader(request, SecurityConstants.DETAILS_USERNAME));
         SecurityContextHolder.setUserKey(ServletUtils.getHeader(request, SecurityConstants.USER_KEY));
-        SecurityContextHolder.set(SecurityConstants.ADMIN_OPEN, Boolean.parseBoolean(ServletUtils.getHeader(request, SecurityConstants.ADMIN_OPEN)));
+        SecurityContextHolder.setUserType(ServletUtils.getHeader(request, SecurityConstants.USER_TYPE));
 
         String token = SecurityUtils.getToken();
         if (StringUtils.isNotEmpty(token))
         {
-            if (SecurityUtils.verificationAdmin(request)){
-                LoginUser loginApUser = AuthUtil.getLoginUser(token);
-                contextSet(loginApUser);
-            }else {
-                LoginApUser loginApUser = AuthUtil.getLoginApUser(token);
-                contextSet(loginApUser);
+            LoginUser<Object> loginUser = AuthUtil.getLoginUser(token);
+            if (!ObjectUtils.isEmpty(loginUser)) {
+                SecurityContextHolder.set(SecurityConstants.LOGIN_USER, loginUser);
             }
         }
         return true;
     }
 
-    private void contextSet(LoginUser userinfo){
-        if (!ObjectUtils.isEmpty(userinfo))
-        {
-            AuthUtil.verifyLoginUserExpire(userinfo);
-            SecurityContextHolder.set(SecurityConstants.LOGIN_ADMIN,userinfo);
-        }
-    }
-
-    private void contextSet(LoginApUser userinfo){
-        if (!ObjectUtils.isEmpty(userinfo))
-        {
-            AuthUtil.verifyLoginUserExpire(userinfo);
-           SecurityContextHolder.set(SecurityConstants.LOGIN_USER, userinfo);
-        }
-    }
 
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-            throws Exception
-    {
+            throws Exception {
         SecurityContextHolder.remove();
     }
 }

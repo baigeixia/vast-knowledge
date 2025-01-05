@@ -1,6 +1,7 @@
 package com.vk.common.core.utils;
 
 
+import com.vk.common.core.annotation.Excel;
 import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.constant.TokenConstants;
 import com.vk.common.core.text.Convert;
@@ -168,6 +169,19 @@ public class TokenUtils {
         Claims claims = parseToken(token);
         return getValue(claims, SecurityConstants.DETAILS_USERNAME);
     }
+
+    /**
+     * 根据身份信息获取身份类型
+     *
+     * @param token token
+     * @return 用户名
+     */
+    public static String getUserType(String token)
+    {
+        Claims claims = parseToken(token);
+        return getValue(claims, SecurityConstants.USER_TYPE);
+    }
+
     /**
      * 根据令牌获取用户标识
      *
@@ -179,6 +193,13 @@ public class TokenUtils {
         Claims claims = parseToken(token);
         return getValue(claims, SecurityConstants.USER_KEY);
     }
+
+    public static String getRefreshUserKey(String token, String type)
+    {
+        Claims claims = parseToken(token);
+        return getValue(claims, type);
+    }
+
 
     /**
      * 根据身份信息获取键值

@@ -1,14 +1,9 @@
 package com.vk.common.security.auth;
 
 
-import com.vk.common.core.constant.TokenConstants;
 import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.annotation.RequiresRoles;
 import com.vk.system.model.LoginUser;
-import com.vk.user.model.LoginApUser;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Token 权限验证工具类
@@ -54,14 +49,9 @@ public class AuthUtil
      * @param token 指定token
      * @return 用户信息
      */
-    public static LoginUser getLoginUser(String token)
+    public static <T> LoginUser<T> getLoginUser(String token)
     {
         return authLogic.getLoginUser(token);
-    }
-
-    public static LoginApUser getLoginApUser(String token)
-    {
-        return authLogic.getLoginApUser(token);
     }
 
     /**
@@ -69,14 +59,9 @@ public class AuthUtil
      * 
      * @param loginUser 用户信息
      */
-    public static void verifyLoginUserExpire(LoginUser loginUser)
+    public static  <T> void verifyLoginUserExpire(LoginUser<T> loginUser)
     {
         authLogic.verifyLoginUserExpire(loginUser);
-    }
-
-    public static void verifyLoginUserExpire(LoginApUser loginApUser)
-    {
-        authLogic.verifyLoginUserExpire(loginApUser);
     }
 
     /**
@@ -182,14 +167,5 @@ public class AuthUtil
     }
 
 
-    public static void logoutRefreshToken(HttpServletResponse response) {
-        Cookie cookie = new Cookie(TokenConstants.REFRESH_TOKEN, null);
-        cookie.setPath("/");  // 设置为你应用的根路径，确保在所有路径下都可以删除
-        cookie.setMaxAge(0);  // 设置过期时间为 0，表示删除此 Cookie
-        cookie.setSecure(true);  // 根据需要设置 secure 属性，确保在 HTTPS 下传输
-        cookie.setHttpOnly(true);  // 如果需要设置 HttpOnly，防止 JavaScript 访问该 Cookie
-        cookie.setAttribute("SameSite", "None");
 
-        response.addCookie(cookie);  // 添加这个 Cookie 到响应中
-    }
 }

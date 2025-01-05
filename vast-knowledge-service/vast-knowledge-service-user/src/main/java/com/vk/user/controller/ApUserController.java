@@ -6,16 +6,14 @@ import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.domain.AjaxResult;
-import com.vk.common.security.annotation.InnerAuth;
+import com.vk.common.log.annotation.Log;
+import com.vk.common.log.enums.BusinessType;
+import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.AuthorInfo;
-import com.vk.user.domain.ClientApUser;
-import com.vk.user.domain.UserAndInfo;
 import com.vk.user.domain.vo.UserListVo;
 import com.vk.user.mapper.ApUserMapper;
-import com.vk.user.model.LoginApUser;
 import com.vk.user.service.ApUserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -39,27 +37,6 @@ public class ApUserController {
     private ApUserService apUserService;
     @Autowired
     private ApUserMapper apUserMapper;
-
-
-    @InnerAuth
-    @GetMapping("/info/{username}")
-    public R<LoginApUser> info(@PathVariable(name = "username") String username) {
-        // ApUser apUser = apUserService.getOne(QueryWrapper.create().where(AP_USER.NAME.eq(username)));
-        UserAndInfo userInfoVo = apUserMapper.getUserinfoByName(username);
-        if (StringUtils.isNull(userInfoVo)) {
-            return R.fail("用户名或密码错误");
-        }
-        // 角色集合
-        // Set<String> roles = permissionService.getRolePermission(sysUser);
-        // 权限集合
-        // Set<String> permissions = permissionService.getMenuPermission(sysUser);
-        LoginApUser resultVo = new LoginApUser();
-        ClientApUser user = new ClientApUser();
-        BeanUtils.copyProperties(userInfoVo, user);
-        resultVo.setUsername(userInfoVo.getName());
-        resultVo.setClientApUser(user);
-        return R.ok(resultVo);
-    }
 
 
     @PostMapping("/getUserList")
@@ -94,6 +71,8 @@ public class ApUserController {
      * @return
      */
     @DeleteMapping("/userBan")
+    @RequiresPermissions("system:user:ban")
+    @Log(title = "封禁或解封", businessType = BusinessType.UPDATE)
     public AjaxResult userBan(
             @RequestParam(name = "id") Long id,
             @RequestParam(name = "type") Boolean type

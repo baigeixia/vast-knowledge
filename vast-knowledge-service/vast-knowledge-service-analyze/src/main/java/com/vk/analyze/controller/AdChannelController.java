@@ -47,7 +47,6 @@ public class AdChannelController  {
     private RedisService redisService;
 
     @GetMapping("getOneInfo/{channelId}")
-    @RequiresPermissions("admin:channel:list")
     public R<AdChannel> getOneInfo(@PathVariable(name = "channelId") Long channelId) {
         AdChannel adChannel = redisService.getCacheObject(BusinessConstants.loadingChannel(channelId));
         if (ObjectUtils.isEmpty(adChannel)){
@@ -64,7 +63,7 @@ public class AdChannelController  {
      * @return {@code true} 添加成功，{@code false} 添加失败
      */
     @PostMapping("save")
-    @Log(title = "操作日志", businessType = BusinessType.INSERT)
+    @Log(title = "添加频道", businessType = BusinessType.INSERT)
     @RequiresPermissions("system:channel:add")
     public AjaxResult save(@RequestBody AdChannel adChannel) {
         String name = adChannel.getName();
@@ -98,7 +97,7 @@ public class AdChannelController  {
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @DeleteMapping("remove/{id}")
-    @Log(title = "操作日志", businessType = BusinessType.DELETE)
+    @Log(title = "删除频道", businessType = BusinessType.DELETE)
     @RequiresPermissions("system:channel:del")
     public AjaxResult remove(@PathVariable(name = "id") Long  id) {
         adChannelService.removeByIdone(id);
@@ -115,7 +114,7 @@ public class AdChannelController  {
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @RequiresPermissions("system:channel:up")
-    @Log(title = "操作日志", businessType = BusinessType.UPDATE)
+    @Log(title = "频道状态", businessType = BusinessType.UPDATE)
     @DeleteMapping("disable/{id}")
     public AjaxResult disable(
             @PathVariable(name = "id") Long  id,
@@ -159,7 +158,7 @@ public class AdChannelController  {
      * @return {@code true} 更新成功，{@code false} 更新失败
      */
     @RequiresPermissions("system:channel:up")
-    @Log(title = "操作日志", businessType = BusinessType.UPDATE)
+    @Log(title = "更新频道", businessType = BusinessType.UPDATE)
     @PutMapping("update")
     public AjaxResult update(@RequestBody AdChannel adChannel) {
         Long id = adChannel.getId();
@@ -199,7 +198,6 @@ public class AdChannelController  {
      * @param page 分页对象
      * @return 分页对象
      */
-    @RequiresPermissions("admin:channel:list")
     @GetMapping("page")
     public AjaxResult page(
             @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,

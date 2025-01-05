@@ -22,6 +22,9 @@ public class IgnoreWhiteProperties
      * 放行白名单配置，网关不校验此处的白名单
      */
     private List<String> whites ;
+    /**
+     * 验证码 验证 获取路径
+     */
     private List<String> checkCode=new ArrayList<>() ;
     @PostConstruct
     private void init(){
@@ -44,10 +47,11 @@ public class IgnoreWhiteProperties
         whites.add("/dev-collection/behaviour/collect/list");
         whites.add("/dev-system/user/follow/list");
         whites.add("/dev-system/user/fan/list");
+
         whites.add("/dev-system/user/login");
         whites.add("/dev-system/user/refresh");
         whites.add("/dev-system/user/logout");
-        whites.add("/dev-system/user/refresh");
+
         whites.add("/dev-system/system/login");
         whites.add("/dev-system/system/logout");
         whites.add("/dev-system/system/refresh");

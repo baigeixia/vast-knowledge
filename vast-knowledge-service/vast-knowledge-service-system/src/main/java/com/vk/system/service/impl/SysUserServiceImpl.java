@@ -553,7 +553,7 @@ public class SysUserServiceImpl implements ISysUserService
     private ISysPermissionService permissionService;
 
     @Override
-    public LoginUser getUser(String username){
+    public LoginUser<SysUser> getUser(String username){
         SysUser sysUser = userMapper.selectUserByUserName(username);
         if (StringUtils.isNull(sysUser))
         {
@@ -563,7 +563,7 @@ public class SysUserServiceImpl implements ISysUserService
         Set<String> roles = permissionService.getRolePermission(sysUser);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(sysUser);
-        LoginUser sysUserVo = new LoginUser();
+        LoginUser<SysUser> sysUserVo = new LoginUser<>();
         sysUserVo.setSysUser(sysUser);
         sysUserVo.setRolesLocal(roles);
         sysUserVo.setPermissions(permissions);

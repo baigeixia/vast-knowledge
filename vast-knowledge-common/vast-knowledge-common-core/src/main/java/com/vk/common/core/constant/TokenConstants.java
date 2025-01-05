@@ -10,11 +10,9 @@ public class TokenConstants
     /**
      * 令牌自定义标识
      */
-    public static final String USER_AUTHORIZATION_HEADER = "user-authorization";
-    public static final String ADMIN_AUTHORIZATION_HEADER = "admin-authorization";
-    public static final String REFRESH_ADMIN_TOKEN = "admin-refresh_token";
+    public static final String AUTHORIZATION_HEADER = "authorization";
     public static final String REFRESH_TOKEN = "refresh_token";
-    public static final String REFRESH_USER_TOKEN = "user-refresh_token";
+
     /**
      * 令牌前缀
      */

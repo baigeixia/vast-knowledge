@@ -4,7 +4,7 @@ package com.vk.user.service.user;
 import com.mybatisflex.core.row.Db;
 import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.constant.UserBehaviourConstants;
-import com.vk.common.core.enums.ClientUserStatus;
+import com.vk.common.core.enums.UserType;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.exception.ServiceException;
 import com.vk.common.core.text.Convert;
@@ -13,20 +13,20 @@ import com.vk.common.core.utils.ip.IpUtils;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.common.redis.service.RedisService;
 import com.vk.common.security.utils.SecurityUtils;
+import com.vk.system.model.LoginUser;
+import com.vk.user.common.constant.ClientUserStatus;
 import com.vk.user.domain.ApUser;
 import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.ClientApUser;
 import com.vk.user.domain.UserAndInfo;
 import com.vk.user.mapper.ApUserInfoMapper;
 import com.vk.user.mapper.ApUserMapper;
-import com.vk.user.model.LoginApUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -41,7 +41,7 @@ public class UserLoginService {
     @Autowired
     private ApUserInfoMapper apUserInfoMapper;
 
-    public LoginApUser login(String token, String email, String password, Integer codeOrPas) {
+    public LoginUser<ClientApUser> login(String token, String email, String password, Integer codeOrPas) {
         String redisToken = redisService.getCacheObject(getCacheTokenKey(token));
         if (StringUtils.isNotEmpty(redisToken)) {
             throw new ServiceException("重复提交");
@@ -56,7 +56,7 @@ public class UserLoginService {
         if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr())) {
             throw new ServiceException("访问IP已被列入系统黑名单");
         }
-        LoginApUser resultVo = new LoginApUser();
+        LoginUser<ClientApUser> resultVo = new LoginUser<>();
 
         if (UserBehaviourConstants.LOGIN.equals(codeOrPas)) {
             // 查询用户信息
@@ -66,7 +66,7 @@ public class UserLoginService {
                 throw new ServiceException("登录用户：" + email + " 不存在");
             }
 
-            if (Objects.equals(ClientUserStatus.CLIENT_DISABLE.getCode(), byName.getStatus())) {
+            if (ClientUserStatus.CLIENT_DISABLE.getCode() == byName.getStatus()) {
                 throw new ServiceException("对不起，您的账号：" + email + " 已停用");
             }
 
@@ -75,8 +75,11 @@ public class UserLoginService {
             ClientApUser user = new ClientApUser();
             BeanUtils.copyProperties(byName, user);
             resultVo.setUsername(byName.getName());
-            resultVo.setClientApUser(user);
+            resultVo.setSysUser(user);
 
+            resultVo.setUserid(byName.getId());
+            resultVo.setUsername(byName.getName());
+            resultVo.setMarkType(UserType.USER_TYPE.getType());
 
             // redisAddUser(byName, resultVo);
 
@@ -97,7 +100,7 @@ public class UserLoginService {
         }
     }
 
-    private void createNewUser(String email, String password,LoginApUser resultVo) {
+    private void createNewUser(String email, String password,LoginUser<ClientApUser> resultVo) {
         // UserAndInfo userAndInfo = new UserAndInfo();
         LocalDateTime dateTime = LocalDateTime.now();
 
@@ -131,11 +134,12 @@ public class UserLoginService {
             }
             return true;
         });
+
         try {
             ClientApUser clientApUser = new ClientApUser();
             BeanUtils.copyProperties(user,clientApUser);
             resultVo.setUsername(info.getName());
-            resultVo.setClientApUser(clientApUser);
+            resultVo.setSysUser(clientApUser);
             // BeanUtils.copyProperties(userAndInfo, user);
             // BeanUtils.copyProperties(userAndInfo, info);
         } catch (Exception e) {

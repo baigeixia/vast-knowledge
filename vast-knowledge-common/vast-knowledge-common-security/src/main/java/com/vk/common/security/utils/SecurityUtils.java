@@ -6,14 +6,13 @@ import com.vk.common.core.constant.TokenConstants;
 import com.vk.common.core.context.SecurityContextHolder;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
+import com.vk.system.domain.SysUser;
 import com.vk.system.model.LoginUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 
 /**
@@ -48,11 +47,19 @@ public class SecurityUtils
     }
 
     /**
+     * 获取用户key
+     */
+    public static String getUserType()
+    {
+        return SecurityContextHolder.getUserType();
+    }
+
+    /**
      * 获取登录 管理 用户信息
      */
-    public static LoginUser getLoginUser()
+    public static  <T> LoginUser<T> getLoginUser()
     {
-        return SecurityContextHolder.get(SecurityConstants.LOGIN_ADMIN, LoginUser.class);
+        return SecurityContextHolder.get(SecurityConstants.LOGIN_USER, LoginUser.class);
     }
 
     /**
@@ -68,10 +75,7 @@ public class SecurityUtils
      */
     public static String getToken(HttpServletRequest request)
     {
-        String headerName = verificationAdmin(request) ? TokenConstants.ADMIN_AUTHORIZATION_HEADER : TokenConstants.USER_AUTHORIZATION_HEADER;
-
-        String token = request.getHeader(headerName);
-
+        String token = request.getHeader(TokenConstants.AUTHORIZATION_HEADER);
         return replaceTokenPrefix(token);
     }
 
@@ -91,12 +95,6 @@ public class SecurityUtils
         }
         return null;
     }
-    public static boolean verificationAdmin(HttpServletRequest request){
-        //从header获取admin标识
-        String adminOpen = request.getHeader(SecurityConstants.ADMIN_OPEN);
-        return Boolean.parseBoolean(adminOpen);
-    }
-
     /**
      * 裁剪token前缀
      */

@@ -93,15 +93,16 @@ public class SecurityContextHolder
         set(SecurityConstants.ROLE_PERMISSION, permissions);
     }
 
-    // public static String getAdminOpen()
-    // {
-    //     return get(SecurityConstants.ADMIN_OPEN);
-    // }
-    //
-    // public static void setAdminOpen(Boolean admin)
-    // {
-    //     set(SecurityConstants.ADMIN_OPEN, admin);
-    // }
+    public static String getUserType()
+    {
+        return get(SecurityConstants.USER_TYPE);
+    }
+
+    public static void setUserType(String userType)
+    {
+        set(SecurityConstants.USER_TYPE, userType);
+    }
+
 
     public static void remove()
     {

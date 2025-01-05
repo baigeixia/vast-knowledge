@@ -23,18 +23,9 @@ public class ClientApUser implements Serializable {
     private Long id;
 
     /**
-     * 密码、通信等加密盐
-     */
-    private String salt;
-
-    /**
      * 用户邮箱
      */
     private String email;
-    /**
-     * 密码,md5加密
-     */
-    private String password;
 
     /**
      * 手机号

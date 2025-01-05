@@ -7,6 +7,7 @@ package com.vk.common.core.constant;
  */
 public class UserConstants
 {
+
     /**
      * 平台内系统用户的唯一标志
      */

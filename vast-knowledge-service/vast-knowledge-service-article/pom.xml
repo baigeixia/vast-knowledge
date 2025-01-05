@@ -65,8 +65,6 @@
             <artifactId>vast-knowledge-common-datasource</artifactId>
         </dependency>
 
-
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -104,6 +102,10 @@
             <artifactId>vast-knowledge-common-security</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-log</artifactId>
+        </dependency>
 
     </dependencies>
 

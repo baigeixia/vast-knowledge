@@ -17,15 +17,6 @@ public class SecurityConstants
      */
     public static final String DETAILS_USERNAME = "username";
     public static final String ADMIN_PATH = "/dev-system/system/**";
-    /**
-     * 是否是管理端
-     */
-    public static final String ADMIN_OPEN= "adminOpen";
-    /**
-     * 授权信息字段
-     */
-    public static final String USER_AUTHORIZATION_HEADER = "user-authorization";
-    public static final String ADMIN_AUTHORIZATION_HEADER = "admin-authorization";
 
 
     /**
@@ -42,6 +33,10 @@ public class SecurityConstants
      * 用户标识
      */
     public static final String USER_KEY = "user_key";
+    /**
+     * 用户类型
+     */
+    public static final String USER_TYPE = "user_type";
 
 
     /**

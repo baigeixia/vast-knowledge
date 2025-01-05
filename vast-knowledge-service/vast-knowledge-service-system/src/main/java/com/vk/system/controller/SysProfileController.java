@@ -60,7 +60,7 @@ public class SysProfileController extends BaseController
     @PutMapping
     public AjaxResult updateProfile(@RequestBody SysUser user)
     {
-        LoginUser loginUser = SecurityUtils.getLoginUser();
+        LoginUser<SysUser> loginUser = SecurityUtils.getLoginUser();
         SysUser sysUser = loginUser.getSysUser();
         user.setUserName(sysUser.getUserName());
         if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user))
@@ -109,7 +109,7 @@ public class SysProfileController extends BaseController
         if (userService.resetUserPwd(username, SecurityUtils.encryptPassword(newPassword)) > 0)
         {
             // 更新缓存用户密码
-            LoginUser loginUser = SecurityUtils.getLoginUser();
+            LoginUser<SysUser> loginUser = SecurityUtils.getLoginUser();
             loginUser.getSysUser().setPassword(SecurityUtils.encryptPassword(newPassword));
             tokenService.setLoginUser(loginUser);
             return success();
@@ -126,7 +126,7 @@ public class SysProfileController extends BaseController
     {
         if (!file.isEmpty())
         {
-            LoginUser loginUser = SecurityUtils.getLoginUser();
+            LoginUser<SysUser> loginUser = SecurityUtils.getLoginUser();
             String extension = FileTypeUtils.getExtension(file);
             if (!StringUtils.equalsAnyIgnoreCase(extension, MimeTypeUtils.IMAGE_EXTENSION))
             {

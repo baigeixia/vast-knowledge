@@ -5,6 +5,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.comment.common.utils.CommentUtils;
+import com.vk.comment.common.utils.SensitiveWordUtils;
 import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.document.ApCommentRepayDocument;
 import com.vk.comment.domain.ApComment;
@@ -20,6 +21,7 @@ import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
+import com.vk.common.core.utils.SensitiveWord;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
@@ -31,6 +33,7 @@ import org.springframework.util.ObjectUtils;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_HOT;
@@ -58,6 +61,8 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
     @Autowired
     private CommentRepayDocumentRepository commentRepayDocumentRepository;
 
+    @Autowired
+    private SensitiveWordUtils sensitiveWordUtils;
     @Override
     public CommentListRe saveCommentRe(CommentReSaveDto dto) {
         Long userId = RequestContextUtil.getUserId();
@@ -78,6 +83,8 @@ public class ApCommentRepayServiceImpl extends ServiceImpl<ApCommentRepayMapper,
         if (StringUtils.isEmpty(content) && StringUtils.isEmpty(image)) {
             throw new LeadNewsException("评论内容或回复图片不能为空");
         }
+
+        sensitiveWordUtils.sensitiveDetectionThrow(content);
 
         Set<Long> longHashSet = new HashSet<>();
 

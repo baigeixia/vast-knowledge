@@ -5,7 +5,6 @@ import com.vk.common.core.domain.R;
 import com.vk.user.domain.AuthorInfo;
 import com.vk.user.domain.ClientApUser;
 import com.vk.user.feign.RemoteClientUserService;
-import com.vk.user.model.LoginApUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -27,10 +26,6 @@ public class RemoteClientUserFallbackFactory implements FallbackFactory<RemoteCl
     public RemoteClientUserService create(Throwable throwable) {
         log.error("用户服务调用失败:{}", throwable.getMessage());
         return new RemoteClientUserService() {
-            @Override
-            public R<LoginApUser> getUserInfo(String username, String source) {
-                return R.fail("获取用户失败:" + throwable.getMessage());
-            }
 
             @Override
             public R<Boolean> registerUserInfo(ClientApUser sysUser, String source) {

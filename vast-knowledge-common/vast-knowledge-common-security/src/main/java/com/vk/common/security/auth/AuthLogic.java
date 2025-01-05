@@ -13,9 +13,8 @@ import com.vk.common.security.annotation.RequiresPermissions;
 import com.vk.common.security.annotation.RequiresRoles;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
+import com.vk.system.domain.SysUser;
 import com.vk.system.model.LoginUser;
-import com.vk.user.model.LoginApUser;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.PatternMatchUtils;
 
 import java.util.Collection;
@@ -72,14 +71,14 @@ public class AuthLogic
      * 
      * @return 用户缓存信息
      */
-    public LoginUser getLoginUser()
+    public LoginUser<SysUser> getLoginUser()
     {
         String token = SecurityUtils.getToken();
         if (token == null)
         {
             throw new NotLoginException("未提供token");
         }
-        LoginUser loginUser = SecurityUtils.getLoginUser();
+        LoginUser<SysUser> loginUser = SecurityUtils.getLoginUser();
         if (loginUser == null)
         {
             throw new NotLoginException("无效的token");
@@ -93,15 +92,11 @@ public class AuthLogic
      * @param token 前端传递的认证信息
      * @return 用户缓存信息
      */
-    public LoginUser getLoginUser(String token)
+    public <T> LoginUser<T> getLoginUser(String token)
     {
         return tokenService.getLoginUserInfo(token);
     }
 
-    public LoginApUser getLoginApUser(String token)
-    {
-        return tokenService.getLoginUserInfo(token);
-    }
 
 
     /**
@@ -109,15 +104,9 @@ public class AuthLogic
      * 
      * @param loginUser 当前用户信息
      */
-    public void verifyLoginUserExpire(LoginUser loginUser)
+    public <T> void verifyLoginUserExpire(LoginUser<T> loginUser)
     {
-        // tokenService.verifyToken(loginUser);
         tokenService.verifyTokenAndRefreshToken(loginUser);
-    }
-    public void verifyLoginUserExpire(LoginApUser LoginApUser)
-    {
-        // tokenService.verifyToken(LoginApUser);
-        tokenService.verifyTokenAndRefreshToken(LoginApUser);
     }
 
     /**
@@ -335,7 +324,7 @@ public class AuthLogic
     {
         try
         {
-            LoginUser loginUser = getLoginUser();
+            LoginUser<SysUser> loginUser = getLoginUser();
             return loginUser.getRolesLocal();
         }
         catch (Exception e)
@@ -353,7 +342,7 @@ public class AuthLogic
     {
         try
         {
-            LoginUser loginUser = getLoginUser();
+            LoginUser<SysUser> loginUser = getLoginUser();
             return loginUser.getPermissions();
         }
         catch (Exception e)

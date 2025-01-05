@@ -2,14 +2,16 @@ package com.vk.user.controller;
 
 
 import com.vk.common.core.domain.R;
+import com.vk.common.core.enums.UserType;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
+import com.vk.system.model.LoginUser;
+import com.vk.user.domain.ClientApUser;
 import com.vk.user.domain.user.UserLoginBody;
-import com.vk.user.model.LoginApUser;
 import com.vk.user.service.user.UserLoginService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,12 +33,12 @@ public class UserSecurityController {
     private TokenService tokenService;
 
     @PostMapping("login")
-    public AjaxResult login(@RequestBody UserLoginBody form, HttpServletResponse response)
+    public AjaxResult login(@RequestBody UserLoginBody form,HttpServletRequest request, HttpServletResponse response)
     {
         // 用户登录
-        LoginApUser userInfo = userLoginService.login(form.getToken(),form.getEmail(), form.getPassword(),form.getCodeOrPas());
+        LoginUser<ClientApUser> login = userLoginService.login(form.getToken(), form.getEmail(), form.getPassword(), form.getCodeOrPas());
         // 获取登录token
-        return AjaxResult.success(tokenService.createToken(userInfo,response));
+        return AjaxResult.success(tokenService.createToken(login,request,response));
     }
 
     @DeleteMapping("logout")
@@ -51,7 +53,6 @@ public class UserSecurityController {
             }
             // 删除用户缓存记录
             AuthUtil.logoutByToken(token);
-            // AuthUtil.logoutRefreshToken(response);
         }
         return R.ok();
     }
@@ -59,17 +60,18 @@ public class UserSecurityController {
    @PostMapping("refresh")
    public R<?> refresh(HttpServletRequest request, HttpServletResponse response)
    {
-       LoginApUser loginApUser = tokenService.getLoginApUser(request);
-       if (!ObjectUtils.isEmpty(loginApUser))
+       String userType = UserType.USER_TYPE.getType();
+       LoginUser<ClientApUser> loginUser = tokenService.getLoginUser(request,userType);
+       if (!ObjectUtils.isEmpty(loginUser))
        {
-           String key = loginApUser.getToken();
-           String username = loginApUser.getUsername();
-           Long userId = loginApUser.getClientApUser().getId();
+           String key = loginUser.getToken();
+           String username = loginUser.getUsername();
+           Long userId = loginUser.getSysUser().getId();
 
-           String token = tokenService.createToken(key, userId, username);
+           String token = tokenService.createToken(key, userId, username,userType);
            // 刷新redis有效期
-           tokenService.refreshTokenRedis(loginApUser);
-           tokenService.refreshToken(response,key);
+           tokenService.refreshTokenRedis(loginUser);
+           tokenService.addRefreshToken(request,response,userType,key);
            return R.ok(token);
        }
        return R.fail(401,"请重新登录");

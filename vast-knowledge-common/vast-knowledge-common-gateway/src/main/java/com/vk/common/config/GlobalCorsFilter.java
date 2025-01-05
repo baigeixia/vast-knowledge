@@ -30,7 +30,7 @@ public class GlobalCorsFilter implements WebFilter, Ordered {
     private static final String ALLOWED_HEADERS =
         "X-Requested-With, Content-Language, Content-Type,content-type,Authorization, clientid, credential, X-XSRF-TOKEN, " +
         "isToken,isToken, token, Admin-Token, App-Token, Encrypt-Key, isEncrypt,from," +
-                "user-authorization, admin-authorization,uuid-token,longin-code,repeatsubmit";
+                ",uuid-token,longin-code,repeatsubmit,refresh_token";
 
     /**
      * 允许的请求方法

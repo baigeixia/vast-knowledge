@@ -63,7 +63,7 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
                              @Param("updateTime") LocalDateTime updateTime,
                              @Param("status") Integer status);
 
-    @Update("UPDATE ap_article_config SET is_down = 0 WHERE article_id = #{articleId}")
+    @Update("UPDATE ap_article_config SET is_down = true WHERE article_id = #{articleId}")
     void updateArticleConfigStatus(@Param("articleId") Long articleId);
 
     @Select("select  COUNT(*) from ap_article where  status = 2")

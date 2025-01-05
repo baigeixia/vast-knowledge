@@ -195,7 +195,7 @@ public interface ISysUserService
      * @return 结果
      */
     public int deleteUserByIds(Long[] userIds);
-    LoginUser getUser(String username);
+    LoginUser<SysUser> getUser(String username);
 
     /**
      * 导入用户数据

@@ -11,6 +11,9 @@ import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.controller.BaseController;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.core.web.page.TableDataInfo;
+import com.vk.common.log.annotation.Log;
+import com.vk.common.log.enums.BusinessType;
+import com.vk.common.security.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +48,8 @@ public class AdSensitiveController   {
      * @return {@code true} 添加成功，{@code false} 添加失败
      */
     @PostMapping("save")
+    @RequiresPermissions("system:sensitive:add")
+    @Log(title = "添加敏感词", businessType = BusinessType.INSERT)
     public AjaxResult save(@RequestBody AdSensitive adSensitive) {
         String sensitives = adSensitive.getSensitives();
         if (StringUtils.isEmpty(sensitives)){
@@ -69,6 +74,8 @@ public class AdSensitiveController   {
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @DeleteMapping("remove/{id}")
+    @RequiresPermissions("system:sensitive:del")
+    @Log(title = "更新敏感词", businessType = BusinessType.DELETE)
     public AjaxResult remove(
             @PathVariable(name = "id") Serializable id
     ) {
@@ -90,6 +97,8 @@ public class AdSensitiveController   {
      * @return {@code true} 更新成功，{@code false} 更新失败
      */
     @PutMapping("update")
+    @RequiresPermissions("system:sensitive:up")
+    @Log(title = "更新敏感词", businessType = BusinessType.UPDATE)
     public AjaxResult update(
             @RequestParam(name = "id") Long id,
             @RequestParam(name = "name") String name,

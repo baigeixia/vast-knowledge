@@ -43,22 +43,10 @@ public class FeignRequestInterceptor implements RequestInterceptor
             {
                 requestTemplate.header(SecurityConstants.DETAILS_USERNAME, userName);
             }
-            String userAuthentication = headers.get(SecurityConstants.USER_AUTHORIZATION_HEADER);
-            if (StringUtils.isNotEmpty(userAuthentication))
+            String userType = headers.get(SecurityConstants.USER_TYPE);
+            if (StringUtils.isNotEmpty(userType))
             {
-                requestTemplate.header(SecurityConstants.USER_AUTHORIZATION_HEADER, userAuthentication);
-            }
-
-            String authentication = headers.get(SecurityConstants.ADMIN_AUTHORIZATION_HEADER);
-            if (StringUtils.isNotEmpty(authentication))
-            {
-                requestTemplate.header(SecurityConstants.ADMIN_AUTHORIZATION_HEADER, authentication);
-            }
-
-            String admin = headers.get(SecurityConstants.ADMIN_OPEN);
-            if (StringUtils.isNotEmpty(admin))
-            {
-                requestTemplate.header( SecurityConstants.ADMIN_OPEN, admin);
+                requestTemplate.header( SecurityConstants.USER_TYPE, userType);
             }
             
             // 配置客户端IP

@@ -3,6 +3,7 @@ package com.vk.system.model;
 
 import com.vk.system.domain.SysUser;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -11,14 +12,19 @@ import java.util.Set;
  *
  * @author vk
  */
-public class LoginUser implements Serializable
+public class LoginUser<T> implements Serializable
 {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
      * 用户唯一标识
      */
     private String token;
+    /**
+     * 客户端标识
+     */
+    private String markType;
 
     /**
      * 用户名id
@@ -58,7 +64,7 @@ public class LoginUser implements Serializable
     /**
      * 用户信息
      */
-    private SysUser sysUser;
+    private T sysUser;
 
     public String getToken()
     {
@@ -75,6 +81,13 @@ public class LoginUser implements Serializable
         return userid;
     }
 
+    public String getMarkType() {
+        return markType;
+    }
+
+    public void setMarkType(String markType) {
+        this.markType = markType;
+    }
     public void setUserid(Long userid)
     {
         this.userid = userid;
@@ -140,13 +153,12 @@ public class LoginUser implements Serializable
         this.rolesLocal = rolesLocal;
     }
 
-    public SysUser getSysUser()
-    {
+    public T getSysUser() {
         return sysUser;
     }
 
-    public void setSysUser(SysUser sysUser)
-    {
+    // 设置用户信息
+    public void setSysUser(T sysUser) {
         this.sysUser = sysUser;
     }
 }

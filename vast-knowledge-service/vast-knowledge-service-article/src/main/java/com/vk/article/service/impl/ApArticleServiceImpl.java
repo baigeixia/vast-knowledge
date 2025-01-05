@@ -10,6 +10,7 @@ import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
 import com.vk.article.domain.table.ApArticleTableDef;
 import com.vk.article.domain.vo.*;
+import com.vk.article.util.ArticleStatus;
 import com.vk.common.core.utils.DateUtils;
 import com.vk.common.es.domain.ArticleInfoDocument;
 import com.vk.article.domain.HomeArticleListVo;
@@ -83,7 +84,6 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     @Autowired
     private ArticleDocumentRepository articleDocumentRepository;
-
 
 
     @Autowired
@@ -199,10 +199,10 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         article.setAuthorName(userName);
         article.setLabels(dto.getLabels());
         article.setUpdateTime(dateTime);
-        article.setStatus(2);
+        article.setStatus(ArticleStatus.DRAFT.getStatus());
 
         // ApArticleConfig dbConfig = apArticleConfigMapper.selectOneByQuery(QueryWrapper.create().where(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(articleId)));
-        ApArticleConfig dbConfig= mapper.selectOne(articleId);
+        ApArticleConfig dbConfig = mapper.selectOne(articleId);
 
         Db.tx(() -> {
             mapper.insertOrUpdateSelective(article);
@@ -211,7 +211,8 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             ApArticleConfig config = new ApArticleConfig();
             ApArticleConfig dtoConfig = dto.getConfig();
             BeanUtils.copyProperties(dtoConfig, config);
-            if (null != dbConfig){
+            config.setIsDown(true);
+            if (null != dbConfig) {
                 config.setId(dbConfig.getId());
             }
             config.setArticleId(article.getId());
@@ -289,16 +290,19 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             throw new LeadNewsException(401, "未登录");
         }
 
-        if (Stream.of(0,1,2,3,8,9).noneMatch(Predicate.isEqual(status))){
-            throw new LeadNewsException( "错误的查询参数");
+        if (Stream.of(0, 1, 2, 3, 8, 9).noneMatch(Predicate.isEqual(status))) {
+            throw new LeadNewsException("错误的查询参数");
         }
         QueryWrapper wrapper = QueryWrapper.create();
-        wrapper.where(AP_ARTICLE.AUTHOR_ID.eq(userId))
+        wrapper.select(AP_ARTICLE.DEFAULT_COLUMNS, AP_ARTICLE_CONFIG.IS_DOWN, AP_ARTICLE_CONFIG.IS_DELETE, AP_ARTICLE_CONFIG.IS_COMMENT, AP_ARTICLE_CONFIG.IS_FORWARD).from(AP_ARTICLE)
+                .innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID))
+                .where(AP_ARTICLE.AUTHOR_ID.eq(userId))
+                .and(AP_ARTICLE_CONFIG.IS_DELETE.eq(false))
                 .and(AP_ARTICLE.TITLE.like(title, StringUtils.isNotEmpty(title)))
                 .and(AP_ARTICLE.CHANNEL_ID.eq(channelId, !StringUtils.isLongEmpty(channelId)))
-                .and(AP_ARTICLE.STATUS.eq(status, !ObjectUtils.isEmpty(status) && status !=0))
+                .and(AP_ARTICLE.STATUS.eq(status, !ObjectUtils.isEmpty(status) && status != 0))
                 .and(AP_ARTICLE.UPDATE_TIME.between(startTime, endTime, !ObjectUtils.isEmpty(startTime) && !ObjectUtils.isEmpty(endTime)))
-                .orderBy(AP_ARTICLE.UPDATE_TIME,false);
+                .orderBy(AP_ARTICLE.UPDATE_TIME, false);
 
 
         return mapper.paginateAs(Page.of(page, size), wrapper, ArticleListVo.class);
@@ -394,16 +398,16 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     @Async("asyncTaskExecutor")
     public void importAll(long page, Long size, CountDownLatch countDownLatch, LocalDateTime now) {
         String threadName = Thread.currentThread().getName();
-        log.info("{} start: page={},size={}", threadName,page,size);
+        log.info("{} start: page={},size={}", threadName, page, size);
         //1分页查询到数据
-        List<ArticleInfoDocument> articleList = mapper.selectByPage((page - 1) * size, size,now);
-        log.info("{} start: page={},size={}, actualSize={} found", threadName,page,size,articleList.size());
+        List<ArticleInfoDocument> articleList = mapper.selectByPage((page - 1) * size, size, now);
+        log.info("{} start: page={},size={}, actualSize={} found", threadName, page, size, articleList.size());
         //2.分批导入到ES中
         try {
             articleDocumentRepository.saveAll(articleList);
-            log.info("{} end: page={},size={}, actualSize={} found", threadName,page,size,articleList.size());
+            log.info("{} end: page={},size={}, actualSize={} found", threadName, page, size, articleList.size());
         } catch (Exception e) {
-            log.error("{} error: page={},size={}, actualSize={} found", threadName,page,size,articleList.size(),e);
+            log.error("{} error: page={},size={}, actualSize={} found", threadName, page, size, articleList.size(), e);
         } finally {
             //减掉数量
             countDownLatch.countDown();
@@ -413,13 +417,13 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     @Override
     public void deleteOne(Long articleId) {
-        if (StringUtils.isLongEmpty(articleId)){
+        if (StringUtils.isLongEmpty(articleId)) {
             throw new LeadNewsException("文章id不能为空");
         }
         Long localUserId = RequestContextUtil.getUserId();
 
-        Long dbId =mapper.selectCountOne(articleId,localUserId);
-        if (StringUtils.isLongEmpty(dbId)){
+        Long dbId = mapper.selectCountOne(articleId, localUserId);
+        if (StringUtils.isLongEmpty(dbId)) {
             throw new LeadNewsException("文章不存在或者已经被删除");
         }
 
@@ -438,7 +442,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         Long userId = RequestContextUtil.getUserId();
 
         ApArticle article = mapper.selectOneByQuery(QueryWrapper.create().where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE.ID.eq(id)));
-        if (ObjectUtils.isEmpty(article)){
+        if (ObjectUtils.isEmpty(article)) {
             throw new LeadNewsException("错误的文章");
         }
         ArticleInfoVo articleInfoVo = new ArticleInfoVo();
@@ -498,8 +502,8 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         Long userId = RequestContextUtil.getUserId();
         ArticleDataListVo listVo = new ArticleDataListVo();
 
-        List<ArticleData> articleData = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleInfoData(userId,(page - 1) * size,size));
-        Long total=TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleDataTotal(userId));
+        List<ArticleData> articleData = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleInfoData(userId, (page - 1) * size, size));
+        Long total = TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleDataTotal(userId));
 
         listVo.setPage(page);
         listVo.setSize(size);
@@ -509,44 +513,128 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
     }
 
     @Override
-    public void pushArticle(Long articleId) {
+    public void pushArticle(Long articleId, Boolean isDown) {
+        if (StringUtils.isLongEmpty(articleId)) {
+            throw new LeadNewsException("文章错误");
+        }
+
+        if (null == isDown) {
+            throw new LeadNewsException("文章错误");
+        }
+
         Long userId = RequestContextUtil.getUserId();
-        ApArticle localAr=  mapper.getLocalArticle(userId,articleId);
+        ApArticle localAr = mapper.getLocalArticle(userId, articleId);
         if (ObjectUtils.isEmpty(localAr)) {
             throw new LeadNewsException("权限不足,或文章被删除");
         }
+        QueryWrapper where = QueryWrapper.create().where(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(articleId));
+        where.and(AP_ARTICLE_CONFIG.IS_DELETE.eq(false));
+
+        ApArticleConfig articleConfig = apArticleConfigMapper.selectOneByQuery(where);
+
+        if (ObjectUtils.isEmpty(articleConfig)) {
+            throw new LeadNewsException("权限不足,或文章被删除");
+        }
+        Boolean down = articleConfig.getIsDown();
+        if (down == isDown) {
+            throw new LeadNewsException("已经是 " + (isDown ? "下架" : "上架") + " 状态");
+        }
+
         Integer status = localAr.getStatus();
 
-        if(status.equals(1)){
-            mapper.upArticleStatus(articleId,LocalDateTime.now(),2);
-        }else if (status.equals(9)){
-            Db.tx(()->{
-                mapper.upArticleStatus(articleId,LocalDateTime.now(),1);
-                ApArticleConfig config = new ApArticleConfig();
-                config.setArticleId(articleId);
-                config.setIsDown(true);
-                apArticleConfigMapper.update(config);
-                return true;
-            });
 
+        ApArticle apArticle = new ApArticle();
+        apArticle.setId(articleId);
+
+        ApArticleConfig config = new ApArticleConfig();
+        config.setArticleId(articleId);
+//        config.setIsDown(isDown);
+
+        if (isDown){
+            if (status.equals(ArticleStatus.PUBLISHED.getStatus())) {
+                config.setIsDown(!down);
+                apArticle.setStatus(ArticleStatus.DRAFT.getStatus());
+            }else {
+                throw new LeadNewsException("错误的文章状态");
+            }
+        }else {
+            if (status.equals(ArticleStatus.DRAFT.getStatus())) {
+                config.setIsDown(!down);
+                apArticle.setStatus(ArticleStatus.UNDER_REVIEW.getStatus());
+            }else {
+                throw new LeadNewsException("错误的文章状态");
+            }
+        }
+
+        //下架 草稿 无法下架 其他的都改为草稿
+       /* if (isDown) {
+            if (status != 1) {
+                apArticle.setStatus(1);
+            }else {
+                throw new LeadNewsException("错误的文章状态");
+            }
+        } else {
+            //上架 草稿 提交为 审核  通过为 发布
+            if (status == ArticleStatus.DRAFT.getStatus()) {
+                apArticle.setStatus(ArticleStatus.UNDER_REVIEW.getStatus());
+                config.setIsDown(true);
+            } else if (status == ArticleStatus.PASS.getStatus()) {
+                apArticle.setStatus(ArticleStatus.PUBLISHED.getStatus());
+            }else {
+                throw new LeadNewsException("错误的文章状态");
+            }
+        }*/
+
+        Db.tx(() -> {
+            mapper.update(apArticle);
+            apArticleConfigMapper.updateByQuery(config, where);
+            return true;
+        });
+
+    }
+
+    private void handleArticleDownStatus(ApArticle apArticle, int status) {
+        // 如果是已下架的状态，直接返回
+        if (status == ArticleStatus.DOWN.getStatus()) {
+            return;
+        }
+        // 其他状态都设置为已下架
+        apArticle.setStatus(ArticleStatus.DOWN.getStatus());
+    }
+
+    private void handleArticleUpStatus(ApArticle apArticle, int status) {
+        // 如果是已上架的状态，直接返回
+        if (status == ArticleStatus.NOT_DOWN.getStatus()) {
+            return;
+        }
+        // 上架操作，根据当前状态判断
+        switch (status) {
+            case 1: // 草稿
+                apArticle.setStatus(ArticleStatus.UNDER_REVIEW.getStatus());
+                break;
+            case 8: // 提交审核
+                apArticle.setStatus(ArticleStatus.PUBLISHED.getStatus());
+                break;
+            default:
+                break;
         }
     }
 
     @Override
     public Page<NewsPushVo> newsPush(String title, LocalDate beginDate, LocalDate endDate, Integer status, Integer pageNum, Integer pageSize) {
 
-        if (status != null && Stream.of(2,3,8,9).noneMatch(Predicate.isEqual(status))) {
+        if (status != null && Stream.of(2, 3, 8, 9).noneMatch(Predicate.isEqual(status))) {
             throw new LeadNewsException("类型错误");
         }
 
         QueryWrapper wrapper = QueryWrapper.create();
-        wrapper.select(AP_ARTICLE.DEFAULT_COLUMNS,AP_ARTICLE_CONFIG.IS_DOWN,AP_ARTICLE_CONFIG.IS_DELETE).from(AP_ARTICLE).innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID))
-                .where(AP_ARTICLE.TITLE.like(title,StringUtils.isNotEmpty(title)))
-                .and(AP_ARTICLE.STATUS.eq(status,status!=null))
+        wrapper.select(AP_ARTICLE.DEFAULT_COLUMNS, AP_ARTICLE_CONFIG.IS_DOWN, AP_ARTICLE_CONFIG.IS_DELETE).from(AP_ARTICLE).innerJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE.ID.eq(AP_ARTICLE_CONFIG.ARTICLE_ID))
+                .where(AP_ARTICLE.TITLE.like(title, StringUtils.isNotEmpty(title)))
+                .and(AP_ARTICLE.STATUS.eq(status, status != null))
                 .and(AP_ARTICLE.STATUS.ne(1))//不需要草稿显示
                 // .and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0).and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0)))
                 .and(AP_ARTICLE.UPDATE_TIME.between(beginDate, endDate, !ObjectUtils.isEmpty(beginDate) && !ObjectUtils.isEmpty(endDate)))
-                .orderBy(AP_ARTICLE.UPDATE_TIME,false);
+                .orderBy(AP_ARTICLE.UPDATE_TIME, false);
 
         return mapper.paginateAs(Page.of(pageNum, pageSize), wrapper, NewsPushVo.class);
     }

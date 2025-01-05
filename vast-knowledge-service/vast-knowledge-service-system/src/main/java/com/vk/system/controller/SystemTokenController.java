@@ -1,12 +1,15 @@
 package com.vk.system.controller;
 
 
+import com.vk.common.core.constant.TokenConstants;
 import com.vk.common.core.domain.R;
+import com.vk.common.core.enums.UserType;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.security.auth.AuthUtil;
 import com.vk.common.security.service.TokenService;
 import com.vk.common.security.utils.SecurityUtils;
+import com.vk.system.domain.SysUser;
 import com.vk.system.domain.system.SystemLoginBody;
 import com.vk.system.domain.system.SystemRegisterBody;
 import com.vk.system.model.LoginUser;
@@ -36,12 +39,12 @@ public class SystemTokenController
     private SysLoginService sysLoginService;
 
     @PostMapping("login")
-    public R<?> login(@RequestBody SystemLoginBody form, HttpServletResponse response)
+    public R<?> login(@RequestBody SystemLoginBody form,HttpServletRequest request, HttpServletResponse response)
     {
         // 用户登录
-        LoginUser userInfo = sysLoginService.login(form.getUsername(), form.getPassword());
+        LoginUser<SysUser> userInfo = sysLoginService.login(form.getUsername(), form.getPassword());
         // 获取登录token
-        return R.ok(tokenService.createToken(userInfo,response));
+        return R.ok(tokenService.createToken(userInfo,request,response));
     }
 
     @DeleteMapping("logout")
@@ -66,17 +69,18 @@ public class SystemTokenController
     @PostMapping("refresh")
     public R<?> refresh(HttpServletRequest request, HttpServletResponse response)
     {
-        LoginUser loginUser = tokenService.getLoginUser(request);
+        String adminType = UserType.ADMIN_TYPE.getType();
+        LoginUser<SysUser> loginUser = tokenService.getLoginUser(request,adminType);
         if (StringUtils.isNotNull(loginUser))
         {
             String key = loginUser.getToken();
             String username = loginUser.getUsername();
             Long userId = loginUser.getSysUser().getUserId();
 
-            String token = tokenService.createToken(key, userId, username);
+            String token = tokenService.createToken(key, userId, username,adminType);
             // 刷新令牌有效期
             tokenService.refreshTokenRedis(loginUser);
-            tokenService.refreshToken(response,key);
+            tokenService.addRefreshToken(request,response,adminType,key);
             return R.ok(token);
         }
         return R.ok();

@@ -32,6 +32,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Set;
 
+import static com.vk.common.core.constant.CacheConstants.LOGIN_TOKEN_KEY;
+
 
 /**
  * 网关鉴权
@@ -56,16 +58,13 @@ public class AuthFilter implements GlobalFilter, Ordered {
         ServerHttpRequest.Builder mutate = request.mutate();
 
         String url = request.getURI().getPath();
-        //是否有管理身份 管理登录先给身份
-        boolean adminOpen = isAuthorized(request,url);
 
         // 跳过不需要验证的路径
         if (StringUtils.matches(url, ignoreWhite.getWhites())) {
-            addHeader(mutate, SecurityConstants.ADMIN_OPEN, adminOpen);
-            return chain.filter(exchange.mutate().request(mutate.build()).build());
+            return chain.filter(exchange);
         }
 
-        String token = getToken(request,adminOpen);
+        String token = getToken(request);
         if (StringUtils.isEmpty(token)) {
             return unauthorizedResponse(exchange, "令牌不能为空");
         }
@@ -83,17 +82,18 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
 
         String userkey = TokenUtils.getUserKey(token);
-        boolean islogin = redisService.hasKey(getTokenKey(userkey,adminOpen));
-
+        boolean islogin = redisService.hasKey(getTokenKey(userkey));
         if (!islogin) {
             return unauthorizedResponse(exchange, "登录状态已过期");
         }
 
+        String userType = TokenUtils.getUserType(token);
+
         // 设置用户信息到请求
         addHeader(mutate, SecurityConstants.USER_KEY, userkey);
+        addHeader(mutate, SecurityConstants.USER_TYPE, userType);
         addHeader(mutate, SecurityConstants.DETAILS_USER_ID, userid);
         addHeader(mutate, SecurityConstants.DETAILS_USERNAME, username);
-        addHeader(mutate, SecurityConstants.ADMIN_OPEN, adminOpen);
 
         // 内部请求来源参数清除
         removeHeader(mutate, SecurityConstants.FROM_SOURCE);
@@ -111,21 +111,17 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
         return tokenRefreshResponse(exchange, "重新刷新令牌");
     }
-
-    public boolean isAuthorized(ServerHttpRequest request, String url) {
-        String authHeader = request.getHeaders().getFirst(TokenConstants.ADMIN_AUTHORIZATION_HEADER);
-        return StringUtils.isNotEmpty(authHeader) || "/dev-system/system/login".equals(url);
+    private String getTokenKey(String token) {
+        return LOGIN_TOKEN_KEY + token;
     }
+
 
     /**
      * 获取请求 access token
      */
-    private String getToken(ServerHttpRequest request, boolean adminOpen) {
-        // 根据 adminOpen 的值来获取对应的请求头字段
-        String headerName = adminOpen ? TokenConstants.ADMIN_AUTHORIZATION_HEADER : TokenConstants.USER_AUTHORIZATION_HEADER;
-
+    private String getToken(ServerHttpRequest request) {
         // 获取 token
-        String token = request.getHeaders().getFirst(headerName);
+        String token = request.getHeaders().getFirst(TokenConstants.AUTHORIZATION_HEADER);
 
         // 如果 token 存在且不为空，移除前缀并返回
         return StringUtils.isNotEmpty(token) ? token.replaceFirst(TokenConstants.PREFIX, "") : null;
@@ -168,12 +164,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         return ServletUtils.webFluxResponseWriter(exchange.getResponse(), msg, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * 获取缓存key
-     */
-    private String getTokenKey(String token,boolean adminOpen) {
-        return  adminOpen ? CacheConstants.LOGIN_TOKEN_KEY + token :CacheConstants.LOGIN_CLIENT_TOKEN_KEY + token;
-    }
+
 
 
     @Override

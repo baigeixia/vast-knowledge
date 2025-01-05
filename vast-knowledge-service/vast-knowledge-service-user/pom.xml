@@ -83,6 +83,11 @@
             <artifactId>vast-knowledge-common-security</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-log</artifactId>
+        </dependency>
+
 
     </dependencies>
 

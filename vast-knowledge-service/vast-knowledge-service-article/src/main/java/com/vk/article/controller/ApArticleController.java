@@ -1,13 +1,20 @@
 package com.vk.article.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.row.Db;
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.ApArticleConfig;
 import com.vk.article.domain.HomeArticleListVo;
 import com.vk.article.domain.dto.ArticleAndConfigDto;
 import com.vk.article.domain.vo.*;
+import com.vk.article.service.ApArticleConfigService;
 import com.vk.article.service.ApArticleService;
+import com.vk.article.util.ArticleStatus;
 import com.vk.common.core.domain.R;
+import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.web.domain.AjaxResult;
+import com.vk.common.security.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +25,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.vk.article.domain.table.ApArticleConfigTableDef.AP_ARTICLE_CONFIG;
 
 /**
  * 文章信息 控制层。
@@ -31,6 +40,8 @@ public class ApArticleController {
 
     @Autowired
     private ApArticleService apArticleService;
+    @Autowired
+    private ApArticleConfigService apArticleConfigService;
 
 
     @PostMapping("save")
@@ -198,15 +209,59 @@ public class ApArticleController {
     }
 
 
+    /**
+     * 上 下架
+     * @param id
+     * @param isDown
+     * @return
+     */
     @GetMapping("/push")
     public AjaxResult pushArticle(
+            @RequestParam(name = "id") Long id,
+            @RequestParam(name = "isDown") Boolean isDown
+    ){
+        apArticleService.pushArticle(id,isDown);
+        return AjaxResult.success();
+    }
+
+    /**
+     * 发布
+     * @param id
+     * @return
+     */
+    @GetMapping("/release")
+    public AjaxResult releaseArticle(
             @RequestParam(name = "id") Long id
     ){
-        apArticleService.pushArticle(id);
+        ApArticle byId = apArticleService.getById(id);
+        if (null==byId){
+            throw new LeadNewsException("错误的文章");
+        }
+        ApArticle apArticle = new ApArticle();
+        apArticle.setId(id);
+        apArticle.setPublishTime(LocalDateTime.now());
+        apArticle.setFlag(0);
+        if (byId.getStatus().equals(ArticleStatus.PASS.getStatus())) {
+            apArticle.setStatus(ArticleStatus.PUBLISHED.getStatus());
+        }else {
+            throw new LeadNewsException("错误的文章状态");
+        }
+        ApArticleConfig config = new ApArticleConfig();
+        config.setArticleId(id);
+        config.setIsDown(false);
+
+        Db.tx(()->{
+            apArticleConfigService.update(config, QueryWrapper.create().where(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(id)));
+            apArticleService.updateById(apArticle);
+
+            return true;
+        });
+
         return AjaxResult.success();
     }
 
     @GetMapping("/newsPush")
+    @RequiresPermissions("system:article:list")
     public AjaxResult newsPush(
             @RequestParam(name = "title",required = false) String title,
             @RequestParam(name = "beginDate",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate beginDate,

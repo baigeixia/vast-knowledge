@@ -1,11 +1,9 @@
 package com.vk.system.service.system;
 
-import com.vk.common.core.constant.CacheConstants;
-import com.vk.common.core.constant.Constants;
-import com.vk.common.core.constant.SecurityConstants;
-import com.vk.common.core.constant.UserConstants;
+import com.vk.common.core.constant.*;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.enums.UserStatus;
+import com.vk.common.core.enums.UserType;
 import com.vk.common.core.exception.ServiceException;
 import com.vk.common.core.text.Convert;
 import com.vk.common.core.utils.StringUtils;
@@ -45,7 +43,7 @@ public class SysLoginService
     /**
      * 登录
      */
-    public LoginUser login(String username, String password)
+    public LoginUser<SysUser> login(String username, String password)
     {
         // 用户名或密码为空 错误
         if (StringUtils.isAnyBlank(username, password))
@@ -90,8 +88,14 @@ public class SysLoginService
         // }
         
         // LoginUser userInfo = userResult.getData();
-        LoginUser userInfo = sysUserService.getUser(username);
+
+        LoginUser<SysUser> userInfo = sysUserService.getUser(username);
         SysUser user = userInfo.getSysUser();
+        userInfo.setUserid(user.getUserId());
+        userInfo.setUsername(user.getUserName());
+        userInfo.setMarkType(UserType.ADMIN_TYPE.getType());
+
+
         if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
             recordLogService.recordLogininfor(username, Constants.LOGIN_FAIL, "对不起，您的账号已被删除");

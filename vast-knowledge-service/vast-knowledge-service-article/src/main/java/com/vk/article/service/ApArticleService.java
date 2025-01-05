@@ -55,7 +55,7 @@ public interface ApArticleService extends IService<ApArticle> {
 
     ArticleDataListVo getArticleInfoData(Long page, Long size);
 
-    void pushArticle(Long id);
+    void pushArticle(Long id,Boolean isDown);
 
     Page<NewsPushVo> newsPush(String title, LocalDate beginDate, LocalDate endDate, Integer status, Integer pageNum, Integer pageSize);
 }

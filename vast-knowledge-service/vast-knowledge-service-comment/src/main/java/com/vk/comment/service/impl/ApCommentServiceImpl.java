@@ -8,6 +8,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.feign.RemoteClientArticleQueryService;
 import com.vk.comment.common.CommentConstants;
 import com.vk.comment.common.utils.CommentUtils;
+import com.vk.comment.common.utils.SensitiveWordUtils;
 import com.vk.comment.document.ApCommentDocument;
 import com.vk.comment.document.NotificationDocument;
 import com.vk.comment.domain.ApComment;
@@ -88,7 +89,8 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
     private RemoteClientArticleQueryService remoteClientArticleQueryService;
 
     @Autowired
-    private SensitiveWord sensitiveWord;
+    private SensitiveWordUtils sensitiveWordUtils;
+
     @Override
     public CommentList saveComment(CommentSaveDto dto) {
         Long userId = RequestContextUtil.getUserId();
@@ -106,6 +108,8 @@ public class ApCommentServiceImpl extends ServiceImpl<ApCommentMapper, ApComment
         if (StringUtils.isEmpty(content) && StringUtils.isEmpty(image)) {
             throw new RuntimeException("评论内容不能为空");
         }
+
+        sensitiveWordUtils.sensitiveDetectionThrow(content);
 
         Long arAuthorId = dto.getArAuthorId();
 
