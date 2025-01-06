@@ -1,2 +1,3 @@
 com.vk.common.redis.configure.RedisConfig
 com.vk.common.redis.service.RedisService
+com.vk.common.redis.utlis.SensitiveWord

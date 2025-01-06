@@ -1,7 +1,11 @@
 package com.vk.comment.common.utils;
 
+import com.vk.analyze.feign.RemoteChannelService;
+import com.vk.common.core.domain.R;
+import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
-import com.vk.common.core.utils.SensitiveWord;
+
+import com.vk.common.redis.utlis.SensitiveWord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,28 +18,37 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 public class SensitiveWordUtils {
+
     @Autowired
-    private SensitiveWord sensitiveWord;
+    private RemoteChannelService remoteChannelService;
 
     /**
      * 直接弹出
      */
     public void sensitiveDetectionThrow (String content){
-        Map<String, AtomicInteger> stringAtomicIntegerMap = sensitiveWord.filterInfoShortText(content);
-        if (!stringAtomicIntegerMap.isEmpty()) {
-            Set<String> sensitiveS = stringAtomicIntegerMap.keySet();
-            String result = String.join(",", sensitiveS);
-            throw new LeadNewsException("评论内容内容违禁："+result);
+        R<Map<String, AtomicInteger>> sensitiveShort = remoteChannelService.getSensitiveShort(content);
+        if (ValidationUtils.validateRSuccess(sensitiveShort)) {
+            Map<String, AtomicInteger> shortData = sensitiveShort.getData();
+            if (!shortData.isEmpty()) {
+                Set<String> sensitiveS = shortData.keySet();
+                String result = String.join(",", sensitiveS);
+                throw new LeadNewsException("评论内容内容违禁："+result);
+            }
         }
+
     }
     /**
      * 返回敏感词
      */
     public Map<String, AtomicInteger> sensitiveDetection (String content){
-        Map<String, AtomicInteger> stringAtomicIntegerMap = sensitiveWord.filterInfoShortText(content);
-        if (!stringAtomicIntegerMap.isEmpty()) {
-          return stringAtomicIntegerMap;
+        R<Map<String, AtomicInteger>> sensitiveShort = remoteChannelService.getSensitiveShort(content);
+        if (ValidationUtils.validateRSuccess(sensitiveShort)) {
+            Map<String, AtomicInteger> shortData = sensitiveShort.getData();
+            if (!shortData.isEmpty()) {
+                return shortData;
+            }
         }
+
         return null;
     }
 }

@@ -107,6 +107,7 @@
             <artifactId>vast-knowledge-common-log</artifactId>
         </dependency>
 
+
     </dependencies>
 
     <build>

@@ -1,4 +1,4 @@
-package com.vk.common.core.utils;
+package com.vk.common.redis.utlis;
 
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -12,33 +12,33 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 敏感词过滤
  */
 @Component
 public class SensitiveWord {
+
     private static final Logger log = LoggerFactory.getLogger(SensitiveWord.class);
 
     private final Set<String> sensitiveWordSet = new CopyOnWriteArraySet<>();
-    private final Map<String, AtomicInteger> sensitiveWordCountMap = new ConcurrentHashMap<>();
+
     private final TrieNode root = new TrieNode();
 
     private static final String FILE_NAME = "CensorWords.txt";
 
+
+
     // 在Spring启动后，异步加载敏感词
-    @PostConstruct
-    private void init() {
-        loadSensitiveWordsAsync();  // 使用虚拟线程异步加载敏感词
-    }
+    // @PostConstruct
+    // private void init() {
+    //     loadSensitiveWordsAsync();  // 使用虚拟线程异步加载敏感词
+    // }
 
     // 使用虚拟线程异步加载敏感词
     public void loadSensitiveWordsAsync() {
         // 创建虚拟线程池
         ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-
         // 异步加载敏感词
         executor.submit(() -> {
             try {
@@ -51,35 +51,99 @@ public class SensitiveWord {
             }
             log.info("初始化敏感词完成");
         });
-
         executor.shutdown();  // 关闭线程池
     }
 
-    public void addSensitive(Set<String> addSensitive) {
-
-            if (sensitiveWordSet.isEmpty()) {
-                log.error("敏感词未初始化");
-                return;
+    public synchronized void addSensitive(Set<String> addSensitive) {
+        if (sensitiveWordSet.isEmpty()) {
+            log.error("敏感词未初始化");
+            return;
+        }
+        if (addSensitive != null && !addSensitive.isEmpty()) {
+            sensitiveWordSet.addAll(addSensitive);
+            for (String word : addSensitive) {
+                addWord(word);
             }
-            if (addSensitive != null && !addSensitive.isEmpty()) {
-                sensitiveWordSet.addAll(addSensitive);
-            }
-            log.info("数据库敏感词添加部分完成");
-
-
+        }
+        log.info("数据库敏感词添加部分完成");
     }
 
-    public void removeSensitive(Set<String> addSensitive) {
-            if (sensitiveWordSet.isEmpty()) {
-                log.error("敏感词未初始化");
-                return;
-            }
-            if (addSensitive != null && !addSensitive.isEmpty()) {
-                sensitiveWordSet.removeAll(addSensitive);
-            }
-            log.info("数据库敏感词排除部分完成");
 
 
+    public synchronized  void removeSensitive(Set<String> removeSensitive) {
+        if (sensitiveWordSet.isEmpty()) {
+            log.error("敏感词未初始化");
+            return;
+        }
+        if (removeSensitive != null && !removeSensitive.isEmpty()) {
+            sensitiveWordSet.removeAll(removeSensitive);
+            for (String word : removeSensitive) {
+                removeWord(word);
+            }
+        }
+        log.info("数据库敏感词排除部分完成");
+    }
+    public synchronized void upSensitive(String beforeSensitive,String newSensitive) {
+        if (sensitiveWordSet.isEmpty()) {
+            log.error("敏感词未初始化");
+            return;
+        }
+        if (beforeSensitive == null || newSensitive == null) {
+            log.error("参数不能为空");
+            return;
+        }
+
+        if (!sensitiveWordSet.contains(beforeSensitive)) {
+            sensitiveWordSet.add(newSensitive);
+            addWord(newSensitive);
+            return;
+        }
+
+        if (beforeSensitive.equals(newSensitive)) {
+            log.info("新的敏感词与旧的敏感词相同，无需更新");
+            return;
+        }
+
+        if (sensitiveWordSet.contains(newSensitive)) {
+            log.warn("新的敏感词 {} 已经存在，更新操作取消", newSensitive);
+            return;
+        }
+        // 移除旧的敏感词
+        sensitiveWordSet.remove(beforeSensitive);
+        removeWord(beforeSensitive);
+
+        // 添加新的敏感词
+        sensitiveWordSet.add(newSensitive);
+        addWord(newSensitive);
+
+        log.info("数据库敏感词更新完成，将 {} 更新为 {}", beforeSensitive, newSensitive);
+    }
+
+
+    // 从Trie树中移除词
+    private synchronized void removeWord(String word) {
+        TrieNode node = root;
+        Stack<TrieNode> stack = new Stack<>();
+        for (char c : word.toCharArray()) {
+            stack.push(node);
+            node = node.children.get(c);
+            if (node == null) {
+                return; // 词不存在，无需删除
+            }
+        }
+        if (!node.isEnd) {
+            return; // 不是结束节点，无需删除
+        }
+        node.isEnd = false;
+        while (!stack.isEmpty()) {
+            TrieNode parent = stack.pop();
+            TrieNode child = parent.children.get(word.charAt(stack.size()));
+            child.count--;
+            if (child.count == 0) {
+                parent.children.remove(child);
+                break; // 可以提前终止，因为下面的节点都不再被使用
+            }
+        }
     }
 
     // 从文件加载敏感词
@@ -98,12 +162,19 @@ public class SensitiveWord {
     // 构建 Trie 树
     private void buildTrie() {
         for (String word : sensitiveWordSet) {
-            TrieNode node = root;
-            for (char c : word.toCharArray()) {
-                node = node.children.computeIfAbsent(c, k -> new TrieNode());
-            }
-            node.isEnd = true;
+            addWord(word);
         }
+    }
+
+    // 添加词到Trie树
+    private synchronized void addWord(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            node.children.computeIfAbsent(c, k -> new TrieNode());
+            node.children.get(c).count++;
+            node = node.children.get(c);
+        }
+        node.isEnd = true;
     }
 
     // 检查文本中的敏感词
@@ -171,5 +242,8 @@ public class SensitiveWord {
     private static class TrieNode {
         Map<Character, TrieNode> children = new HashMap<>();
         boolean isEnd = false;
+        int count = 0; // 引用计数
     }
 }
+
+

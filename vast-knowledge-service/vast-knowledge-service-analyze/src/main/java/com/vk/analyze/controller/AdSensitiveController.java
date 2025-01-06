@@ -3,14 +3,12 @@ package com.vk.analyze.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.analyze.domain.AdSensitive;
-import com.vk.analyze.domain.table.AdSensitiveTableDef;
 import com.vk.analyze.service.AdSensitiveService;
+import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
-import com.vk.common.core.utils.SensitiveWord;
+import com.vk.common.redis.utlis.SensitiveWord;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.web.controller.BaseController;
 import com.vk.common.core.web.domain.AjaxResult;
-import com.vk.common.core.web.page.TableDataInfo;
 import com.vk.common.log.annotation.Log;
 import com.vk.common.log.enums.BusinessType;
 import com.vk.common.security.annotation.RequiresPermissions;
@@ -20,8 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.vk.analyze.domain.table.AdSensitiveTableDef.AD_SENSITIVE;
 
@@ -111,8 +111,9 @@ public class AdSensitiveController   {
         if (ObjectUtils.isEmpty(byId)){
             throw new LeadNewsException("敏感词不存在,已经被移除");
         }
+        String sensitives = byId.getSensitives();
         Boolean idType = byId.getType();
-        if (idType.equals(type)){
+        if (sensitives.equals(name) && idType.equals(type)){
             throw new LeadNewsException("敏感词已经是："+(type?"不匹配":"匹配"));
         }
         AdSensitive adSensitive = new AdSensitive();
@@ -125,7 +126,7 @@ public class AdSensitiveController   {
             if (type){
                 sensitiveWord.removeSensitive(Set.of(name));
             }else {
-                sensitiveWord.addSensitive(Set.of(name));
+                sensitiveWord.upSensitive(sensitives,name);
             }
         }
         return AjaxResult.success();
@@ -146,6 +147,33 @@ public class AdSensitiveController   {
                 QueryWrapper.create().where(AD_SENSITIVE.SENSITIVES.like(name, StringUtils.isNotEmpty(name)))
                         .orderBy(AD_SENSITIVE.CREATED_TIME,false));
         return AjaxResult.success(paged);
+    }
+
+
+    /**
+     * 短文本处理
+     * @param text
+     * @return
+     */
+    @GetMapping("/sensitiveShort")
+    public R<Map<String, AtomicInteger>> getSensitiveShort(
+            @RequestParam(name = "text" ) String text
+    ) {
+        Map<String, AtomicInteger> stringAtomicIntegerMap = sensitiveWord.filterInfoShortText(text);
+        return R.ok(stringAtomicIntegerMap);
+    }
+
+    /**
+     * 文本处理
+     * @param text
+     * @return
+     */
+    @GetMapping("/sensitive")
+    public R<Map<String, AtomicInteger>> getSensitive(
+            @RequestParam(name = "text" ) String text
+    ) {
+        Map<String, AtomicInteger> stringAtomicIntegerMap = sensitiveWord.filterInfo(text);
+        return R.ok(stringAtomicIntegerMap);
     }
 
 

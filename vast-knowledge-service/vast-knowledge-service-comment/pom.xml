@@ -70,6 +70,11 @@
             <artifactId>vast-knowledge-common-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-redis</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>com.vk</groupId>
@@ -84,6 +89,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-api-analyze</artifactId>
         </dependency>
 
 

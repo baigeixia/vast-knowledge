@@ -1,11 +1,13 @@
 package com.vk.article.jobhandler;
 
 import com.mybatisflex.core.row.Db;
-import com.vk.article.domain.ApArticle;
+import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApRejection;
 import com.vk.article.mapper.ApArticleMapper;
 import com.vk.article.mapper.ApRejectionMapper;
-import com.vk.common.core.utils.SensitiveWord;
+import com.vk.common.core.domain.R;
+import com.vk.common.core.domain.ValidationUtils;
+import com.vk.common.redis.utlis.SensitiveWord;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.db.domain.article.ArticleMg;
@@ -14,10 +16,6 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
@@ -45,7 +43,7 @@ public class ArticleReviewJob {
     private ArticleMgRepository articleMgRepository;
 
     @Autowired
-    private SensitiveWord sensitiveWord;
+    private RemoteChannelService remoteChannelService;
 
     private final Lock lock = new ReentrantLock();
     @XxlJob("articleReview")
@@ -151,19 +149,22 @@ public class ArticleReviewJob {
         log.info("敏感词检测 文章id=： {}",articleId);
         ArticleMg repository = articleMgRepository.findByArticleId(articleId);
         String content = repository.getContent();
-        Map<String, AtomicInteger> atomicIntegerMap = sensitiveWord.filterInfo(content);
-        log.info("敏感词检测结束 文章id=： {}",articleId);
-        if (!ObjectUtils.isEmpty(atomicIntegerMap)) {
-            ApRejection rejection = new ApRejection();
-            rejection.setArticleId(articleId);
-            rejection.setRejection("- 出现违禁词 -");
-            StringBuffer buffer = new StringBuffer();
-            atomicIntegerMap.forEach((word, count) -> buffer.append(word).append("出现：").append(count).append("次").append(","));
-            log.info("敏感词检测结束 敏感词 : {}", buffer);
-            rejection.setProhibited(buffer.toString());
-            apRejections.add(rejection);
-        }else {
-            approvedIds.add(articleId);
+        R<Map<String, AtomicInteger>> sensitiveShort = remoteChannelService.getSensitiveShort(content);
+        if (ValidationUtils.validateRSuccess(sensitiveShort)) {
+            Map<String, AtomicInteger> shortData = sensitiveShort.getData();
+            log.info("敏感词检测结束 文章id=： {}",articleId);
+            if (!ObjectUtils.isEmpty(shortData)) {
+                ApRejection rejection = new ApRejection();
+                rejection.setArticleId(articleId);
+                rejection.setRejection("- 出现违禁词 -");
+                StringBuffer buffer = new StringBuffer();
+                shortData.forEach((word, count) -> buffer.append(word).append("出现：").append(count).append("次").append(","));
+                log.info("敏感词检测结束 敏感词 : {}", buffer);
+                rejection.setProhibited(buffer.toString());
+                apRejections.add(rejection);
+            }else {
+                approvedIds.add(articleId);
+            }
         }
     }
 

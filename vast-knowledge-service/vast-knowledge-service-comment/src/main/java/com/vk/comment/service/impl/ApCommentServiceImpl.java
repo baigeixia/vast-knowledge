@@ -26,7 +26,6 @@ import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
-import com.vk.common.core.utils.SensitiveWord;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.user.domain.AuthorInfo;
 import com.vk.user.feign.RemoteClientUserService;
@@ -52,7 +51,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.vk.comment.common.CommentConstants.COMMENT_TYPE_HOT;

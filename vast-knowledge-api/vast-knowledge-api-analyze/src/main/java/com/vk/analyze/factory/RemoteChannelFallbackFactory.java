@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * 用户服务降级处理
  * 
@@ -28,6 +31,16 @@ public class RemoteChannelFallbackFactory implements FallbackFactory<RemoteChann
             @Override
             public R<AdChannel> getChannel(Long channelId) {
                 return R.fail("获取频道信息失败"+throwable.getMessage());
+            }
+
+            @Override
+            public R<Map<String, AtomicInteger>> getSensitiveShort(String text) {
+                return R.fail("敏感词检测错误"+throwable.getMessage());
+            }
+
+            @Override
+            public R<Map<String, AtomicInteger>> getSensitive(String text) {
+                return R.fail("敏感词检测错误"+throwable.getMessage());
             }
         };
     }
