@@ -8,4 +8,5 @@ public class AuthorInfo{
     private String avatar;
     private String username;
     private String position;
+    private String location;
 }

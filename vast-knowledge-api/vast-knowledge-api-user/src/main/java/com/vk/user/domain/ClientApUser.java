@@ -67,4 +67,10 @@ public class ClientApUser implements Serializable {
      */
     private LocalDateTime createdTime;
 
+    /**
+     * 归属地
+     */
+    private String location;
+
+
 }

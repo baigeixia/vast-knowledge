@@ -105,6 +105,11 @@
 <!--        </dependency>-->
 
 
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+        </dependency>
+
         <!-- servlet-->
         <dependency>
             <groupId>jakarta.servlet</groupId>

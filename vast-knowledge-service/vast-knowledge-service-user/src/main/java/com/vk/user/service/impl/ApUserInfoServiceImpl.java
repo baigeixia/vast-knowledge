@@ -363,7 +363,7 @@ public class ApUserInfoServiceImpl extends ServiceImpl<ApUserInfoMapper, ApUserI
                 throw new LeadNewsException("错误的用户");
             }
             UserInfoVo userInfoVo = mapper.selectGetInfo(id);
-            userInfoVo.setPhone(maskPhoneNumber(userInfoVo.getPhone()));
+            // userInfoVo.setPhone(maskPhoneNumber(userInfoVo.getPhone()));
             redisService.setCacheObject(redisUserInfoKey(id),userInfoVo,60*30L, TimeUnit.SECONDS);
             // redisService.setCacheObject(redisUserInfoKey(id), userInfoVo);
             return userInfoVo;

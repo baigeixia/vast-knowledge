@@ -120,4 +120,37 @@
             #{articleId}
         </foreach>
     </update>
+
+
+    <select id="listByIds" resultType="com.vk.article.domain.ApArticle">
+        select
+        `id` ,
+        `title` ,
+        `author_id` ,
+        `author_name` ,
+        `channel_id` ,
+        `channel_name` ,
+        `layout`,
+        `flag` ,
+        `images` ,
+        `labels` ,
+        `likes` ,
+        `collection` ,
+        `comment` ,
+        `views`,
+        `province_id` ,
+        `city_id` ,
+        `county_id`,
+        `created_time`,
+        `update_time` ,
+        `publish_time`,
+        `sync_status` ,
+        `status`
+        from ap_article
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and status=9
+    </select>
 </mapper>

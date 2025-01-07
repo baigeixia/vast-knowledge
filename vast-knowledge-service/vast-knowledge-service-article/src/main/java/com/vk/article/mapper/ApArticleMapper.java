@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public interface ApArticleMapper extends BaseMapper<ApArticle> {
 
-    @Select("SELECT a.id from  ap_article a LEFT JOIN ap_article_config c ON a.id = c.article_id WHERE a.author_id = #{userId}  and c.is_down=0 and c.is_delete=0    ORDER BY  created_time DESC LIMIT #{page},5")
+    @Select("SELECT a.id from  ap_article a LEFT JOIN ap_article_config c ON a.id = c.article_id WHERE a.author_id = #{userId}  and c.is_down=0 and c.is_delete=0 and a.status=9   ORDER BY  created_time DESC LIMIT #{page},5")
     List<Long> selectUserIdGetList(@Param("userId") Long userId, @Param("page")Long page);
 
     @Select(value="select count(1) from ap_article apa inner join ap_article_config apc on apa.id=apc.article_id where publish_time<=#{publishTime}")
@@ -78,4 +78,7 @@ public interface ApArticleMapper extends BaseMapper<ApArticle> {
 
     @Select("select count(*) from ap_article where  author_id = #{userId} and id=#{id}  ")
     Long userArticle(@Param("userId")Long userId, @Param("id")Long id);
+
+
+    List<ApArticle> listByIds(@Param("ids") Set<Long> ids);
 }

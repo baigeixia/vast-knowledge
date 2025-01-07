@@ -6,6 +6,8 @@ import com.vk.analyze.domain.AdSensitive;
 import com.vk.analyze.service.AdSensitiveService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.ip.IpUtils;
+import com.vk.common.core.utils.ip.SearcherIpToAdder;
 import com.vk.common.redis.utlis.SensitiveWord;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.domain.AjaxResult;
@@ -40,6 +42,10 @@ public class AdSensitiveController   {
 
     @Autowired
     private SensitiveWord sensitiveWord;
+    @Autowired
+    private SearcherIpToAdder searcherIpToAdder;
+
+
 
     /**
      * 添加敏感词信息。
@@ -104,6 +110,8 @@ public class AdSensitiveController   {
             @RequestParam(name = "name") String name,
             @RequestParam(name = "type") Boolean type
     ) {
+
+
         if (StringUtils.isEmpty(name)){
             throw new LeadNewsException("敏感词修改不能为空");
         }

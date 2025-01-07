@@ -1,3 +1,4 @@
 com.vk.common.core.utils.SpringUtils
 com.vk.common.core.exception.GlobalExceptionHandler
 com.vk.common.core.context.CustomObjectMapperConfig
+com.vk.common.core.utils.ip.SearcherIpToAdder

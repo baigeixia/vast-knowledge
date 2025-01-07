@@ -13,6 +13,7 @@ import com.vk.system.model.LoginUser;
 import com.vk.user.domain.ClientApUser;
 import com.vk.user.domain.user.UserLoginBody;
 import com.vk.user.service.user.UserLoginService;
+import com.vk.user.util.UpIpAddr;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +32,9 @@ public class UserSecurityController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private UpIpAddr upIpAddr;
 
     @PostMapping("login")
     public AjaxResult login(@RequestBody UserLoginBody form,HttpServletRequest request, HttpServletResponse response)
@@ -62,11 +66,14 @@ public class UserSecurityController {
    {
        String userType = UserType.USER_TYPE.getType();
        LoginUser<ClientApUser> loginUser = tokenService.getLoginUser(request,userType);
+
        if (!ObjectUtils.isEmpty(loginUser))
        {
            String key = loginUser.getToken();
            String username = loginUser.getUsername();
            Long userId = loginUser.getSysUser().getId();
+           String location = loginUser.getSysUser().getLocation();
+           upIpAddr.checkAddress(location,userId);
 
            String token = tokenService.createToken(key, userId, username,userType);
            // 刷新redis有效期

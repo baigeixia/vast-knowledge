@@ -328,7 +328,9 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         Map<Long, HomeArticleListVo> listVoMap = new HashMap<>();
         if (!ObjectUtils.isEmpty(ids)) {
             listVoMap = TaskVirtualExecutorUtil.executeWith(() -> {
-                List<ApArticle> apArticles = mapper.selectListByIds(ids);
+                // List<ApArticle> apArticles = mapper.selectListByIds(ids);
+                List<ApArticle> apArticles = mapper.listByIds(ids);
+
 
                 List<HomeArticleListVo> homeArticleListVos = apArticles.stream().map(i -> {
                     HomeArticleListVo listVo = new HomeArticleListVo();
@@ -363,7 +365,9 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
         wrapper.
                 select(AP_ARTICLE.DEFAULT_COLUMNS).from(AP_ARTICLE)
                 .leftJoin(AP_ARTICLE_CONFIG).on(AP_ARTICLE_CONFIG.ARTICLE_ID.eq(AP_ARTICLE.ID))
-                .where(AP_ARTICLE.AUTHOR_ID.eq(userId)).and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0))
+                .where(AP_ARTICLE.AUTHOR_ID.eq(userId))
+                .and(AP_ARTICLE.STATUS.eq(9))
+                .and(AP_ARTICLE_CONFIG.IS_DELETE.eq(0))
                 .and(AP_ARTICLE_CONFIG.IS_DOWN.eq(0));
 
         if (type == 1) {

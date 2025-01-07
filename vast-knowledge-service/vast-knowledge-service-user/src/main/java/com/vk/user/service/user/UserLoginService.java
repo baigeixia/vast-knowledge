@@ -1,6 +1,7 @@
 package com.vk.user.service.user;
 
 
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
 import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.constant.UserBehaviourConstants;
@@ -10,6 +11,7 @@ import com.vk.common.core.exception.ServiceException;
 import com.vk.common.core.text.Convert;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.ip.IpUtils;
+import com.vk.common.core.utils.ip.SearcherIpToAdder;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.common.redis.service.RedisService;
 import com.vk.common.security.utils.SecurityUtils;
@@ -19,8 +21,10 @@ import com.vk.user.domain.ApUser;
 import com.vk.user.domain.ApUserInfo;
 import com.vk.user.domain.ClientApUser;
 import com.vk.user.domain.UserAndInfo;
+import com.vk.user.domain.table.ApUserInfoTableDef;
 import com.vk.user.mapper.ApUserInfoMapper;
 import com.vk.user.mapper.ApUserMapper;
+import com.vk.user.util.UpIpAddr;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
+
+import static com.vk.user.domain.table.ApUserInfoTableDef.AP_USER_INFO;
 
 @Component
 @Slf4j
@@ -40,6 +46,12 @@ public class UserLoginService {
     private ApUserMapper apUserMapper;
     @Autowired
     private ApUserInfoMapper apUserInfoMapper;
+
+    @Autowired
+    private UpIpAddr upIpAddr;
+
+    @Autowired
+    private SearcherIpToAdder searcherIpToAdder;
 
     public LoginUser<ClientApUser> login(String token, String email, String password, Integer codeOrPas) {
         String redisToken = redisService.getCacheObject(getCacheTokenKey(token));
@@ -77,10 +89,16 @@ public class UserLoginService {
             resultVo.setUsername(byName.getName());
             resultVo.setSysUser(user);
 
+
+
             resultVo.setUserid(byName.getId());
             resultVo.setUsername(byName.getName());
             resultVo.setMarkType(UserType.USER_TYPE.getType());
 
+            String location = byName.getLocation();
+            Long userid = byName.getId();
+            //登录归属地改变，更新
+            upIpAddr.checkAddress(location,userid);
             // redisAddUser(byName, resultVo);
 
             return resultVo;
@@ -113,12 +131,13 @@ public class UserLoginService {
         user.setCreatedTime(dateTime);
         user.setIsCertification(0);
         user.setIsIdentityAuthentication(0);
-        user.setIsIdentityAuthentication(0);
         user.setStatus(false);
         String encryptPassword = SecurityUtils.encryptPassword(password, salt);
         user.setPassword(encryptPassword);
 
         ApUserInfo info = new ApUserInfo();
+        String ipAddr = IpUtils.getIpAddr();
+        String province = searcherIpToAdder.SearcherToAdder(ipAddr);
 
         Db.tx(() -> {
             try {
@@ -127,6 +146,7 @@ public class UserLoginService {
                 info.setUserId(id);
                 info.setName("MOMO");
                 info.setSex(2);
+                info.setLocation(province);
                 info.setUpdatedTime(dateTime);
                 apUserInfoMapper.insert(info);
             } catch (Exception e) {

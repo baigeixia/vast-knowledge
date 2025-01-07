@@ -14,10 +14,6 @@ public class UserInfoVo {
      * 用户名
      */
     private String name;
-    /**
-     * 手机号
-     */
-    private String phone;
 
     /**
      * 头像
@@ -31,10 +27,7 @@ public class UserInfoVo {
      * 0:男 1:女 2:未知
      */
     private Integer sex;
-    /**
-     * 注册时间
-     */
-    private LocalDateTime createdTime;
+
     /**
      * 公司
      */
@@ -95,10 +88,6 @@ public class UserInfoVo {
      */
     private Integer isDisplayImage;
 
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updatedTime;
 
 
 }

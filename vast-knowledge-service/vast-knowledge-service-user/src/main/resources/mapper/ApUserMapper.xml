@@ -5,7 +5,7 @@
 <mapper namespace="com.vk.user.mapper.ApUserMapper">
 
     <select id="selectListOrInfo" resultType="com.vk.user.domain.AuthorInfo">
-        SELECT u.id as id, i.name as username, u.image as avatar,i.position as position
+        SELECT u.id as id, i.name as username, u.image as avatar,i.position as `position` ,i.location as location
         from ap_user u
                  JOIN ap_user_info i on u.id = i.user_id
         WHERE
