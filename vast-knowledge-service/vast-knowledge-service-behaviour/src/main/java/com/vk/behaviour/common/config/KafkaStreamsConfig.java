@@ -14,11 +14,6 @@ import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @version 1.0
- * @description 说明
- * @package com.itheima.kafka.stream
- */
 @Data
 @Configuration
 @EnableKafkaStreams
@@ -38,6 +33,4 @@ public class KafkaStreamsConfig {
         props.put(StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG, WallclockTimestampExtractor.class.getName());
         return new KafkaStreamsConfiguration(props);
     }
-
-
 }

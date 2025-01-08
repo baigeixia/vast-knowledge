@@ -5,6 +5,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
 import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.constant.UserBehaviourConstants;
+import com.vk.common.core.constant.VisitorStatisticsConstant;
 import com.vk.common.core.enums.UserType;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.exception.ServiceException;
@@ -110,6 +111,12 @@ public class UserLoginService {
             }
 
             createNewUser(email, password,resultVo);
+
+            try {
+                redisService.incr(VisitorStatisticsConstant.getVisitorRegistrationsKey());
+            } catch (Exception e) {
+                log.error("reds add registrations error:{}",e.getMessage());
+            }
 
             // redisAddUser(newUser, resultVo);
             return resultVo;

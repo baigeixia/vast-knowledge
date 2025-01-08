@@ -4,6 +4,7 @@ package com.vk.common.security.service;
 import com.vk.common.core.constant.CacheConstants;
 import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.constant.TokenConstants;
+import com.vk.common.core.constant.VisitorStatisticsConstant;
 import com.vk.common.core.utils.ServletUtils;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.TokenUtils;
@@ -73,6 +74,13 @@ public class TokenService {
 
 
     public String createToken(String key, Long userId, String username,String markType) {
+        try {
+            redisService.setBit(VisitorStatisticsConstant.getVisitorDauKey(),userId);
+            redisService.incr(VisitorStatisticsConstant.getVisitorPvKey());
+        } catch (Exception e) {
+            log.error("redis add DAU PV error:{}",e.getMessage());
+        }
+
         Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put(SecurityConstants.USER_KEY, key);
         claimsMap.put(SecurityConstants.USER_TYPE, markType);
@@ -97,7 +105,6 @@ public class TokenService {
             if (!ObjectUtils.isEmpty(parseToken)) {
                 claims.putAll(parseToken);
             }
-
         }
 
         claims.put(type, key);

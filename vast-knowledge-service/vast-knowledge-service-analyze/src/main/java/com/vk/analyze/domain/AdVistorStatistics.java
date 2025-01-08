@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -52,6 +53,7 @@ public class AdVistorStatistics implements Serializable {
     /**
      * 创建时间
      */
-    private LocalDateTime createdTime;
+    private LocalDate createdTime;
+
 
 }

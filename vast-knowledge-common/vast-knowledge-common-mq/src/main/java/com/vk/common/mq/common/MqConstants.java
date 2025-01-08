@@ -4,6 +4,7 @@ public interface MqConstants {
 
     String NOTIFY_GROUP ="notify-group";
     String COMMENT_NOTIFY_GROUP ="comment-notify-group";
+    String VISITOR_GROUP ="visitor-group";
     interface TopicCS{
         /** 文章自动审核主的topic */
         String NEWS_ARTICLE_AUTO_SCAN_TOPIC = "news.article.auto.scan.topic";
@@ -16,12 +17,18 @@ public interface MqConstants {
 
         /** 用户行为 kafka stream 消费者 topic */
         String HOT_ARTICLE_INCR_HANDLE_TOPIC="article_behavior_out";
-
         String NEWS_USER_MESSAGE_TOPIC = "news.user.message.topic";
         /** 用户评论点赞行为 kafka stream 输入 topic */
         String NEWS_COMMENT_TOPIC = "news_comment_input";
         /** 用户评论点赞行为 kafka stream 消费者 topic */
         String NEWS_COMMENT_INCR_HANDLE_TOPIC = "news_comment_out";
+
+
+        /** 访问数据 kafka stream 输入 topic */
+        String VISITOR_STATISTICS_TOPIC = "visitor_statistics_input";
+
+        /** 访问数据 kafka stream 消费者 topic */
+        String VISITOR_STATISTICS_INCR_HANDLE_TOPIC = "visitor_statistics_out";
     }
 
 

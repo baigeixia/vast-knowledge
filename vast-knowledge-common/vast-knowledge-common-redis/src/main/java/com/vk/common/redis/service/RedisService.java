@@ -311,4 +311,21 @@ public class RedisService
         return redisTemplate.keys(pattern);
     }
 
+    public void setBit( String dateKey,Long userid)
+    {
+        redisTemplate.opsForValue().setBit(dateKey, userid, true);
+    }
+
+    public Long getBit( String dateKey)
+    {
+       return Objects.requireNonNull(redisTemplate.getConnectionFactory()).getConnection().stringCommands().bitCount(dateKey.getBytes());
+    }
+
+    public void incr( String dateKey)
+    {
+        redisTemplate.opsForValue().increment(dateKey, 1L);
+    }
+
+
 }
+

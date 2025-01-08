@@ -497,7 +497,6 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     private ArticleDataVo timeData(LocalDateTime startTime, LocalDateTime endTime) {
         Long userId = RequestContextUtil.getUserId();
-
         return TaskVirtualExecutorUtil.executeWith(() -> mapper.getArticleData(userId, startTime, endTime));
     }
 
