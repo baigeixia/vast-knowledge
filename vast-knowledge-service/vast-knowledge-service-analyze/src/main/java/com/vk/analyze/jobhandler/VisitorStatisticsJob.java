@@ -43,7 +43,7 @@ public class VisitorStatisticsJob {
                 dau = redisService.getBit(VisitorStatisticsConstant.getVisitorDauKey());
                 pv = Integer.toUnsignedLong(redisService.getCacheObject(VisitorStatisticsConstant.getVisitorPvKey()));
                 Integer register = redisService.getCacheObject(VisitorStatisticsConstant.getVisitorRegistrationsKey());
-                registrations = register != null ? Integer.toUnsignedLong(register) : null;
+                registrations = register != null ? Integer.toUnsignedLong(register) : 0L;
             } catch (Exception e) {
                 log.error("统计数据--> 获取redis数据错误 error：{}", e.getMessage());
             }

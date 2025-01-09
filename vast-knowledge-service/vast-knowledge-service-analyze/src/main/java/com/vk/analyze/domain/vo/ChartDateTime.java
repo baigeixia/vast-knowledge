@@ -8,6 +8,6 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 public class ChartDateTime {
-    private LocalDate dateTime;
-    private Long rowData;
+    private LocalDate name;
+    private Long value;
 }

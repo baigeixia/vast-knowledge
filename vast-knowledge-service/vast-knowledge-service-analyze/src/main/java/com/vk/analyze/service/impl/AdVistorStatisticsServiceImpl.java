@@ -7,9 +7,13 @@ import com.vk.analyze.domain.vo.ChartDateTime;
 import com.vk.analyze.domain.vo.VisitorListVo;
 import com.vk.analyze.mapper.AdVistorStatisticsMapper;
 import com.vk.analyze.service.AdVistorStatisticsService;
+import com.vk.common.core.constant.VisitorStatisticsConstant;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.DateUtils;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
+import com.vk.common.redis.service.RedisService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -30,11 +34,15 @@ import static com.vk.analyze.domain.table.AdVistorStatisticsTableDef.AD_VISTOR_S
  * @since 2024-05-13
  */
 @Service
+@Slf4j
 public class AdVistorStatisticsServiceImpl extends ServiceImpl<AdVistorStatisticsMapper, AdVistorStatistics> implements AdVistorStatisticsService {
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public VisitorListVo chartLIstDate(LocalDate startTime, LocalDate endTime, Integer cycle) {
-        if (Stream.of(0, 1, 2, 3).noneMatch(Predicate.isEqual(cycle))) {
+        if (Stream.of(0, 1, 2, 3, 4).noneMatch(Predicate.isEqual(cycle))) {
             throw new LeadNewsException("错误的日期");
         }
 
@@ -50,7 +58,24 @@ public class AdVistorStatisticsServiceImpl extends ServiceImpl<AdVistorStatistic
             case 0 -> {
                 // 今天
                 cycleStartTime = DateUtils.getStartOfDay().toLocalDate();
-                cycleEndTime = DateUtils.getEndOfDay().toLocalDate();
+
+                try {
+                    Long dau = redisService.getBit(VisitorStatisticsConstant.getVisitorDauKey());
+                    Long pv = Integer.toUnsignedLong(redisService.getCacheObject(VisitorStatisticsConstant.getVisitorPvKey()));
+                    Integer register = redisService.getCacheObject(VisitorStatisticsConstant.getVisitorRegistrationsKey());
+                    Long registrations = register != null ? Integer.toUnsignedLong(register) : 0L;
+
+                    VisitorListVo vo = new VisitorListVo();
+                    vo.setDailyDataTime(List.of(cycleStartTime));
+                    vo.setDailyRowData(List.of(dau));
+                    vo.getRegistrationsData().add(new ChartDateTime(cycleStartTime,registrations));
+                    vo.getVisitsData().add(new ChartDateTime(cycleStartTime,pv));
+
+                    return vo;
+                } catch (Exception e) {
+                    log.error("统计数据--> 获取redis数据错误 error：{}", e.getMessage());
+                }
+
             }
             case 1 -> {
                 // 本周
@@ -66,6 +91,11 @@ public class AdVistorStatisticsServiceImpl extends ServiceImpl<AdVistorStatistic
                 // 整月
                 cycleStartTime = DateUtils.getStartOfWholeMonth().toLocalDate();
                 cycleEndTime = DateUtils.getEndOfWholeMonth().toLocalDate();
+            }
+            case 4 -> {
+                // 昨天
+                cycleStartTime = DateUtils.getStartOfYesterday().toLocalDate();
+                cycleEndTime = DateUtils.getEndOfYesterday().toLocalDate();
             }
         }
 

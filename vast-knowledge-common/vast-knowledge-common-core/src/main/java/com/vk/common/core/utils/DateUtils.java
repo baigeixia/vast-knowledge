@@ -183,6 +183,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         return LocalDateTime.now().toLocalDate().atStartOfDay();
     }
 
+    public static LocalDateTime getStartOfYesterday() {
+        return LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay();
+    }
     // 获取当天的结束时间
     public static LocalDateTime getEndOfDay() {
         return LocalDateTime.now().toLocalDate().atTime(23, 59, 59, 999999);
@@ -219,6 +222,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     // 获取最近30天的结束时间（wholeMoon）
     public static LocalDateTime getEndOfWholeMonth() {
         return LocalDateTime.now().toLocalDate().atTime(23, 59, 59, 999999);
+    }
+    public static LocalDateTime getEndOfYesterday() {
+        return LocalDateTime.now().minusDays(1).toLocalDate().atTime(23, 59, 59, 999999);
     }
 
 
