@@ -11,8 +11,10 @@ WORKDIR /vk/gen
 
 ENV SERVER_PORT=19006 LANG=C.UTF-8 LC_ALL=C.UTF-8 JAVA_OPTS=""
 
+ARG JAR_FILE
+
 EXPOSE ${SERVER_PORT}
 
-ADD ./target/*.jar ./app.jar
+COPY ./target/${JAR_FILE} ./app.jar
 
-ENTRYPOINT java -Djava.security.egd=file:/dev/./urandom -Dserver.port=${SERVER_PORT} ${JAVA_OPTS} -jar app.jar
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-Dserver.port=${SERVER_PORT}", "${JAVA_OPTS}", "-jar", "app.jar"]
