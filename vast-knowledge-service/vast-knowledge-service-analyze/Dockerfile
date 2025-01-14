@@ -2,7 +2,7 @@
 #FROM bellsoft/liberica-openjdk-debian:17.0.11-cds
 #FROM bellsoft/liberica-openjdk-debian:21.0.3-cds
 #FROM findepi/graalvm:java17-native
-FROM alpine/java:21.0.4-jdk
+FROM openjdk:21.0.1
 
 LABEL maintainer="zhang san"
 
