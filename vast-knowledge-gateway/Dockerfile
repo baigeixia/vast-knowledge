@@ -2,7 +2,7 @@
 #FROM bellsoft/liberica-openjdk-debian:17.0.11-cds
 #FROM bellsoft/liberica-openjdk-debian:21.0.3-cds
 #FROM findepi/graalvm:java17-native
-FROM bellsoft/liberica-openjdk:21.0.1
+FROM dragonwell-registry.cn-hangzhou.cr.aliyuncs.com/dragonwell/dragonwell:21
 
 LABEL maintainer="zhang san"
 
