@@ -31,34 +31,34 @@ public class IgnoreWhiteProperties
         initializeWhites();
     }
     private void initializeWhites() {
-        whites.add("/dev-collection/analyze/channel/page");
-        whites.add("/dev-core/article/article/homeList");
-        // whites.add("/dev-collection/behaviour/likes/articleLike");
-        whites.add("/dev-core/search/search/searchInfo");
-        whites.add("/dev-system/user/info/search");
-        whites.add("/dev-core/article/Content/getInfo");
-        whites.add("/dev-core/article/article/info");
-        whites.add("/dev-core/comment/Comment/getCommentList");
-        // whites.add("/dev-system/user/info/getInfo");
-//        whites.add("/dev-collection/behaviour/likes/commentLike/**");
-        whites.add("/dev-collection/behaviour/behavior/list");
-        // whites.add("/dev-system/user/info/InfoRelation");
-        whites.add("/dev-core/article/article/posts");
-        whites.add("/dev-collection/behaviour/collect/list");
-        whites.add("/dev-system/user/follow/list");
-        whites.add("/dev-system/user/fan/list");
+        whites.add("/analyze/channel/page");
+        whites.add("/article/article/homeList");
+        // whites.add("/behaviour/likes/articleLike");
+        whites.add("/search/search/searchInfo");
+        whites.add("/user/info/search");
+        whites.add("/article/Content/getInfo");
+        whites.add("/article/article/info");
+        whites.add("/comment/Comment/getCommentList");
+        // whites.add("/user/info/getInfo");
+//        whites.add("/behaviour/likes/commentLike/**");
+        whites.add("/behaviour/behavior/list");
+        // whites.add("/user/info/InfoRelation");
+        whites.add("/article/article/posts");
+        whites.add("/behaviour/collect/list");
+        whites.add("/user/follow/list");
+        whites.add("/user/fan/list");
 
-        whites.add("/dev-system/user/login");
-        whites.add("/dev-system/user/refresh");
-        whites.add("/dev-system/user/logout");
+        whites.add("/user/login");
+        whites.add("/user/refresh");
+        whites.add("/user/logout");
 
-        whites.add("/dev-system/system/login");
-        whites.add("/dev-system/system/logout");
-        whites.add("/dev-system/system/refresh");
+        whites.add("/system/login");
+        whites.add("/system/logout");
+        whites.add("/system/refresh");
 
 
-        checkCode.add("/dev-system/system/login");
-        checkCode.add("/dev-system/user/login");
+        checkCode.add("/system/login");
+        checkCode.add("/user/login");
     }
 
     public List<String> getCheckCode() {

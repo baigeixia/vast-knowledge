@@ -11,13 +11,42 @@
 
     <groupId>com.vk</groupId>
     <artifactId>vast-knowledge-gateway</artifactId>
-    <packaging>pom</packaging>
 
-    <modules>
-        <module>vast-knowledge-gateway-system</module>
-        <module>vast-knowledge-gateway-core</module>
-        <module>vast-knowledge-gateway-collection</module>
-    </modules>
+    <dependencies>
+        <!--验证码 -->
+        <dependency>
+            <groupId>pro.fessional</groupId>
+            <artifactId>kaptcha</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-gateway</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-redis</artifactId>
+        </dependency>
+
+    </dependencies>
+
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

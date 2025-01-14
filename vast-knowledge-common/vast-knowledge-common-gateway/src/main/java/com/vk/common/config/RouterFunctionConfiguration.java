@@ -8,8 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
-import org.springframework.web.server.WebFilterChain;
-import reactor.core.publisher.Mono;
 
 /**
  * 路由配置信息
@@ -28,7 +26,7 @@ public class RouterFunctionConfiguration
     public RouterFunction routerFunction()
     {
         return RouterFunctions.route(
-                RequestPredicates.GET("/dev-system/system/code")
+                RequestPredicates.GET("/system/code")
                         .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)),validateCodeHandler
         );
     }

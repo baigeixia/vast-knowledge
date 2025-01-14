@@ -146,11 +146,11 @@
         `publish_time`,
         `sync_status` ,
         `status`
-        from ap_article
-        WHERE id IN
+        from ap_article a left join ap_article_config f
+        WHERE a.id IN
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
-        and status=9
+        and a.status=9 and f.is_down = 0 and is_delete=0
     </select>
 </mapper>

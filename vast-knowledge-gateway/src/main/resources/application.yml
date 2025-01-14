@@ -1,0 +1,114 @@
+server:
+  port: 16001
+spring:
+  cloud:
+    gateway:
+      # 网关全局跨域配置
+#      globalcors:
+#        add-to-simple-url-handler-mapping: true
+#        cors-configurations:
+#          '[/**]': # 匹配所有请求
+#            allowedOrigins: "*" #跨域处理 允许所有的域
+#            allowedHeaders: "*"
+#            allowedMethods: # 支持的方法
+#              - GET
+#              - POST
+#              - PUT
+#              - DELETE
+#              - OPTIONS
+#            maxAge: 18000
+#            allowCredentials: true
+      routes:
+#        # 权限微服
+#        - id: vk-service-auth
+#          uri: lb://vk-service-auth
+#          predicates:
+#            - Path=/auth/**
+#          filters:
+#            - StripPrefix=1
+        # 后台管理微服
+        - id: vk-service-system
+          uri: lb://vk-service-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+        # 用户信息
+        - id: vk-service-user
+          uri: lb://vk-service-user
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+        # 媒体信息
+        - id: vk-service-wemedia
+          uri: lb://vk-service-wemedia
+          predicates:
+            - Path=/media/**
+          filters:
+            - StripPrefix=1
+        # 评论
+        - id: vk-service-comment
+          uri: lb://vk-service-comment
+          predicates:
+            - Path=/comment/**
+          filters:
+            - StripPrefix=1
+        # 搜索
+        - id: vk-service-search
+          uri: lb://vk-service-search
+          predicates:
+            - Path=/search/**
+          filters:
+            - StripPrefix=1
+        # 文章
+        - id: vk-service-article
+          uri: lb://vk-service-article
+          predicates:
+            - Path=/article/**
+          filters:
+            - StripPrefix=1
+
+        # 评论
+        - id: vk-service-comment
+          uri: lb://vk-service-comment
+          predicates:
+            - Path=/comment/**
+          filters:
+            - StripPrefix=1
+        # 搜索
+        - id: vk-service-search
+          uri: lb://vk-service-search
+          predicates:
+            - Path=/search/**
+          filters:
+            - StripPrefix=1
+        # 文章
+        - id: vk-service-article
+          uri: lb://vk-service-article
+          predicates:
+            - Path=/article/**
+          filters:
+            - StripPrefix=1
+
+        # 用户行为
+        - id: vk-service-behaviour
+          uri: lb://vk-service-behaviour
+          predicates:
+            - Path=/behaviour/**
+          filters:
+            - StripPrefix=1
+        #统计信息
+        - id: vk-service-analyze
+          uri: lb://vk-service-analyze
+          predicates:
+            - Path=/analyze/**
+          filters:
+            - StripPrefix=1
+        #dfs
+        - id: vk-service-dfs
+          uri: lb://vk-service-dfs
+          predicates:
+            - Path=/dfs/**
+          filters:
+            - StripPrefix=1
