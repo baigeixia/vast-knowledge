@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('克隆代码') {
             steps {
-                git credentialsId: '29f354e3-e3db-4ed5-98c8-460e03110e53', url: 'https://github.com/baigeixia/vast-knowledge.git', branch: 'main'
+              git credentialsId: '29f354e3-e3db-4ed5-98c8-460e03110e53', url: 'https://github.com/baigeixia/vast-knowledge.git'
             }
         }
 
