@@ -21,7 +21,7 @@ pipeline {
                 dir('vast-knowledge-gateway') {
                     script {
                         def image = docker.build("vk-dev")
-                        docker.withRegistry('https://registry.cn-hangzhou.aliyuncs.com', 'aliyun-credentials-id') {
+                        docke   r.withRegistry('https://registry.cn-hangzhou.aliyuncs.com', 'aliyun-credentials-id') {
                             image.push()
                         }
                     }

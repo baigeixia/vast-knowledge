@@ -21,7 +21,6 @@
         <module>vast-knowledge-service-comment</module>
         <module>vast-knowledge-service-search</module>
         <module>vast-knowledge-service-wemedia</module>
-        <module>vast-knowledge-service-socket</module>
         <module>vast-knowledge-service-dfs</module>
     </modules>
 
