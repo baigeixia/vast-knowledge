@@ -8,36 +8,21 @@ pipeline {
             }
         }
 
-        stage('构建 Maven 项目') {
+        stage('编译公共模块') {
             steps {
-                dir('vast-knowledge-gateway') {
-                    sh 'mvn clean package'
-                }
+               dir('vast-knowledge') {
+                sh 'mvn clean install -pl vast-knowledge-common,vast-knowledge-api -am'
+              }
             }
         }
-
-        stage('构建 Docker 镜像') {
-            steps {
-                dir('vast-knowledge-gateway') {
-                    script {
-                        def image = docker.build("vk-dev")
-                        docke   r.withRegistry('https://registry.cn-hangzhou.aliyuncs.com', 'aliyun-credentials-id') {
-                            image.push()
-                        }
+           stage('编译并部署选择的服务') {
+                    steps {
+                          script {
+                                 echo "模块路径 ${server_name} 。"
+                          }
                     }
                 }
-            }
-        }
 
-        stage('部署到服务器') {
-            steps {
-                sshagent(credentials: ['ssh-credentials-id']) {
-                    sh '''
-                        ssh user@server "docker stop vk-dev || true && docker rm vk-dev || true"
-                        ssh user@server "docker pull registry.cn-hangzhou.aliyuncs.com/vk-25/vk-dev && docker run -d --name vk-dev registry.cn-hangzhou.aliyuncs.com/vk-25/vk-dev"
-                    '''
-                }
-            }
-        }
+
     }
 }
