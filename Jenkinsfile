@@ -10,9 +10,7 @@ pipeline {
 
         stage('编译公共模块') {
             steps {
-               dir('vast-knowledge') {
                 sh 'mvn clean install -pl vast-knowledge-common,vast-knowledge-api -am'
-              }
             }
         }
            stage('编译并部署选择的服务') {
