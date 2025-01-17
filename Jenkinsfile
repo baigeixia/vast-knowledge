@@ -25,7 +25,7 @@ pipeline {
 		}
         stage('克隆代码') {
             steps {
-                git credentialsId: '255712a3-6ca4-4692-851f-5d801b325938', url: 'https://gitee.com/tsitsiharry/vk-dev.git'
+                git credentialsId: '255712a3-6ca4-4692-851f-5d801b325938', url: 'https://gitee.com/tsitsiharry/vast-knowledge.git'
             }
         }
         stage('编译公共模块') {
@@ -113,6 +113,7 @@ pipeline {
                     if (push_server == 'local') {
                         sh "/opt/jenkins_shell/deploy.sh $ali_url $ali_project_name $mirror_name ${tag} ${service_part}"
                     } else {
+						echo "publishers_server: ${push_server}"
                         sshPublisher(publishers: [sshPublisherDesc(configName: "${push_server}", transfers: [
                             sshTransfer(
                                 cleanRemote: false,
