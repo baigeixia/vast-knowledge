@@ -12,7 +12,7 @@ RUN mkdir -p /vk/dev/logs
 WORKDIR /vk/gen
 
 # 设置环境变量  与 application.yml保存一致
-ENV SERVER_PORT=16001 LANG=C.UTF-8 LC_ALL=C.UTF-8 JAVA_OPTS=""
+ENV SERVER_PORT=19005 LANG=C.UTF-8 LC_ALL=C.UTF-8 JAVA_OPTS=""
 
 # 暴露端口
 EXPOSE ${SERVER_PORT}
