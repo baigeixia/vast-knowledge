@@ -354,11 +354,11 @@
                 <version>${ip2region.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.spotify</groupId>
-                <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>${dockerfile-maven-version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.spotify</groupId>-->
+<!--                <artifactId>dockerfile-maven-plugin</artifactId>-->
+<!--                <version>${dockerfile-maven-version}</version>-->
+<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
