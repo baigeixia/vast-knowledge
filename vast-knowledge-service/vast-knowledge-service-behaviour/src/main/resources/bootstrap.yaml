@@ -23,7 +23,7 @@ spring:
 # SocketIO配置
 socketio:
   # SocketIO端口
-  port: 9090
+  port: 19090
   # 连接数大小
   workCount: 100
   # 允许客户请求
