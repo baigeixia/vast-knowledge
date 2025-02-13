@@ -1,0 +1,100 @@
+#Namespace dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev
+---
+#Secret mysql密码
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-pass
+type: Opaque
+data:
+  password: bXlzcWxfcm9vdF8xMjNAMTEyLi4=  # Base64 编码后的密码
+---
+#Service 暴露端口 3306
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: wordpress
+    tier: mysql
+  clusterIP: None
+---
+#PVC卷 10g rw
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: wordpress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1 #必选，版本号，例如v1
+kind: Deployment #必选，资源类型，例如 Pod
+metadata: #必选，元数据
+  name: wordpress-mysql #必选，Pod名称
+  labels: #自定义标签列表
+    app: wordpress
+spec: #必选，Pod中容器的详细定义
+  replicas: 3 #Pod数量
+  selector: #选择器
+    matchLabels: #匹配标签
+      app: wordpress
+      tier: mysql
+  template:
+    metadata:
+      labels:
+        tier: mysql
+    spec:
+      containers: #必选，Pod中容器列表
+        - name: mysql   #必选，容器名称
+          image: mysql:8.0  #必选，容器的镜像名称
+          imagePullPolicy: IfNotPresent  #获取镜像的策略
+          workingDir: string  #容器的工作目录
+          volumeMounts: #挂载到容器内部的存储卷配置
+            - name: mysql-persistent-storage #引用pod定义的共享存储卷的名称，需用volumes[]部分定义的的卷名
+              mountPath: /var/lib/mysql #存储卷在容器内mount的绝对路径，应少于512字符
+              readOnly: false #是否为只读模式
+          ports: #需要暴露的端口库号列表
+            - name: mysql        #端口的名称
+              containerPort: 3306  #容器需要监听的端口号
+              protocol: TCP #端口协议，支持TCP和UDP，默认TCP
+          env: #容器运行前需设置的环境变量列表
+          - name: MYSQL_ROOT_PASSWORD #环境变量名称
+            valueFrom: #环境变量的值
+              secretKeyRef:
+                name: mysql-pass
+                key: password # root 用户密码
+          resources: #资源限制和请求的设置
+            limits: #资源限制的设置
+              cpu: "2" #Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
+              memory: "4"  #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
+          livenessProbe: #对Pod内各容器健康检查的设置，当探测无响应几次后将自动重启该容器
+            tcpSocket: #对Pod内个容器健康检查方式设置为tcpSocket方式
+              port: 3306
+            initialDelaySeconds: 30 #容器启动完成后首次探测的时间，单位为秒
+            timeoutSeconds: 5 #对容器健康检查探测等待响应的超时时间，单位秒，默认1秒
+            periodSeconds: 10 #对容器监控检查的定期探测时间设置，单位秒，默认10秒一次
+            successThreshold: 3
+            failureThreshold: 1
+      restartPolicy: Always  #Pod的重启策略
+      nodeSelector:
+        kubernetes.io/hostname: master #设置NodeName表示将该Pod调度到指定到名称的node节点上
+      hostNetwork: false   #是否使用主机网络模式，默认为false，如果设置为true，表示使用宿主机网络
+      volumes: #在该pod上定义共享存储卷列表
+        - name: mysql-persistent-storage    #共享存储卷名称 （volumes类型有很多种）
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
