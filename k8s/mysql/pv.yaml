@@ -2,15 +2,44 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mysql-pv
-  namespace: dev
 spec:
   capacity:
     storage: 10Gi  # 定义存储大小
   volumeMode: Filesystem  # 默认为文件系统
+  storageClassName: standard
+  local:
+    path: /mnt/data/mysql
   accessModes:
-    - ReadWriteMany  # 多节点可读写
+    - ReadWriteOnce  # 多节点可读写
   persistentVolumeReclaimPolicy: Retain  # PV 被释放时保留数据
-  nfs:
-    path: /root/data/nfs
-    server: 10.66.66.1
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - master
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv-node1
+spec:
+  capacity:
+    storage: 10Gi  # 定义存储大小
+  volumeMode: Filesystem  # 默认为文件系统
+  storageClassName: standard
+  local:
+    path: /mnt/data/mysql
+  accessModes:
+    - ReadWriteOnce  # 多节点可读写
+  persistentVolumeReclaimPolicy: Retain  # PV 被释放时保留数据
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - node1

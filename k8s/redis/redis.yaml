@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv-node4
+spec:
+  capacity:
+    storage: 2Gi  # 定义存储大小
+  volumeMode: Filesystem  # 默认为文件系统
+  storageClassName: standard
+  local:
+    path: /mnt/data/redis
+  accessModes:
+    - ReadWriteOnce    # 多节点可读写
+  persistentVolumeReclaimPolicy: Retain  # PV 被释放时保留数据
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - node4
+---
+#Namespace dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  namespace: redis
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  type: NodePort
+  selector:
+    app: redis
+    role: master
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: redis
+data:
+  redis.conf: |
+    requirepass myredis_root_#123  # 设置密码
+     # 启用 RDB 持久化
+    save 900 1
+    save 300 10
+    save 60 10000
+    
+    # 启用 AOF 持久化
+    appendonly yes
+    appendfsync everysec
+    
+    # 内存限制和淘汰策略
+    maxmemory 1gb
+    maxmemory-policy allkeys-lru
+    
+    # 启用保护模式
+    protected-mode no
+    
+    # 配置绑定接口
+    bind 0.0.0.0
+    
+    # 设置日志级别
+    loglevel notice
+    logfile ""
+    
+    # 设置客户端连接
+    timeout 300
+    maxclients 10000
+    
+    # 禁止危险命令
+    rename-command CONFIG ""
+    rename-command SHUTDOWN ""
+    rename-command FLUSHDB ""
+    rename-command FLUSHALL ""
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: redis
+spec:
+  serviceName: "redis"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+    spec:
+#      部署 master 节点需要
+#      tolerations:
+#        - key: "node-role.kubernetes.io/control-plane"
+#          operator: "Exists"
+#          effect: "NoSchedule"  # 容忍控制平面节点的 taint
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: redis
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: redis
+          image: redis:latest
+          ports:
+            - containerPort: 6379
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
+          volumeMounts:
+            - name: redis-config
+              mountPath: /etc/redis/redis.conf  # 将 ConfigMap 挂载到 Redis 配置路径
+              subPath: redis.conf  # 使用 ConfigMap 中的 redis.conf 文件
+            - name: redis-data
+              mountPath: /data
+          resources: #资源限制和请求的设置
+            limits: #资源限制的设置
+              cpu: "1" #Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
+              memory: "1Gi"  #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
+          livenessProbe: #对Pod内各容器健康检查的设置，当探测无响应几次后将自动重启该容器
+            tcpSocket: #对Pod内个容器健康检查方式设置为tcpSocket方式
+              port: 6379
+            initialDelaySeconds: 10   #容器启动完成后首次探测的时间，单位为秒
+            successThreshold: 1
+            failureThreshold: 3
+      volumes:
+        - name: redis-config
+          configMap:
+            name: redis-config  # 引用创建的 ConfigMap
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        storageClassName: standard
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 2Gi
+
+---
