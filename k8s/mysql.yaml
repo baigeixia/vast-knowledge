@@ -10,7 +10,7 @@ spec:
   local:
     path: /mnt/data/mysql
   accessModes:
-    - ReadWriteOnce  # 多节点可读写
+    - ReadWriteOnce  
   persistentVolumeReclaimPolicy: Retain  # PV 被释放时保留数据
   nodeAffinity:
     required:
@@ -33,7 +33,7 @@ spec:
   local:
     path: /mnt/data/mysql
   accessModes:
-    - ReadWriteOnce  # 多节点可读写
+    - ReadWriteOnce  
   persistentVolumeReclaimPolicy: Retain  # PV 被释放时保留数据
   nodeAffinity:
     required:
@@ -56,7 +56,7 @@ spec:
   local:
     path: /mnt/data/mysql
   accessModes:
-    - ReadWriteOnce  # 多节点可读写
+    - ReadWriteOnce  
   persistentVolumeReclaimPolicy: Retain  # PV 被释放时保留数据
   nodeAffinity:
     required:
@@ -95,6 +95,7 @@ metadata:
 spec:
   ports:
     - port: 3306
+      targetPort: 3306
   selector:
     app: mysql
     role: master # 仅选择主节点
@@ -125,11 +126,24 @@ metadata:
   namespace: mysql
 data:
   my.cnf: |
+    [client]
+    default-character-set=utf8
+    [mysql]
+    default-character-set=utf8
     [mysqld]
-    server-id=1 # 从服务器的唯一标识符
-    log-bin=mysql-bin #启用二进制日志功能
-    binlog_format=ROW #设置二进制日志的格式为 ROW
-    bind-address = 0.0.0.0  # 允许远程连接
+    init_connect='SET collation_connection = utf8_unicode_ci'
+    init_connect='SET NAMES utf8'
+    character-set-server=utf8
+    collation-server=utf8_unicode_ci
+    skip-character-set-client-handshake
+    skip-name-resolve
+    server_id=1
+    log-bin=mysql-bin
+    read-only=0
+    replicate-ignore-db=mysql
+    replicate-ignore-db=sys
+    replicate-ignore-db=information_schema
+    replicate-ignore-db=performance_schema
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -181,6 +195,8 @@ spec: #必选，Pod中容器的详细定义
               containerPort: 3306  #容器需要监听的端口号
               protocol: TCP #端口协议，支持TCP和UDP，默认TCP
           env: #容器运行前需设置的环境变量列表
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
             - name: MYSQL_ROOT_PASSWORD #环境变量名称
               valueFrom: #环境变量的值
                 secretKeyRef:
@@ -193,18 +209,7 @@ spec: #必选，Pod中容器的详细定义
           command: [ "sh", "-c" ]
           args:
             - |
-              # 等待MySQL启动，确保mysql服务可用
-              while ! mysqladmin -u root -p$MYSQL_ROOT_PASSWORD ping -h127.0.0.1 --silent; do
-                echo "Waiting for MySQL to be ready..."
-                sleep 2
-              done
-              
-              # 这里可以增加一个额外的检测机制，比如netcat，确保3306端口可用
-              while ! nc -z 127.0.0.1 3306; do
-                echo "Waiting for MySQL to be accessible on port 3306..."
-                sleep 2
-              done
-              
+         
               echo "MySQL is up and running. Creating replication user..."
               
               # 创建复制用户
@@ -217,7 +222,7 @@ spec: #必选，Pod中容器的详细定义
               exec mysqld
           resources: #资源限制和请求的设置
             limits: #资源限制的设置
-              cpu: "2" #Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
+              cpu: "1" #Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
               memory: "2Gi"  #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
           livenessProbe: #对Pod内各容器健康检查的设置，当探测无响应几次后将自动重启该容器
             tcpSocket: #对Pod内个容器健康检查方式设置为tcpSocket方式
@@ -276,6 +281,13 @@ spec:
         app: mysql
         role: slave  # 关键标签
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: redis
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: mysql
           image: mysql:8.4.4
@@ -288,6 +300,8 @@ spec:
           ports:
             - containerPort: 3306
           env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:

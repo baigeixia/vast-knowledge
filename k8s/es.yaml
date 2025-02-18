@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: es-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - node2
+  hostPath:
+    path: /mnt/data/es
+---
+#Namespace dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: es
+---
+#Service 暴露端口 3306
+apiVersion: v1
+kind: Service
+metadata:
+  name: es-svc
+  namespace: es
+  labels:
+    app: es
+spec:
+  ports:
+    - name: http
+      port: 9200
+      targetPort: 9200
+    - name: transport
+      port: 9300
+      targetPort: 9300
+  selector:
+    app: es
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  namespace: es
+spec:
+  serviceName: "elasticsearch"  # 必须指定 Service 名称
+  replicas: 1  # 副本数，根据需要调整
+  selector:
+    matchLabels:
+      app: es
+  template:
+    metadata:
+      labels:
+        app: es
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: es
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: elasticsearch
+          image: elasticsearch:8.17.2  # 使用适合的版本
+          env:
+            - name: discovery.type
+              value: single-node  # 对于开发环境，使用单节点模式；生产环境请使用集群发现配置
+            - name: "ES_JAVA_OPTS"
+              value: "-Xms512m -Xmx512m"
+          ports:
+            - containerPort: 9200
+            - containerPort: 9300
+          volumeMounts:
+            - name: es-storage
+              mountPath: /usr/share/elasticsearch/data
+  volumeClaimTemplates:
+    - metadata:
+        name: es-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi  # 持久化存储大小
