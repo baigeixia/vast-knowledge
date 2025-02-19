@@ -4,7 +4,7 @@ metadata:
   name: jk-pv
 spec:
   capacity:
-    storage: 5Gi
+    storage: 10Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
@@ -35,9 +35,12 @@ spec:
   selector:
     app: jenkins
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
+    - port: 8080
+      name: web
+      nodePort: 31397
+    - port: 50000
+      name: agent
+      nodePort: 31529
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -55,7 +58,7 @@ spec:
       labels:
         app: jenkins
     spec:
-      #      部署 master 节点需要
+      # 署 master 节点需要
       tolerations:
         - key: "node-role.kubernetes.io/control-plane"
           operator: "Exists"
@@ -63,16 +66,25 @@ spec:
       containers:
         - name: jenkins
           image: jenkins/jenkins:jdk21
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
           ports:
             - containerPort: 8080
+            - containerPort: 50000
           volumeMounts:
             - mountPath: /var/jenkins_home
               name: jenkins-home
+            - mountPath: /certs/client  # 挂载 /certs/client
+              name: jenkins-certs  # 挂载的 volume 名称
           resources:
             limits:
               memory: "1Gi"
               cpu: "1"
-
+      volumes:
+        - name: jenkins-certs
+          hostPath:
+            path: /usr/local/jenkins/certs
   volumeClaimTemplates:
     - metadata:
         name: jenkins-home
@@ -80,5 +92,5 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 5Gi
+            storage: 10Gi
 ---

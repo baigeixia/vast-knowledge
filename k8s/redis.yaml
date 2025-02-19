@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: redis-pv-node4
+  name: redis-pv-node2
 spec:
   capacity:
     storage: 2Gi  # 定义存储大小
@@ -19,7 +19,7 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - node4
+                - node2
 ---
 #Namespace dev
 apiVersion: v1
@@ -30,16 +30,15 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-master
+  name: redis
   namespace: redis
 spec:
   ports:
     - port: 6379
-      targetPort: 6379
+      nodePort: 32227
   type: NodePort
   selector:
     app: redis
-    role: master
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -48,7 +47,8 @@ metadata:
   namespace: redis
 data:
   redis.conf: |
-    requirepass myredis_root_#123  # 设置密码
+    # 设置密码
+    requirepass 'myredis_root_#123'
      # 启用 RDB 持久化
     save 900 1
     save 300 10
@@ -94,12 +94,10 @@ spec:
   selector:
     matchLabels:
       app: redis
-      role: master
   template:
     metadata:
       labels:
         app: redis
-        role: master
     spec:
 #      部署 master 节点需要
 #      tolerations:
@@ -115,7 +113,7 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: redis
-          image: redis:latest
+          image: redis:alpine3.21
           ports:
             - containerPort: 6379
           env:

@@ -61,27 +61,35 @@ spec:
       labels:
         app: es
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app: es
-              topologyKey: kubernetes.io/hostname
       containers:
         - name: elasticsearch
           image: elasticsearch:8.17.2  # 使用适合的版本
           env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
             - name: discovery.type
-              value: single-node  # 对于开发环境，使用单节点模式；生产环境请使用集群发现配置
+              value: zen-disco
             - name: "ES_JAVA_OPTS"
-              value: "-Xms512m -Xmx512m"
+              value: "-Xms512m -Xmx1g"
           ports:
             - containerPort: 9200
             - containerPort: 9300
+          resources: #资源限制和请求的设置
+            limits: #资源限制的设置
+              cpu: "1"
+              memory: "1Gi"
+          livenessProbe: #对Pod内各容器健康检查的设置，当探测无响应几次后将自动重启该容器
+            tcpSocket: #对Pod内个容器健康检查方式设置为tcpSocket方式
+              port: 9200
+            initialDelaySeconds: 10   #容器启动完成后首次探测的时间，单位为秒
+            successThreshold: 1
+            failureThreshold: 3
           volumeMounts:
             - name: es-storage
-              mountPath: /usr/share/elasticsearch/data
+              mountPath: /usr/share/elasticsearch
+            - name: host-time  #挂载本地时区
+              mountPath: /etc/localtime
+              readOnly: true
   volumeClaimTemplates:
     - metadata:
         name: es-storage
