@@ -32,7 +32,11 @@ metadata:
 spec:
   ports:
     - port: 9000
-      targetPort: 9000
+      name: api
+      nodePort: 31753
+    - port: 9001
+      name: controller
+      nodePort: 32693
   type: NodePort
   selector:
     app: minio
@@ -44,7 +48,7 @@ metadata:
   namespace: minio
 spec:
   serviceName: "minio"
-  replicas: 4  # 根据需要设置副本数，生产环境中通常为多个副本
+  replicas: 1
   selector:
     matchLabels:
       app: minio
@@ -57,22 +61,43 @@ spec:
         - name: minio
           image: minio/minio:RELEASE.2025-02-07T23-21-09Z-cpuv1
           ports:
+            # api 端口
             - containerPort: 9000
+            # 控制台端口
+            - containerPort: 9001
           env:
-            - name: MINIO_ACCESS_KEY
-              value: "your-access-key"  # 设置访问密钥
-            - name: MINIO_SECRET_KEY
-              value: "your-secret-key"  # 设置密钥
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
+              # 管理后台用户名
+            - name: MINIO_ROOT_USER
+              value: "minioPro"  # 设置访问密钥
+              # 管理后台密码，最小8个字符
+            - name: MINIO_ROOT_PASSWORD
+              value: "minioPro_123@112.."
+              # 开启压缩 on 开启 off 关闭
+            - name: MINIO_COMPRESS
+              value: "off"
+              # 扩展名 .pdf,.doc 为空 所有类型均压缩
+            - name: MINIO_COMPRESS_EXTENSIONS
+              value: ""
+              # mime 类型 application/pdf 为空 所有类型均压缩
+            - name: MINIO_COMPRESS_MIME_TYPES
+              value: ""
+          command: [ "sh", "-c" ]
+          args:
+            - |
+              # 指定容器中的目录 /data
+              minio server --address ':9000' --console-address ':9001' /data
           volumeMounts:
-            - name: data
+            - name: minio-pvc
               mountPath: /data
           resources:
             limits:
-              memory: "2Gi"
-              cpu: "1"
+              memory: "1Gi"
+              cpu: "500m"
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: minio-pvc
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:

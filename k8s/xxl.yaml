@@ -4,10 +4,11 @@ metadata:
   name: xxl-pv
 spec:
   capacity:
-    storage: 2Gi
+    storage: 5Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -17,7 +18,7 @@ spec:
               values:
                 - node3
   hostPath:
-    path: /mnt/data/nc
+    path: /mnt/data/xxl
 ---
 #Namespace dev
 apiVersion: v1
@@ -33,11 +34,10 @@ metadata:
 spec:
   type: NodePort
   selector:
-    app: xxl
+    app: xxl-job
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
+    - port: 8080
+      nodePort: 30243
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -69,14 +69,7 @@ spec:
             - containerPort: 8080
           env:
             - name: PARAMS
-              value: "--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai"
-            - name: SPRING_DATASOURCE_USERNAME
-              value: "root"
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-pass
-                  key: password
+              value: "--spring.datasource.url=jdbc:mysql://mysql-svc.mysql.svc.cluster.local/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai --spring.datasource.username=root --spring.datasource.password=mysql_root_123@112.."
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           volumeMounts:
@@ -100,5 +93,5 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 2Gi
+            storage: 5Gi
 ---

@@ -121,11 +121,14 @@ spec:
               value: "Asia/Shanghai"  # 设置时区为上海
           volumeMounts:
             - name: redis-config
-              mountPath: /etc/redis/redis.conf  # 将 ConfigMap 挂载到 Redis 配置路径
+              mountPath: /etc/redis  # 将 ConfigMap 挂载到 Redis 配置路径
               subPath: redis.conf  # 使用 ConfigMap 中的 redis.conf 文件
             - name: redis-data
               mountPath: /data
+          command: ["redis-server", "/etc/redis"] #通过command覆盖容器启动命令
           resources: #资源限制和请求的设置
+            requests: #资源请求的设置
+              memory: "512Mi" #内存请求,容器启动的初始可用数量
             limits: #资源限制的设置
               cpu: "1" #Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
               memory: "1Gi"  #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
