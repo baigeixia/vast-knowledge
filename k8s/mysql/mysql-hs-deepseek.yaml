@@ -1,0 +1,281 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mysql
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secrets
+  namespace: mysql
+type: Opaque
+data:
+  root-password: bXlzcWxfcm9vdF8xMjNAMTEyLi4=
+  repl-password: bXlzcWxfcm9vdF8xMjNAMTEyLi4=
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: mysql
+data:
+  master.cnf: |
+    [mysqld]
+    server-id=1
+    log_bin=mysql-bin
+    gtid_mode=ON
+    enforce_gtid_consistency=ON
+    log_replica_updates=ON
+    innodb_flush_log_at_trx_commit=1
+    sync_binlog=1
+    
+
+  slave.cnf: |
+    [mysqld]
+    gtid_mode=ON
+    enforce_gtid_consistency=ON
+    read_only=ON
+    log_replica_updates=ON
+    skip_networking=No
+
+  init-master.sh: |
+    #!/bin/bash
+    # 等待 MySQL 启动
+    until mysqladmin ping -uroot -p$MYSQL_ROOT_PASSWORD --silent; do
+      sleep 2
+    done
+    # 创建复制账号
+    mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "
+    CREATE USER 'repl'@'%' IDENTIFIED BY '$REPL_PASSWORD'; 
+    GRANT REPLICATION SLAVE ON *.* TO 'repl'@::1';;
+    FLUSH PRIVILEGES;
+    "
+    
+
+  init-slave.sh: |
+    #!/bin/bash
+      # 提取 Pod 名称中的索引部分
+    POD_INDEX=${HOSTNAME##*-}
+    # 生成动态的 server-id
+    # 对于 mysql-master 和 mysql-slave，你可以分别设置不同的起始点，确保它们的 server-id 不冲突
+    if [[ $HOSTNAME == *"master"* ]]; then
+    SERVER_ID=$((POD_INDEX + 1000))  # master 的 server-id 从 1001 开始
+    else
+    SERVER_ID=$((POD_INDEX + 2000))  # slave 的 server-id 从 2001 开始
+    fi
+    
+    # 输出到 MySQL 配置文件
+    echo -e "[mysqld]\nserver-id=$SERVER_ID" > /etc/mysql/conf.d/server-id.
+    # 配置主从复制
+    mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "CHANGE REPLICATION SOURCE TO
+      SOURCE_HOST='mysql-master.mysql.svc.cluster.local',
+      SOURCE_USER='repl',
+      SOURCE_PASSWORD='$REPL_PASSWORD',
+      GET_SOURCE_PUBLIC_KEY=1;
+      START REPLICA;"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-master
+  namespace: mysql
+spec:
+  type: NodePort
+  selector:
+    app: mysql
+    role: master
+  ports:
+    - port: 3306
+      name: mysql
+      nodePort: 31193
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-read
+  namespace: mysql
+spec:
+  type: NodePort
+  selector:
+    app: mysql
+    role: slave
+  ports:
+    - port: 3306
+      name: mysql
+      nodePort: 32471
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-master
+  namespace: mysql
+spec:
+  serviceName: mysql-master
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+      role: master
+  template:
+    metadata:
+      labels:
+        app: mysql
+        role: master
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - node1
+      initContainers:
+        - name: config-init
+          image: mysql:8.4.4
+          command: ["sh", "-c", "cp /mnt/config/master.cnf /etc/mysql/conf.d/"]
+          volumeMounts:
+            - name: config
+              mountPath: /mnt/config
+            - name: mysql-conf
+              mountPath: /etc/mysql/conf.d
+      containers:
+        - name: mysql
+          image: mysql:8.4.4
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: root-password
+            - name: REPL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: repl-password
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: mysql-conf
+              mountPath: /etc/mysql/conf.d
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+            - name: timezone
+              mountPath: /etc/localtime
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: mysql-data
+          hostPath:
+            path: /mnt/data/mysql
+        - name: config
+          configMap:
+            name: mysql-config
+            items:
+              - key: master.cnf
+                path: master.cnf
+        - name: mysql-conf
+          emptyDir: {}
+        - name: init-script
+          configMap:
+            name: mysql-config
+            items:
+              - key: init-master.sh
+                path: init-master.sh
+                mode: 0777
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-slave
+  namespace: mysql
+spec:
+  serviceName: mysql-slave
+  replicas: 2  # 初始副本数，可随时调整
+  selector:
+    matchLabels:
+      app: mysql
+      role: slave
+  template:
+    metadata:
+      labels:
+        app: mysql
+        role: slave
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: mysql
+              topologyKey: "kubernetes.io/hostname"
+      initContainers:
+        - name: wait-master
+          image: busybox:1.28
+          command: ['sh', '-c', 'until nc -z mysql-master.mysql.svc.cluster.local 3306; do echo waiting for master; sleep 2; done']
+        - name: config-init
+          image: mysql:8.4.4
+          command: ["sh", "-c", "cp /mnt/config/slave.cnf /etc/mysql/conf.d/"]
+          volumeMounts:
+            - name: config
+              mountPath: /mnt/config
+            - name: mysql-conf
+              mountPath: /etc/mysql/conf.d
+      containers:
+        - name: mysql
+          image: mysql:8.4.4
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: root-password
+            - name: REPL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: repl-password
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: mysql-conf
+              mountPath: /etc/mysql/conf.d
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: mysql-data
+          hostPath:
+            path: /mnt/data/mysql
+        - name: config
+          configMap:
+            name: mysql-config
+            items:
+              - key: slave.cnf
+                path: slave.cnf
+        - name: mysql-conf
+          emptyDir: {}
+        - name: init-script
+          configMap:
+            name: mysql-config
+            items:
+              - key: init-slave.sh
+                path: init-slave.sh
+                mode: 0777

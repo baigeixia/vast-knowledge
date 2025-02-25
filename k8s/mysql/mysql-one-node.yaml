@@ -1,26 +1,3 @@
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-pv-node4
-spec:
-  capacity:
-    storage: 10Gi  # 定义存储大小
-  volumeMode: Filesystem  # 默认为文件系统
-  storageClassName: standard
-  local:
-    path: /mnt/data/mysql
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain  # PV 被释放时保留数据
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - node4
----
 #Namespace dev
 apiVersion: v1
 kind: Namespace
@@ -48,7 +25,7 @@ metadata:
 spec:
   ports:
     - port: 3306
-      nodePort: 31520
+      nodePort: 31193
   selector:
     app: mysql
   type: NodePort
@@ -71,6 +48,13 @@ spec: #必选，Pod中容器的详细定义
       labels:
         app: mysql
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: mysql
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: mysql
           image: mysql:8.4.4  #必选，容器的镜像名称
@@ -86,8 +70,8 @@ spec: #必选，Pod中容器的详细定义
                   key: password # root 用户密码
           resources:
             limits:
-              cpu: "1" #Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
-              memory: "2Gi"  #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
+              cpu: "500m" #Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
+              memory: "1Gi"  #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
           livenessProbe: #对Pod内各容器健康检查的设置，当探测无响应几次后将自动重启该容器
             tcpSocket: #对Pod内个容器健康检查方式设置为tcpSocket方式
               port: 3306
@@ -97,17 +81,11 @@ spec: #必选，Pod中容器的详细定义
             successThreshold: 1
             failureThreshold: 3
           volumeMounts: #挂载到容器内部的存储卷配置
-            - name: mysql-pvc
+            - name: mysql-data
               mountPath: /var/lib/mysql
               readOnly: false
-  volumeClaimTemplates:
-    - metadata:
-        name: mysql-pvc
-      spec:
-        storageClassName: "standard"
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 10Gi
+      volumes:
+        - name: mysql-data
+          hostPath:
+            path: /mnt/data/mysql
 ---
