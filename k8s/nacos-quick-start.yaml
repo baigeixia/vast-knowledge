@@ -22,6 +22,7 @@ spec:
     - port: 9848
       name: client-rpc
       targetPort: 9848
+      nodePort: 32080
     - port: 9849
       name: raft-rpc
       targetPort: 9849

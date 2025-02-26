@@ -56,16 +56,6 @@ spec:
               value: "Asia/Shanghai"  # 设置时区为上海
             - name: discovery.type
               value: single-node
-            - name: ELASTIC_PASSWORD
-              value: 'esRootElastic'
-            - name: KIBANA_PASSWORD
-              value: 'esRootKibana'
-            - name: xpack.security.enrollment.enabled
-              value: 'true'
-            - name: xpack.security.http.ssl.enabled
-              value: 'false'
-            - name: xpack.license.self_generated.type
-              value: 'trial'
             - name: ES_JAVA_OPTS
               value: "-Xms1g -Xmx1g"
           ports:
@@ -82,12 +72,7 @@ spec:
               name: plugins
             - mountPath: /usr/share/elasticsearch/logs
               name: logs
-            - name: timezone
-              mountPath: /etc/localtime
       volumes:
-        - name: timezone
-          hostPath:
-            path: /usr/share/zoneinfo/Asia/Shanghai
         - hostPath:
             path: /mnt/data/esData/data
             type: DirectoryOrCreate

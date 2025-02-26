@@ -5,7 +5,7 @@ kind: Namespace
 metadata:
   name: kb
 ---
-#Service 暴露端口 3306
+#Service 暴露端口 5601
 apiVersion: v1
 kind: Service
 metadata:
@@ -25,7 +25,7 @@ metadata:
   name: kibana
   namespace: kb
 spec:
-  serviceName: "es"  # 必须指定 Service 名称
+  serviceName: "kibana"
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
@@ -43,7 +43,7 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: In
                     values:
-                      - node1
+                      - node4
       containers:
         - name: kibana
           image: kibana:8.17.2  # 使用适合的版本
@@ -56,16 +56,12 @@ spec:
               value: 'kibana_system'
             - name: ELASTICSEARCH_PASSWORD
               value: 'esRootKibana'
-            - name: xpack.security.enabled
-              value: 'false'
-            - name: xpack.license.self_generated.type
-              value: 'trial'
             - name: i18n.locale
               value: 'zh-CN'
           ports:
             - containerPort: 5601
           resources:
             limits:
-              cpu: "500m"
-              memory: "500Mi"
+              cpu: "1"
+              memory: "1Gi"
 
