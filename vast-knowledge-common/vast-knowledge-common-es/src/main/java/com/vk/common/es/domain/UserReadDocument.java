@@ -28,7 +28,7 @@ public class UserReadDocument {
     /**
      * 文章标题
      */
-    @Field(type = FieldType.Text,analyzer = "ik_smart")
+    @Field(type = FieldType.Text,analyzer = "ik_max_word",searchAnalyzer="ik_smart")
     private  String  title;
 
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)

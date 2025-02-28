@@ -26,7 +26,7 @@ public class AssociateWordsDocument implements Serializable {
     /**
      * 联想词
      */
-    @Field(type = FieldType.Text,analyzer = "ik_smart")
+    @Field(type = FieldType.Text,analyzer = "ik_max_word",searchAnalyzer="ik_smart")
     private String associateWords;
 
     /**

@@ -70,11 +70,11 @@ spec:
             - name: KAFKA_CFG_PROCESS_ROLES
               value: "controller,broker"
             - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
-              value: "0@kafka-svc.kafka.svc.cluster.local:9093"
+              value: "0@kafka-svc.kafka.svc.cluster.local:9093"  # 使用服务名来代替节点名
             - name: KAFKA_CFG_LISTENERS
-              value: "PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094"
+              value: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:31834"
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
-              value: "PLAINTEXT://:9092,EXTERNAL://:9094"
+              value: "PLAINTEXT://kafka-svc.kafka.svc.cluster.local:9092,EXTERNAL://101.126.43.197:31834"  # 广告服务名地址
             - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
               value: "CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT"
             - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES

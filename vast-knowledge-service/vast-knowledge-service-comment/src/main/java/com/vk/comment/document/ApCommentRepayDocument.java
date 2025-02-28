@@ -58,7 +58,7 @@ public class ApCommentRepayDocument implements Serializable {
     /**
      * 评论内容
      */
-    @Field(type = FieldType.Text,analyzer = "ik_smart")
+    @Field(type = FieldType.Text,analyzer = "ik_max_word",searchAnalyzer="ik_smart")
     private String content;
 
     private String image;

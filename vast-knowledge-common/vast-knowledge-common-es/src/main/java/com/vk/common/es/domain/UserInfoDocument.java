@@ -23,7 +23,7 @@ public class UserInfoDocument  implements Serializable {
     /**
      * 用户名
      */
-    @Field(type = FieldType.Text,analyzer = "ik_smart")
+    @Field(type = FieldType.Text,analyzer = "ik_max_word",searchAnalyzer="ik_smart")
     private String name;
     /**
      * 手机号

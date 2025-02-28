@@ -48,6 +48,25 @@ spec:
                     operator: In
                     values:
                       - node2
+#      ik 分词 initContainers
+      initContainers:
+        - name: install-ik
+          image: elasticsearch:8.17.2  # 使用适合的版本
+          command:
+            - sh
+            - -c
+            - |
+              # 检查插件是否已安装，若未安装则执行安装
+              if [ ! -f "/usr/share/elasticsearch/plugins/analysis-ik/plugin-descriptor.properties" ]; then
+                ./bin/elasticsearch-plugin install -b https://get.infini.cloud/elasticsearch/analysis-ik/8.17.2
+                # 修改插件目录权限，确保主容器可访问
+                chown -R 1000:0 /usr/share/elasticsearch/plugins
+              fi
+          securityContext:
+            runAsUser: 0  # 以root用户运行以确保权限
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/plugins
+              name: plugins
       containers:
         - name: es
           image: elasticsearch:8.17.2  # 使用适合的版本

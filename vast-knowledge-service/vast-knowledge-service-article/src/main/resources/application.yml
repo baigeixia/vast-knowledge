@@ -10,7 +10,7 @@ spring:
     password: mysql_root_123@112..
   data:
     mongodb:
-      uri: mongodb://adminRoot%5farticle:mymongoroot%5farticle%5f1234%40@123.207.35.9:26117/article
+      uri: mongodb://adminRoot:mymongoroot_1234%40@101.126.43.197:32407/article
 
 
 # MyBatis配置
