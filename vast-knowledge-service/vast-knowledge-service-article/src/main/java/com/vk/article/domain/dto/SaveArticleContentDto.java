@@ -8,5 +8,6 @@ import lombok.EqualsAndHashCode;
 @Data
 public class SaveArticleContentDto extends ApArticleContent {
 
+
     private String simpleDescription;
 }

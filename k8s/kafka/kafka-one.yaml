@@ -1,0 +1,89 @@
+---
+#Namespace dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kafka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-svc
+  namespace: kafka
+spec:
+  type: NodePort
+  selector:
+    app: kafka
+  ports:
+    # PLAINTEXT 端口是外部客户端（生产者和消费者）通信用的端口，CONTROLLER 端口是集群内控制器的通信端口，EXTERNAL 是提供给外部访问的端口。
+    - port: 9092
+      name: plaintext
+      nodePort: 31908
+    - port: 9093
+      name: controller
+      nodePort: 31678
+    - port: 9094
+      name: external
+      nodePort: 31834
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: kafka
+  labels:
+    app: kafka
+spec:
+  serviceName: "kafka"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - node1
+      containers:
+        - name: kafka
+          securityContext:
+            privileged: true
+          image: bitnami/kafka:3.9.0
+          ports:
+            - containerPort: 9092
+            - containerPort: 9093
+            - containerPort: 9094
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
+            - name: KAFKA_CFG_NODE_ID
+              value: "0"
+            - name: KAFKA_CFG_PROCESS_ROLES
+              value: "controller,broker"
+            - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
+              value: "0@kafka-svc.kafka.svc.cluster.local:9093"
+            - name: KAFKA_CFG_LISTENERS
+              value: "PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094"
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka-svc.kafka.svc.cluster.local:9092,EXTERNAL://101.126.43.197:31834"  # 广告服务名地址
+            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+            - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
+              value: "CONTROLLER"
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /bitnami/kafka
+      volumes:
+        - name: kafka-data
+          hostPath:
+            path: /mnt/data/kafka
+            type: DirectoryOrCreate

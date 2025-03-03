@@ -18,3 +18,4 @@ spring:
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
           - dfs-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+

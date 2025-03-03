@@ -42,7 +42,7 @@ public class TxCOSClient {
             Credentials credentials = getCredential().getCredentials();
             try {
                 COSCredentials cred = new BasicSessionCredentials(credentials.tmpSecretId, credentials.tmpSecretKey, credentials.sessionToken);
-                ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+                ClientConfig clientConfig = new ClientConfig(new Region(txDfsConfig.getRegion()));
                 // 以下的设置，是可选的：
                 // 设置 socket 读取超时，默认 30s
                 // clientConfig.setSocketTimeout(30*1000);

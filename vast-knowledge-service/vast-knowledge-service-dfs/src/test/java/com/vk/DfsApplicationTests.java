@@ -1,5 +1,11 @@
 package com.vk;
 
+import com.qcloud.cos.COSClient;
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.AnonymousCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.http.HttpProtocol;
+import com.qcloud.cos.region.Region;
 import com.tencent.cloud.CosStsClient;
 import com.tencent.cloud.Credentials;
 import com.tencent.cloud.Response;
@@ -88,4 +94,22 @@ public class DfsApplicationTests {
             throw new IllegalArgumentException("no valid secret !");
         }
     }
+
+    @Test
+    public void getObjectUrl() {
+        // getObjectUrl 不需要验证身份信息
+        COSCredentials cred = new AnonymousCOSCredentials();
+        // 设置bucket的区域, COS地域的简称请参照 https://www.qcloud.com/document/product/436/6224
+        ClientConfig clientConfig = new ClientConfig(new Region("ap-guangzhou"));
+        // 设置生成的 url 的协议名
+        clientConfig.setHttpProtocol(HttpProtocol.https);
+        // 生成cos客户端
+        COSClient cosclient = new COSClient(cred, clientConfig);
+
+        String key = "/article/2Ffd4eafd8454f4e90b73e4329f143b434.jpg";
+        String bucketName = "test-1316786270";
+
+        System.out.println(cosclient.getObjectUrl(bucketName, key));
+    }
+
 }
