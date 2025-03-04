@@ -77,6 +77,10 @@ spec:
               value: single-node
             - name: ES_JAVA_OPTS
               value: "-Xms1g -Xmx1g"
+            - name: ELASTIC_PASSWORD
+              value: "E-M4C7g1d_CrrtFI9xFF"  # 设置 elastic 用户密码
+            - name: KIBANA_SYSTEM_PASSWORD
+              value: "LLB37kNRP8zpqe_4UERT"
           ports:
             - containerPort: 9200
             - containerPort: 9300

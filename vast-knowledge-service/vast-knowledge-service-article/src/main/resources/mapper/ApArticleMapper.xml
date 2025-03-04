@@ -123,34 +123,39 @@
 
 
     <select id="listByIds" resultType="com.vk.article.domain.ApArticle">
-        select
-        `id` ,
-        `title` ,
-        `author_id` ,
-        `author_name` ,
-        `channel_id` ,
-        `channel_name` ,
-        `layout`,
-        `flag` ,
-        `images` ,
-        `labels` ,
-        `likes` ,
-        `collection` ,
-        `comment` ,
-        `views`,
-        `province_id` ,
-        `city_id` ,
-        `county_id`,
-        `created_time`,
-        `update_time` ,
-        `publish_time`,
-        `sync_status` ,
-        `status`
-        from ap_article a left join ap_article_config f
-        WHERE a.id IN
+        SELECT
+        a.id,
+        a.title,
+        a.author_id,
+        a.author_name,
+        a.channel_id,
+        a.channel_name,
+        a.layout,
+        a.flag,
+        a.images,
+        a.labels,
+        a.likes,
+        a.collection,
+        a.comment,
+        a.views,
+        a.province_id,
+        a.city_id,
+        a.county_id,
+        a.created_time,
+        a.update_time,
+        a.publish_time,
+        a.sync_status,
+        a.status
+        FROM ap_article a
+        LEFT JOIN ap_article_config f
+        ON a.id = f.article_id
+        WHERE
+        a.id in
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
-        and a.status=9 and f.is_down = 0 and is_delete=0
+        AND a.status = 9
+        AND f.is_down = 0
+        AND f.is_delete = 0;
     </select>
 </mapper>

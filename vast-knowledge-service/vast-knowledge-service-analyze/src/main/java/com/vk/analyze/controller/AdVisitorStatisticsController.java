@@ -3,6 +3,7 @@ package com.vk.analyze.controller;
 import com.vk.analyze.domain.vo.VisitorListVo;
 import com.vk.analyze.service.AdVistorStatisticsService;
 import com.vk.common.core.web.domain.AjaxResult;
+import com.vk.common.security.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ public class AdVisitorStatisticsController {
      * @return 所有数据
      */
     @GetMapping("list")
+    @RequiresPermissions("system:index:list")
     public AjaxResult ChartLIstDate(
             // @RequestParam(name = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime startTime,
             // @RequestParam(name = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime endTime,

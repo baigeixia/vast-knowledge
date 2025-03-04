@@ -55,7 +55,7 @@ spec:
             - name: ELASTICSEARCH_USERNAME
               value: 'kibana_system'
             - name: ELASTICSEARCH_PASSWORD
-              value: 'esRootKibana'
+              value: 'LLB37kNRP8zpqe_4UERT'
             - name: i18n.locale
               value: 'zh-CN'
           ports:
