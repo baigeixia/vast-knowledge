@@ -24,7 +24,8 @@ public class ApArticleContentController {
     private ApArticleContentService apArticleContentService;
 
 
-    @PostMapping("save")
+    // @PostMapping("save")
+    @PatchMapping("save")
     public AjaxResult saveContent(@RequestBody SaveArticleContentDto dto) {
         Long contentId = apArticleContentService.contentSave(dto);
         return AjaxResult.success("保存完成", contentId);

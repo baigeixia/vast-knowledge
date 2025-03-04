@@ -18,6 +18,6 @@ public class ValidationUtils {
         }
     }
     public static <T> boolean validateRSuccess(R<T> result) {
-        return result != null && result.getCode() == Constants.SUCCESS;
+        return result != null && result.getCode() == Constants.SUCCESS &&  result.getData()!= null;
     }
 }

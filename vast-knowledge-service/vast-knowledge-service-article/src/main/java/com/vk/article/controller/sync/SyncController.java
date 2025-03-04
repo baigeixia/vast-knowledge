@@ -4,6 +4,7 @@ import com.vk.article.service.ApArticleService;
 import com.vk.article.util.SyncUtil;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.redis.service.RedisService;
+import com.vk.common.security.annotation.RequiresPermissions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,8 @@ public class SyncController {
     private RedisService redisService;
     private String endTimeStr = null;
     private static final Long size = 5000L;
+
+    @RequiresPermissions("system:user:edit")
     @GetMapping("/importAll")
     public AjaxResult importAll() {
 

@@ -46,7 +46,7 @@ public class XssFilter implements GlobalFilter, Ordered
         }
         // GET DELETE 不过滤
         HttpMethod method = request.getMethod();
-        if (method == HttpMethod.GET || method == HttpMethod.DELETE)
+        if (method == HttpMethod.GET || method == HttpMethod.DELETE || method == HttpMethod.PATCH)
         {
             return chain.filter(exchange);
         }
