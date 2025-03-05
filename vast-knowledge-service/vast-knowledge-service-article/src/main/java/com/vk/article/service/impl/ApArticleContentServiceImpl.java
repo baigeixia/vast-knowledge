@@ -4,8 +4,10 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.row.Db;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.vk.article.domain.ApArticle;
+import com.vk.article.domain.ApArticleConfig;
 import com.vk.article.domain.ApArticleContent;
 import com.vk.article.domain.dto.SaveArticleContentDto;
+import com.vk.article.mapper.ApArticleConfigMapper;
 import com.vk.article.mapper.ApArticleContentMapper;
 import com.vk.article.mapper.ApArticleMapper;
 import com.vk.article.service.ApArticleContentService;
@@ -40,6 +42,8 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
 
     @Autowired
     private ApArticleMapper apArticleMapper;
+    @Autowired
+    private ApArticleConfigMapper apArticleConfigMapper;
 
     @Override
     public Long contentSave(SaveArticleContentDto dto) {
@@ -54,12 +58,12 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
             return dto.getArticleId();
         }
 
-        ArticleMg articleMg = articleMgRepository.findByArticleId(articleId);
+        ArticleMg articleMg = articleMgRepository.findByArticleIdAndAuthorId(articleId,userId);
         if (null == articleMg) {
             // MongoDB 没数据 看下数据库中是否有
             ApArticleContent articleContent = mapper.selectOneByQuery(
                     QueryWrapper.create()
-                            .where(AP_ARTICLE_CONTENT.ARTICLE_ID.eq(articleId)));
+                            .where(AP_ARTICLE_CONTENT.ARTICLE_ID.eq(articleId)).and(AP_ARTICLE_CONTENT.AUTHOR_ID.eq(userId)));
             if (null == articleContent) {
                 // 数据库中也没有 走第一次保存
                 initContentInset(dto);
@@ -92,9 +96,10 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
         if (StringUtils.isLongEmpty(articleId)) {
             throw new LeadNewsException("id不能为空");
         }
+
         ApArticleContent articleContent = new ApArticleContent();
 
-        ArticleMg articleMg = articleMgRepository.findByArticleId(articleId);
+        ArticleMg articleMg = articleMgRepository.findByArticleIda(articleId);
         if (null != articleMg) {
             BeanUtils.copyProperties(articleMg, articleContent);
             return articleContent;
@@ -117,17 +122,24 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
                 // article.setAuthorName(userName);
                 article.setUpdateTime(dateTime);
                 article.setCreatedTime(dateTime);
+                article.setStatus(1);
+
                 apArticleMapper.insertSelective(article);
 
                 insetContent.setArticleId(article.getId());
                 mapper.insertSelective(insetContent);
+
+                ApArticleConfig config = new ApArticleConfig();
+                config.setArticleId(article.getId());
+                config.setIsDown(false);
+                config.setIsDelete(false);
+                config.setIsForward(true);
+                config.setIsComment(true);
+                apArticleConfigMapper.insert(config);
             }else {
                 insetContent.setArticleId(articleId);
                 mapper.insertSelective(insetContent);
             }
-
-
-
 
             return true;
         });

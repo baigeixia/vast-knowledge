@@ -8,7 +8,6 @@ import com.vk.analyze.domain.AdChannel;
 import com.vk.analyze.feign.RemoteChannelService;
 import com.vk.article.domain.ApArticle;
 import com.vk.article.domain.ApArticleConfig;
-import com.vk.article.domain.table.ApArticleTableDef;
 import com.vk.article.domain.vo.*;
 import com.vk.article.util.ArticleStatus;
 import com.vk.common.core.utils.DateUtils;
@@ -265,7 +264,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                     ValidationUtils.validateR(userList, "错误的用户");
 
                     for (HomeArticleListVo record : listVoPage) {
-                        ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
+                        ArticleMg articleMg = articleMgRepository.findByArticleIda(record.getId());
                         record.setSimpleDescription(articleMg.getSimpleDescription());
                         Map<Long, AuthorInfo> infoMap = userList.getData();
                         if (!ObjectUtils.isEmpty(infoMap)) {

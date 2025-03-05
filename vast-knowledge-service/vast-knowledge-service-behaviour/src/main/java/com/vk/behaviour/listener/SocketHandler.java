@@ -394,6 +394,7 @@ public class SocketHandler {
             if (count == 1) {
                 readBehavior.setCount(readBehavior.getCount() + 1);
             }
+            readBehavior.setPercentage(dto.getPercentage());
             readBehavior.setMaxPosition(dto.getPercentage() > readBehavior.getMaxPosition() ? dto.getPercentage() : readBehavior.getMaxPosition());
             // dto.setMaxPosition(dto.getPercentage() > readBehavior.getPercentage() ? dto.getPercentage() : readBehavior.getPercentage());
             readBehavior.setReadDuration(readBehavior.getReadDuration().add(dto.getReadDuration()));

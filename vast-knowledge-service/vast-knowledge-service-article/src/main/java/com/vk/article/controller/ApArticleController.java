@@ -275,5 +275,12 @@ public class ApArticleController {
     }
 
 
+    // @PostMapping("/saveTitle")
+    // public AjaxResult saveTitle(
+    //         @RequestBody ArticleAndConfigDto dto
+    // ){
+    //     apArticleService.saveTitle(dto);
+    //     return AjaxResult.success();
+    // }
 
 }

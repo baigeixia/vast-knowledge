@@ -7,7 +7,6 @@ import com.vk.article.mapper.ApArticleMapper;
 import com.vk.article.mapper.ApRejectionMapper;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.domain.ValidationUtils;
-import com.vk.common.redis.utlis.SensitiveWord;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.db.domain.article.ArticleMg;
@@ -147,7 +146,7 @@ public class ArticleReviewJob {
 
     private void processArticle(Long articleId, List<ApRejection> apRejections,Set<Long> approvedIds) {
         log.info("敏感词检测 文章id=： {}",articleId);
-        ArticleMg repository = articleMgRepository.findByArticleId(articleId);
+        ArticleMg repository = articleMgRepository.findByArticleIda(articleId);
         String content = repository.getContent();
         R<Map<String, AtomicInteger>> sensitiveShort = remoteChannelService.getSensitiveShort(content);
         if (ValidationUtils.validateRSuccess(sensitiveShort)) {
