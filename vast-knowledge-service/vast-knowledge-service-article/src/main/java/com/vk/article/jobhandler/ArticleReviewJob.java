@@ -146,7 +146,7 @@ public class ArticleReviewJob {
 
     private void processArticle(Long articleId, List<ApRejection> apRejections,Set<Long> approvedIds) {
         log.info("敏感词检测 文章id=： {}",articleId);
-        ArticleMg repository = articleMgRepository.findByArticleIda(articleId);
+        ArticleMg repository = articleMgRepository.findByArticleId(articleId);
         String content = repository.getContent();
         R<Map<String, AtomicInteger>> sensitiveShort = remoteChannelService.getSensitiveShort(content);
         if (ValidationUtils.validateRSuccess(sensitiveShort)) {

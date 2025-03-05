@@ -1,8 +1,10 @@
 package com.vk.common.redis.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.BoundSetOperations;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -234,6 +236,13 @@ public class RedisService
      * @param dataMap
      */
     public <T> void setCacheMap(final String key, final Map<String, T> dataMap)
+    {
+        if (dataMap != null) {
+            redisTemplate.opsForHash().putAll(key, dataMap);
+        }
+    }
+
+    public <T> void setCacheMapLong(final String key, final Map<Long, T> dataMap)
     {
         if (dataMap != null) {
             redisTemplate.opsForHash().putAll(key, dataMap);

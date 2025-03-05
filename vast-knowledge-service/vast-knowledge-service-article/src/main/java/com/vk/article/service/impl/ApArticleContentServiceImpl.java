@@ -99,7 +99,7 @@ public class ApArticleContentServiceImpl extends ServiceImpl<ApArticleContentMap
 
         ApArticleContent articleContent = new ApArticleContent();
 
-        ArticleMg articleMg = articleMgRepository.findByArticleIda(articleId);
+        ArticleMg articleMg = articleMgRepository.findByArticleId(articleId);
         if (null != articleMg) {
             BeanUtils.copyProperties(articleMg, articleContent);
             return articleContent;

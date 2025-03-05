@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface ArticleMgRepository extends MongoRepository<ArticleMg,Long> {
 
     ArticleMg findByArticleIdAndAuthorId(Long id,Long userid);
-    ArticleMg findByArticleIda(Long id);
+    ArticleMg findByArticleId(Long id);
 
 
 

@@ -96,6 +96,8 @@ public class SocketHandler {
     private PushNotificationsHandler pushNotificationsHandler;
 
 
+
+
     /**
      * 当客户端发起连接时调用
      */
@@ -359,10 +361,13 @@ public class SocketHandler {
         Long articleId = dto.getArticleId();
         validaParameter(ackRequest, articleId, "文章id不能为空");
         Long userId = clientGetUserId(socketIOClient);
-        // validaParameter(ackRequest, userId, "未登录");
         if (!StringUtils.isLongEmpty(userId)){
+//            String readTime = JSON.toJSONString(dto);
             readUnloadLog(dto, userId, articleId);
+//            String redisKey = "read:" + userId + ":" + articleId;
+//           redisService.setCacheObject(redisKey,dto,5L,TimeUnit.MINUTES);
         }
+
 
     }
 
