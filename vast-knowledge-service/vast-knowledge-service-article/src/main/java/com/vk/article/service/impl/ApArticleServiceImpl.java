@@ -264,7 +264,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
                     ValidationUtils.validateR(userList, "错误的用户");
 
                     for (HomeArticleListVo record : listVoPage) {
-                        ArticleMg articleMg = articleMgRepository.findByArticleIda(record.getId());
+                        ArticleMg articleMg = articleMgRepository.findByArticleId(record.getId());
                         record.setSimpleDescription(articleMg.getSimpleDescription());
                         Map<Long, AuthorInfo> infoMap = userList.getData();
                         if (!ObjectUtils.isEmpty(infoMap)) {

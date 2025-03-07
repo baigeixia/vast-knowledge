@@ -3,17 +3,12 @@ package com.vk.analyze.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.analyze.domain.AdChannel;
-import com.vk.analyze.domain.table.AdChannelTableDef;
 import com.vk.analyze.domain.vo.ChannelListVo;
 import com.vk.analyze.service.AdChannelService;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.StringUtils;
-import com.vk.common.core.web.controller.BaseController;
 import com.vk.common.core.web.domain.AjaxResult;
-import com.vk.common.core.web.page.PageDomain;
-import com.vk.common.core.web.page.TableDataInfo;
-import com.vk.common.core.web.page.TableSupport;
 import com.vk.common.log.annotation.Log;
 import com.vk.common.log.enums.BusinessType;
 import com.vk.common.redis.constants.BusinessConstants;
@@ -23,12 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.vk.analyze.domain.table.AdChannelTableDef.AD_CHANNEL;
-import static com.vk.common.core.constant.CacheConstants.AD_CHANNEL_KEY;
+import static com.vk.common.core.constant.DatabaseConstants.DB_ROW_STATUS_YES;
 
 /**
  * 频道信息 控制层。
@@ -38,7 +32,7 @@ import static com.vk.common.core.constant.CacheConstants.AD_CHANNEL_KEY;
  */
 @RestController
 @RequestMapping("/channel")
-public class AdChannelController  {
+public class AdChannelController {
 
     @Autowired
     private AdChannelService adChannelService;
@@ -49,11 +43,11 @@ public class AdChannelController  {
     @GetMapping("getOneInfo/{channelId}")
     public R<AdChannel> getOneInfo(@PathVariable(name = "channelId") Long channelId) {
         AdChannel adChannel = redisService.getCacheObject(BusinessConstants.loadingChannel(channelId));
-        if (ObjectUtils.isEmpty(adChannel)){
+        if (ObjectUtils.isEmpty(adChannel)) {
             AdChannel channel = adChannelService.getById(channelId);
-            return  R.ok(channel);
+            return R.ok(channel);
         }
-        return  R.ok(adChannel);
+        return R.ok(adChannel);
     }
 
     /**
@@ -68,16 +62,16 @@ public class AdChannelController  {
     public AjaxResult save(@RequestBody AdChannel adChannel) {
         String name = adChannel.getName();
         Integer ord = adChannel.getOrd();
-        if (StringUtils.isEmpty(name)){
+        if (StringUtils.isEmpty(name)) {
             throw new LeadNewsException("频道名称不能为空");
         }
-        if (ObjectUtils.isEmpty(ord)){
+        if (ObjectUtils.isEmpty(ord)) {
             throw new LeadNewsException("频道排序不能为空");
         }
 
         AdChannel one = adChannelService.getOne(QueryWrapper.create().where(AD_CHANNEL.NAME.like(name)));
-        if (!ObjectUtils.isEmpty(one)){
-            throw new LeadNewsException("已经存在:"+one.getName());
+        if (!ObjectUtils.isEmpty(one)) {
+            throw new LeadNewsException("已经存在:" + one.getName());
         }
 
         adChannel.setCreatedTime(LocalDateTime.now());
@@ -85,7 +79,7 @@ public class AdChannelController  {
         adChannel.setIsDefault(0);
         adChannelService.save(adChannel);
 
-      redisService.setCacheObject(BusinessConstants.loadingChannel(adChannel.getId()),adChannel);
+        redisService.setCacheObject(BusinessConstants.loadingChannel(adChannel.getId()), adChannel);
 
         return AjaxResult.success();
     }
@@ -99,7 +93,7 @@ public class AdChannelController  {
     @DeleteMapping("remove/{id}")
     @Log(title = "删除频道", businessType = BusinessType.DELETE)
     @RequiresPermissions("system:channel:del")
-    public AjaxResult remove(@PathVariable(name = "id") Long  id) {
+    public AjaxResult remove(@PathVariable(name = "id") Long id) {
         adChannelService.removeByIdone(id);
         redisService.deleteObject(BusinessConstants.loadingChannel(id));
         return AjaxResult.success();
@@ -109,43 +103,48 @@ public class AdChannelController  {
     /**
      * 禁用  或者 启用。
      *
-     * @param id 主键
-     * @param isDisable  1 禁用 0 启用
+     * @param id        主键
+     * @param isDisable 1 禁用 0 启用
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @RequiresPermissions("system:channel:up")
     @Log(title = "频道状态", businessType = BusinessType.UPDATE)
     @DeleteMapping("disable/{id}")
     public AjaxResult disable(
-            @PathVariable(name = "id") Long  id,
-            @RequestParam(name = "type")Integer isDisable
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "type") Integer isDisable
     ) {
         AdChannel service = adChannelService.getById(id);
-        if (ObjectUtils.isEmpty(service)){
+        if (ObjectUtils.isEmpty(service)) {
             throw new LeadNewsException("频道不存在 可能已被移除");
         }
         AdChannel channel = getChannel(isDisable, service);
-
         adChannelService.updateById(channel);
-        redisService.setCacheObject(BusinessConstants.loadingChannel(id),channel);
+        if (1 == isDisable) {
+            redisService.deleteObject(BusinessConstants.loadingChannel(id));
+        } else {
+            redisService.setCacheObject(BusinessConstants.loadingChannel(id), channel);
+        }
+
+
         return AjaxResult.success();
     }
 
-    private  AdChannel getChannel(Integer isDisable, AdChannel service) {
+    private AdChannel getChannel(Integer isDisable, AdChannel service) {
         AdChannel channel = new AdChannel();
         channel.setId(service.getId());
         Integer status = service.getStatus();
-        if (1== isDisable){
-            if(1==status){
+        if (1 == isDisable) {
+            if (1 == status) {
                 throw new LeadNewsException("频道已经禁用状态");
             }
             channel.setStatus(1);
-        }else if (0== isDisable){
-            if(0==status){
+        } else if (0 == isDisable) {
+            if (0 == status) {
                 throw new LeadNewsException("频道已经启用状态");
             }
             channel.setStatus(0);
-        }else {
+        } else {
             throw new LeadNewsException("频道状态错误");
         }
         return channel;
@@ -162,11 +161,11 @@ public class AdChannelController  {
     @PutMapping("update")
     public AjaxResult update(@RequestBody AdChannel adChannel) {
         Long id = adChannel.getId();
-        if (StringUtils.isLongEmpty(id)){
+        if (StringUtils.isLongEmpty(id)) {
             throw new LeadNewsException("频道id错误");
         }
         AdChannel service = adChannelService.getById(id);
-        if (ObjectUtils.isEmpty(service)){
+        if (ObjectUtils.isEmpty(service)) {
             throw new LeadNewsException("频道不存在 可能已被移除");
         }
 
@@ -176,7 +175,7 @@ public class AdChannelController  {
         channel.setOrd(adChannel.getOrd());
 
         adChannelService.updateById(channel);
-        redisService.setCacheObject(BusinessConstants.loadingChannel(id),channel);
+        redisService.setCacheObject(BusinessConstants.loadingChannel(id), channel);
         return AjaxResult.success();
     }
 
@@ -185,12 +184,38 @@ public class AdChannelController  {
      *
      * @return 所有数据
      */
-    @GetMapping ("list")
+    @GetMapping("list")
     public AjaxResult list(
     ) {
         List<ChannelListVo> list = adChannelService.listAs(QueryWrapper.create().select(AD_CHANNEL.NAME, AD_CHANNEL.ID), ChannelListVo.class);
         return AjaxResult.success(list);
     }
+
+    //用户查询
+    @GetMapping("page")
+    public AjaxResult page(
+            @RequestParam(name = "page", defaultValue = "1", required = false) Long page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) Long size,
+            @RequestParam(name = "status", required = false) Integer status,
+            @RequestParam(name = "name", required = false) String name
+    ) {
+//        Map<String, Object> cacheMap = redisService.getCacheMap(AD_CHANNEL_KEY);
+//        if (!cacheMap.isEmpty()) {
+//            return AjaxResult.success(cacheMap);
+//        }
+
+        Page<AdChannel> paged = adChannelService.page(Page.of(page, size), QueryWrapper.create()
+                .where(
+                        AD_CHANNEL.STATUS.eq(status, !ObjectUtils.isEmpty(status))
+                                .and(AD_CHANNEL.NAME.like(name, StringUtils.isNotEmpty(name)))
+                                .and(AD_CHANNEL.STATUS.eq(DB_ROW_STATUS_YES))
+                                .and(AD_CHANNEL.DEL.eq(false)))
+                .orderBy(AD_CHANNEL.ORD, true)
+        );
+
+        return AjaxResult.success(paged);
+    }
+
 
     /**
      * 分页查询频道信息。
@@ -198,19 +223,24 @@ public class AdChannelController  {
      * @param page 分页对象
      * @return 分页对象
      */
-    @GetMapping("page")
-    public AjaxResult page(
-            @RequestParam(name = "page",defaultValue = "1",required = false) Long page ,
-            @RequestParam(name = "size" ,defaultValue = "10",required = false) Long size,
-            @RequestParam(name = "status" ,required = false) Integer status,
-            @RequestParam(name = "name" ,required = false) String name
+    @GetMapping("pageList")
+    public AjaxResult pageList(
+            @RequestParam(name = "page", defaultValue = "1", required = false) Long page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) Long size,
+            @RequestParam(name = "status", required = false) Integer status,
+            @RequestParam(name = "name", required = false) String name
     ) {
+//        Map<String, Object> cacheMap = redisService.getCacheMap(AD_CHANNEL_KEY);
+//        if (!cacheMap.isEmpty()) {
+//            return AjaxResult.success(cacheMap);
+//        }
+
         Page<AdChannel> paged = adChannelService.page(Page.of(page, size), QueryWrapper.create()
                 .where(
                         AD_CHANNEL.STATUS.eq(status, !ObjectUtils.isEmpty(status))
                                 .and(AD_CHANNEL.NAME.like(name, StringUtils.isNotEmpty(name)))
-                )
-                .orderBy(AD_CHANNEL.ORD, true));
+                ).orderBy(AD_CHANNEL.ORD, true));
+
         return AjaxResult.success(paged);
     }
 

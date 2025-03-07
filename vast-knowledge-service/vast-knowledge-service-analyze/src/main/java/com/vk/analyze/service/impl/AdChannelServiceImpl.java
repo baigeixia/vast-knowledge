@@ -38,23 +38,29 @@ public class AdChannelServiceImpl extends ServiceImpl<AdChannelMapper, AdChannel
      * 项目启动时，初始化字典到缓存
      */
     @PostConstruct
-    public void init()
-    {
+    public void init() {
         loadingChannel();
     }
 
     @Override
     public void loadingChannel() {
-        mapper.selectListByQuery(QueryWrapper.create().where(AD_CHANNEL.STATUS.eq(DB_ROW_STATUS_YES)))
-                .forEach(i->
-                        redisService.setCacheObject(BusinessConstants.loadingChannel(i.getId()), i)
-                );
+       mapper.selectListByQuery(
+                QueryWrapper.create().where(AD_CHANNEL.STATUS.eq(DB_ROW_STATUS_YES))
+                        .and(AD_CHANNEL.DEL.eq(false)).orderBy(AD_CHANNEL.ORD, true))
+                .forEach(i->{
+                    redisService.setCacheObject(BusinessConstants.loadingChannel(i.getId()), i);
+                });
+
+//        Map<Long, AdChannel> adChannelMap = adChannels.stream()
+//                .collect(Collectors.toMap(AdChannel::getId, adChannel -> adChannel));
+//
+//        redisService.setCacheMapLong(AD_CHANNEL_KEY, adChannelMap);
     }
 
     @Override
     public void removeByIdone(Serializable id) {
         AdChannel adChannel = mapper.selectOneById(id);
-        if (ObjectUtils.isEmpty(adChannel)){
+        if (ObjectUtils.isEmpty(adChannel)) {
             throw new LeadNewsException("频道不存在 可能已被移除");
         }
 
@@ -63,7 +69,7 @@ public class AdChannelServiceImpl extends ServiceImpl<AdChannelMapper, AdChannel
 
 
     @Override
-    public  Page<AdChannel>  getlist(AdChannel adChannel) {
+    public Page<AdChannel> getlist(AdChannel adChannel) {
         Integer status = adChannel.getStatus();
         String name = adChannel.getName();
 
@@ -73,7 +79,7 @@ public class AdChannelServiceImpl extends ServiceImpl<AdChannelMapper, AdChannel
         //        QueryCondition eq = AD_CHANNEL.STATUS.eq(adChannel.getStatus(), null!=adChannel.getStatus());
 
         Page<AdChannel> paginate = this.mapper.paginate(pageNum, pageSize, query()
-                .where(AD_CHANNEL.STATUS.eq(status,null!=status ))
+                .where(AD_CHANNEL.STATUS.eq(status, null != status))
                 .and(AD_CHANNEL.NAME.like(name, StringUtils.isNotEmpty(name))));
 
         return paginate;
