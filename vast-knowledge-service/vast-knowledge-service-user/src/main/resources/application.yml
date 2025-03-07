@@ -8,8 +8,3 @@ spring:
     url: jdbc:mysql://101.126.43.197:31193/learned_asked_user?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai
     username: root
     password: mysql_root_123@112..
-# MyBatis配置
-mybatis-flex:
-  type-aliases-package: com.vk.**.domain
-  # 配置mapper的扫描，找到所有的mapper.xml映射文件
-  mapper-locations: classpath*:mapper/**/*Mapper.xml

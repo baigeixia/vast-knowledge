@@ -12,9 +12,9 @@ spring:
         server-addr: 101.126.43.197:31080
       config:
         server-addr: 101.126.43.197:31080
+        group: ${spring.profiles.active}
         # 配置文件格式
         file-extension: yml
         # 共享配置
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
-          - analyze-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}

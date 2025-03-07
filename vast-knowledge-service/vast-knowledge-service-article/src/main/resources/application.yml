@@ -17,14 +17,6 @@ spring:
       database: article
       authentication-database: admin
 #      uri: mongodb://adminRoot:mymongoroot_1234%40@101.126.43.197:32407/article
-
-
-# MyBatis配置
-mybatis-flex:
-  type-aliases-package: com.vk.**.domain
-  # 配置mapper的扫描，找到所有的mapper.xml映射文件
-  mapper-locations: classpath*:mapper/**/*Mapper.xml
-
 logging:
   level:
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG

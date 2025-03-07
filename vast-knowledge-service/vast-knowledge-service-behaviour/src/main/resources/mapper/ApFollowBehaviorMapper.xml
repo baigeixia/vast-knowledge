@@ -10,7 +10,7 @@
     </resultMap>
 
 <!--    <select id="getFollowNotifyCountMap" resultMap="notificationMap">-->
-    <select id="getFollowNotifyCountMap" resultType="FollowNotifyCountMap">
+    <select id="getFollowNotifyCountMap" resultType="com.vk.behaviour.domain.entity.FollowNotifyCountMap">
         SELECT
             DATE(a.created_time) AS dateTime,
             COUNT(a.id) AS total

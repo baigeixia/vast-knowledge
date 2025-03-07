@@ -5,6 +5,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.processor.WallclockTimestampExtractor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
@@ -17,7 +18,7 @@ import java.util.Map;
 @Data
 @Configuration
 @EnableKafkaStreams
-@ConfigurationProperties(prefix = "kafka")
+@ConfigurationProperties(prefix = "spring.kafka")
 public class KafkaStreamsConfig {
     private String hosts;
     private String group;

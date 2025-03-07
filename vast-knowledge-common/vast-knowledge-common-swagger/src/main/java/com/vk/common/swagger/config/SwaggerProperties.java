@@ -1,10 +1,12 @@
 package com.vk.common.swagger.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@RefreshScope
 @ConfigurationProperties("swagger")
 public class SwaggerProperties
 {

@@ -1,0 +1,42 @@
+---
+#Namespace dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-dev-analyze
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-svc
+  namespace: app-dev
+spec:
+  ports:
+    - port: 19006
+  selector:
+    app: analyze
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analyze
+  namespace: app-dev
+spec:
+  replicas: 1  # 副本数，根据需要调整
+  selector:
+    matchLabels:
+      app: analyze
+  template:
+    metadata:
+      labels:
+        app: analyze
+    spec:
+      containers:
+        - name: analyze
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/analyze:latest  # 使用适合的版本
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
+          ports:
+            - containerPort: 19006
