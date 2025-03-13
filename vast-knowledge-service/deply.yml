@@ -1,0 +1,42 @@
+---
+#Namespace dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app-dev-${SERVICE_NAME}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${SERVICE_NAME}-app-svc
+  namespace: app-dev-${SERVICE_NAME}
+spec:
+  ports:
+    - port: ${SERVICE_PORT}
+  selector:
+    app: ${SERVICE_NAME}
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: app-dev-${SERVICE_NAME}
+spec:
+  replicas: 1  # 副本数，根据需要调整
+  selector:
+    matchLabels:
+      app: ${SERVICE_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${SERVICE_NAME}
+    spec:
+      containers:
+        - name: ${SERVICE_NAME}
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/${SERVICE_NAME}:${TAG}  # 使用适合的版本
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
+          ports:
+            - containerPort: ${SERVICE_PORT}

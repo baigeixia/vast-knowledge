@@ -19,13 +19,6 @@ spring:
 #            maxAge: 18000
 #            allowCredentials: true
       routes:
-#        # 权限微服
-#        - id: vk-service-auth
-#          uri: lb://vk-service-auth
-#          predicates:
-#            - Path=/auth/**
-#          filters:
-#            - StripPrefix=1
         # 后台管理微服
         - id: vk-service-system
           uri: lb://vk-service-system

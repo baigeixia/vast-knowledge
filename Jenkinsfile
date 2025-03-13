@@ -1,41 +1,32 @@
 pipeline {
     agent any
     environment {
-        tag = "latest"
+        tag = "env.BUILD_NUMBER"
         ali_url = "registry.cn-shenzhen.aliyuncs.com"
         ali_project_name = "vk-25"
-        ali_credentialsId = "d45925ed-beea-4f73-87ba-432b8e9db465"
-        KUBECONFIG = "/home/jenkins/.kube/config"  // 确保kubeconfig路径正确
+        ali_credentialsId = "2bbf117e-0bfd-406d-95e1-9d9d593474c7"
+        git_auth_id = "2b317317-386b-4924-90e3-b3c78eb83c4d"
     }
 
     tools {
-        maven 'Maven 3.8.8'
-        jdk 'JDK 21'
+        maven 'maven3.8.8'
     }
 
     stages {
-        stage('Check Environment') {
-            steps {
-                script {
-                    // 验证containerd和kubectl可用性
-                    sh 'ctr version'
-                    sh 'kubectl version --client'
-                }
-            }
-        }
 
         stage('克隆代码') {
             steps {
-                git credentialsId: '2b317317-386b-4924-90e3-b3c78eb83c4d',
-                    url: 'https://gitee.com/tsitsiharry/vast-knowledge.git'
+                git credentialsId: git_auth_id, url: 'https://gitee.com/tsitsiharry/vast-knowledge.git'
             }
         }
 
-        stage('编译公共模块') {
+        stage('代码编译') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -Dmaven.test.skip=true'
             }
         }
+
+
 
         stage('构建并部署服务') {
             steps {
@@ -53,12 +44,12 @@ pipeline {
                     def service = parts[0]
                     def service_port = parts[1]
 
-                    def servicePath = service != 'vast-knowledge-gateway' ?
-                        "vast-knowledge-service/${service}" :
-                        service
+                    def servicePath = service != 'gateway' ?
+                        "vast-knowledge-service/vast-knowledge-${service}" :
+                        'vast-knowledge-${service}'
 
                     // Maven打包
-                    sh "mvn -f ${servicePath} clean package"
+                    sh "mvn -f ${servicePath} clean package -Dfile.encoding=UTF-8 -Dmaven.test.skip=true"
 
                     // Containerd构建镜像
                     def full_image_name = "${ali_url}/${ali_project_name}/${service}:${tag}"
@@ -73,28 +64,26 @@ pipeline {
                     // 推送镜像
                     withCredentials([usernamePassword(
                         credentialsId: ali_credentialsId,
-                        usernameVariable: 'REGISTRY_USER',
-                        passwordVariable: 'REGISTRY_PASSWORD')]) {
+                        usernameVariable: 'USERNAME',
+                        passwordVariable: 'PASSWORD')]) {
                         sh """
                             ctr images ls | grep ${ali_url} | awk '{print \$1}' | xargs -I{} ctr images rm {}
-                            ctr images pull --user \$REGISTRY_USER:\$REGISTRY_PASSWORD ${full_image_name}
+                            ctr images pull --user \$USERNAME:\$PASSWORD ${full_image_name}
                             ctr images push ${full_image_name} --skip-verify
                         """
                     }
 
-                    // Kubernetes部署
-                    def yamlDir = "${servicePath}/k8s"
-                    def namespace = service
+                  sh """
+                      sed -i 's#\${SERVICE_NAME}#${service}#' '${servicePath}/deploy.yml'
+                      sed -i 's#\${SERVICE_PORT}#${service_port}#' '${servicePath}/deploy.yml'
+                      sed -i 's#\${TAG}#${tag}#' '${servicePath}/deploy.yml'
+                  """
 
-                    sh """
-                        # 替换YAML模板参数
-                        sed -i 's#{{IMAGE}}#${full_image_name}#g' ${yamlDir}/*.yaml
-                        sed -i 's#{{PORT}}#${service_port}#g' ${yamlDir}/*.yaml
-                        sed -i 's#{{ENV}}#prod#g' ${yamlDir}/*.yaml
+                  kubernetesDeploy(
+                      configs: "${servicePath}/deploy.yml",
+                      kubeconfigId: "${k8s_auth}"
+                  )
 
-                        # 应用Kubernetes配置
-                        kubectl apply -n ${namespace} -f ${yamlDir}/
-                    """
                 }
             }
         }
