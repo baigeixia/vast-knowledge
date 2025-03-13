@@ -3,40 +3,40 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: media
+  name: article
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: media-svc
-  namespace: media
+  name: article-svc
+  namespace: article
 spec:
   ports:
-    - port: 19005
+    - port: 19004
   selector:
-    app: media
+    app: article
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: media
-  namespace: media
+  name: article
+  namespace: article
 spec:
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
-      app: media
+      app: article
   template:
     metadata:
       labels:
-        app: media
+        app: article
     spec:
       containers:
-        - name: media
-          image: registry.cn-shenzhen.aliyuncs.com/vk-25/wemedia:${IMAGE_TAG}  # 使用适合的版本
+        - name: article
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/article:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
-            - containerPort: 19005
+            - containerPort: 19004

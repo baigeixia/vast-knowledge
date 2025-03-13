@@ -3,40 +3,40 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: media
+  name: dfs
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: media-svc
-  namespace: media
+  name: dfs-svc
+  namespace: dfs
 spec:
   ports:
-    - port: 19005
+    - port: 19011
   selector:
-    app: media
+    app: dfs
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: media
-  namespace: media
+  name: dfs
+  namespace: dfs
 spec:
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
-      app: media
+      app: dfs
   template:
     metadata:
       labels:
-        app: media
+        app: dfs
     spec:
       containers:
-        - name: media
-          image: registry.cn-shenzhen.aliyuncs.com/vk-25/wemedia:${IMAGE_TAG}  # 使用适合的版本
+        - name: dfs
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/dfs:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
-            - containerPort: 19005
+            - containerPort: 19011

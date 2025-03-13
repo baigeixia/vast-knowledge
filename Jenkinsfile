@@ -74,9 +74,7 @@ pipeline {
                     }
 
                   sh """
-                      sed -i 's#\${SERVICE_NAME}#${service}#' '${servicePath}/deploy.yml'
-                      sed -i 's#\${SERVICE_PORT}#${service_port}#' '${servicePath}/deploy.yml'
-                      sed -i 's#\${TAG}#${tag}#' '${servicePath}/deploy.yml'
+                      sed -i 's#\${IMAGE_TAG}#${tag}#' '${servicePath}/deploy.yml'
                   """
 
                   kubernetesDeploy(
