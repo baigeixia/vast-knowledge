@@ -79,8 +79,8 @@ spec:
               name: jenkins-certs  # 挂载的 volume 名称
           resources:
             limits:
-              memory: "1Gi"
-              cpu: "1"
+              memory: "500Mi"
+              cpu: "500m"
       volumes:
         - name: jenkins-certs
           hostPath:

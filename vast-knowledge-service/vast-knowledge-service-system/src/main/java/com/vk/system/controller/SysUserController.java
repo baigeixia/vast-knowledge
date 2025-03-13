@@ -3,7 +3,6 @@ package com.vk.system.controller;
 import com.vk.common.core.domain.R;
 import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.StringUtils;
-
 import com.vk.common.core.web.controller.BaseController;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.vk.common.core.web.page.TableDataInfo;
@@ -17,15 +16,11 @@ import com.vk.system.domain.SysRole;
 import com.vk.system.domain.SysUser;
 import com.vk.system.model.LoginUser;
 import com.vk.system.service.*;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,43 +61,43 @@ public class SysUserController extends BaseController
         return getDataTable(list);
     }
 
-    @Log(title = "用户管理", businessType = BusinessType.EXPORT)
-    @RequiresPermissions("system:user:export")
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, SysUser user)
-    {
-        List<SysUser> list = userService.selectUserList(user);
-        // TODO 表格工具类  移除了  SysPost
+    // @Log(title = "用户管理", businessType = BusinessType.EXPORT)
+    // @RequiresPermissions("system:user:export")
+    // @PostMapping("/export")
+    // public void export(HttpServletResponse response, SysUser user)
+    // {
+    //     List<SysUser> list = userService.selectUserList(user);
+    //     // TODO 表格工具类  移除了  SysPost
+    //
+    //    ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+    //    util.exportExcel(response, list, "用户数据");
+    // }
 
-//        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-//        util.exportExcel(response, list, "用户数据");
-    }
+    // @Log(title = "用户管理", businessType = BusinessType.IMPORT)
+    // @RequiresPermissions("system:user:import")
+    // @PostMapping("/importData")
+    // public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
+    // {
+    //    ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+    //    List<SysUser> userList = util.importExcel(file.getInputStream());
+    //    String operName = SecurityUtils.getUsername();
+    //    String message = userService.importUser(userList, updateSupport, operName);
+    //     return success(null);
+    // }
 
-    @Log(title = "用户管理", businessType = BusinessType.IMPORT)
-    @RequiresPermissions("system:user:import")
-    @PostMapping("/importData")
-    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
-    {
-//        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-//        List<SysUser> userList = util.importExcel(file.getInputStream());
-//        String operName = SecurityUtils.getUsername();
-//        String message = userService.importUser(userList, updateSupport, operName);
-        return success(null);
-    }
-
-    @PostMapping("/importTemplate")
-    public void importTemplate(HttpServletResponse response) throws IOException
-    {
-//        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-//        util.importTemplateExcel(response, "用户数据");
-    }
+    // @PostMapping("/importTemplate")
+    // public void importTemplate(HttpServletResponse response) throws IOException
+    // {
+    //    ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+    //    util.importTemplateExcel(response, "用户数据");
+    // }
 
     /**
      * 获取当前用户信息
      */
     @InnerAuth
     @GetMapping("/info/{username}")
-    public R<LoginUser> info(@PathVariable(name = "username") String username)
+    public R<LoginUser<SysUser> > info(@PathVariable(name = "username") String username)
     {
         SysUser sysUser = userService.selectUserByUserName(username);
         if (StringUtils.isNull(sysUser))
@@ -113,7 +108,7 @@ public class SysUserController extends BaseController
         Set<String> roles = permissionService.getRolePermission(sysUser);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(sysUser);
-        LoginUser sysUserVo = new LoginUser();
+        LoginUser<SysUser> sysUserVo = new LoginUser<>();
         sysUserVo.setSysUser(sysUser);
         sysUserVo.setRolesLocal(roles);
         sysUserVo.setPermissions(permissions);

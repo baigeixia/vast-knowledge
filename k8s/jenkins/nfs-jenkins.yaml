@@ -1,0 +1,97 @@
+---
+#Namespace dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jk
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins-sa
+  namespace: jk
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: jenkins-role
+  namespace: jk
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/exec"]
+    verbs: ["create", "delete", "get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: jenkins-role-binding
+  namespace: jk
+subjects:
+  - kind: ServiceAccount
+    name: jenkins-sa
+    namespace: jk
+roleRef:
+  kind: Role
+  name: jenkins-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jk-svc
+  namespace: jk
+spec:
+  type: NodePort
+  selector:
+    app: jenkins
+  ports:
+    - port: 8080
+      name: web
+      nodePort: 31397
+    - port: 50000
+      name: agent
+      nodePort: 31529
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jenkins
+  namespace: jk
+spec:
+  serviceName: "jenkins"
+  replicas: 1  # 可以增加副本数来实现高可用
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:jdk21
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"  # 设置时区为上海
+          ports:
+            - containerPort: 8080
+            - containerPort: 50000
+          volumeMounts:
+            - mountPath: /var/jenkins_home
+              name: jenkins-home
+            - mountPath: /certs/client  # 挂载 /certs/client
+              name: jenkins-certs  # 挂载的 volume 名称
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
+      volumes:
+        - name: jenkins-certs
+          hostPath:
+            path: /mnt/data/jk/certs
+        - name: jenkins-home
+          hostPath:
+            path: /mnt/data/jk
+---

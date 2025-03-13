@@ -43,11 +43,6 @@
 
         <dependency>
             <groupId>com.vk</groupId>
-            <artifactId>vast-knowledge-api-article</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vk</groupId>
             <artifactId>vast-knowledge-api-comment</artifactId>
         </dependency>
 

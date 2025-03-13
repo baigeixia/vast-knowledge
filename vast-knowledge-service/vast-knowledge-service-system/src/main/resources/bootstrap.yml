@@ -12,11 +12,10 @@ spring:
       password: nacos_root_dentity_@^^security
       discovery:
         # 服务注册地址
-        server-addr: 101.126.43.197:31080
+        server-addr: ${NACOS_HOST:101.126.43.197}:${NACOS_PORT:31080}
       config:
-        # 配置中心地址
-        server-addr: 101.126.43.197:31080
-        group: ${spring.profiles.active}
+        server-addr: ${NACOS_HOST:101.126.43.197}:${NACOS_PORT:31080}
+        namespace: ${NACOS_NAMESPACE:}
         # 配置文件格式
         file-extension: yml
         # 共享配置
