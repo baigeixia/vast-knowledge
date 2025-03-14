@@ -17,9 +17,15 @@ metadata:
   name: jenkins-role
   namespace: jk
 rules:
-  - apiGroups: [""]
-    resources: ["pods", "pods/exec"]
-    verbs: ["create", "delete", "get", "list", "watch"]
+  - apiGroups: [ "" ]
+    resources: [ "pods", "pods/exec", "secrets", "configmaps", "services", "events", "deployments", "replicasets" ]
+    verbs: [ "create", "delete", "get", "list", "watch", "update" ]
+  - apiGroups: [ "" ]
+    resources: [ "namespaces" ]
+    verbs: [ "get", "list" ]
+  - apiGroups: [ "" ]
+    resources: [ "jobs", "cronjobs", "poddisruptionbudgets", "ingresses", "horizontalpodautoscalers" ]
+    verbs: [ "get", "list", "create", "delete" ]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -68,7 +74,10 @@ spec:
       labels:
         app: jenkins
     spec:
-
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"  # 容忍控制平面节点的 taint
       containers:
         - name: jenkins
           image: jenkins/jenkins:jdk21
@@ -78,16 +87,22 @@ spec:
           ports:
             - containerPort: 8080
             - containerPort: 50000
+          securityContext:
+            runAsUser: 0  # 运行容器时使用 root 用户
+            runAsGroup: 0 # 运行容器时使用 root 用户组
+            allowPrivilegeEscalation: true  # 允许特权提升，给容器更多权限
           volumeMounts:
+            - mountPath: /var/run/containerd/containerd.sock
+              name: containerd-sock
             - mountPath: /var/jenkins_home
               name: jenkins-home
             - mountPath: /certs/client  # 挂载 /certs/client
               name: jenkins-certs  # 挂载的 volume 名称
-          resources:
-            limits:
-              memory: "500Mi"
-              cpu: "500m"
       volumes:
+        - name: containerd-sock
+          hostPath:
+            path: /var/run/containerd/containerd.sock
+            type: Socket
         - name: jenkins-certs
           hostPath:
             path: /mnt/data/jk/certs

@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        tag = "env.BUILD_NUMBER"
+
         ali_url = "registry.cn-shenzhen.aliyuncs.com"
         ali_project_name = "vk-25"
         ali_credentialsId = "2bbf117e-0bfd-406d-95e1-9d9d593474c7"
@@ -10,6 +10,7 @@ pipeline {
 
     tools {
         maven 'maven3.8.8'
+        dockerTool 'docker:stable'
     }
 
     stages {
@@ -27,50 +28,51 @@ pipeline {
         }
 
 
-
         stage('构建并部署服务') {
             steps {
                 script {
-					// 服务名称@访问端口 common@19008
+					// 服务名称 common
                     if (!server_name || server_name.trim().isEmpty()) {
                         error "server_name 不能为空"
                     }
 
-                    def parts = server_name.split('@')
-                    if (parts.size() != 2) {
-                        error "server_name 格式不正确，应为 'module@port'"
-                    }
-
-                    def service = parts[0]
+                    def service = server_name
                     def service_port = parts[1]
 
-                    def servicePath = service != 'gateway' ?
+                    def servicePath = server_name != 'gateway' ?
                         "vast-knowledge-service/vast-knowledge-${service}" :
                         'vast-knowledge-${service}'
 
                     // Maven打包
                     sh "mvn -f ${servicePath} clean package -Dfile.encoding=UTF-8 -Dmaven.test.skip=true"
 
-                    // Containerd构建镜像
-                    def full_image_name = "${ali_url}/${ali_project_name}/${service}:${tag}"
+                    def tag = env.BUILD_NUMBER
+                    def imageName = "${mirror_name}:${tag}"
+                    def pushImage = "${ali_url}/${ali_project_name}/${imageName}"
+
                     sh """
-                        ctr image rm ${full_image_name} || true
-                        ctr image build -t ${full_image_name} \
-                            --build-arg JAR_FILE=target/*.jar \
-                            -f ${servicePath}/Dockerfile \
-                            ${servicePath}
+                        # 删除旧镜像（如果存在）
+                        crictl rmi ${imageName} || true
+                        # 构建新镜像
+                        crictl build --no-cache -t ${imageName} -f ${servicePath}/Dockerfile ${servicePath}
                     """
 
+                    sh "crictl tag ${imageName} ${pushImage}"
+
+                    // 登录到阿里云 Docker Registry
+                    withCredentials([usernamePassword(credentialsId: ali_credentialsId, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh '''
+                            echo "$DOCKER_PASSWORD" | crictl login --username="$DOCKER_USERNAME" --password-stdin ${ali_url}
+                        '''
+                    }
+
                     // 推送镜像
-                    withCredentials([usernamePassword(
-                        credentialsId: ali_credentialsId,
-                        usernameVariable: 'USERNAME',
-                        passwordVariable: 'PASSWORD')]) {
-                        sh """
-                            ctr images ls | grep ${ali_url} | awk '{print \$1}' | xargs -I{} ctr images rm {}
-                            ctr images pull --user \$USERNAME:\$PASSWORD ${full_image_name}
-                            ctr images push ${full_image_name} --skip-verify
-                        """
+                    sh "crictl push ${pushImage}"
+
+                    // 删除本地镜像
+                    def imageId = sh(script: "crictl images -q ${imageName}", returnStdout: true).trim()
+                    if (imageId) {
+                        sh "crictl rmi ${imageId}"
                     }
 
                   sh """
@@ -89,8 +91,11 @@ pipeline {
 
     post {
         always {
-            // 清理containerd镜像
-            sh 'ctr images ls -q | xargs -I{} ctr images rm {} || true'
+            // 清理 containerd 镜像
+            sh '''
+                # 获取所有镜像ID并逐一删除
+                crictl images -q | xargs -I {} crictl rmi {}
+            '''
         }
 
         success {
