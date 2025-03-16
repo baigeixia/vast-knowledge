@@ -20,7 +20,7 @@ spec:
   hostPath:
     path: /mnt/data/xxl
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:

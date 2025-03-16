@@ -1,42 +1,42 @@
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: comment
+  name: behaviour
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: comment-svc
-  namespace: comment
+  name: behaviour-svc
+  namespace: behaviour
 spec:
   ports:
-    - port: 19008
+    - port: 19007
   selector:
-    app: comment
+    app: behaviour
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: comment
-  namespace: comment
+  name: behaviour
+  namespace: behaviour
 spec:
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
-      app: comment
+      app: behaviour
   template:
     metadata:
       labels:
-        app: comment
+        app: behaviour
     spec:
       containers:
-        - name: comment
-          image: registry.cn-shenzhen.aliyuncs.com/vk-25/comment:${IMAGE_TAG}  # 使用适合的版本
+        - name: behaviour
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/behaviour:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
-            - containerPort: 19008
+            - containerPort: 19007

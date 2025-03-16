@@ -19,7 +19,7 @@ spec:
   hostPath:
     path: /mnt/data/jk
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:

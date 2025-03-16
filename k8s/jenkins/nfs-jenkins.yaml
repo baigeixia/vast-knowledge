@@ -1,5 +1,5 @@
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -12,33 +12,27 @@ metadata:
   namespace: jk
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   name: jenkins-role
-  namespace: jk
 rules:
-  - apiGroups: [ "" ]
-    resources: [ "pods", "pods/exec", "secrets", "configmaps", "services", "events", "deployments", "replicasets" ]
-    verbs: [ "create", "delete", "get", "list", "watch", "update" ]
-  - apiGroups: [ "" ]
-    resources: [ "namespaces" ]
-    verbs: [ "get", "list" ]
-  - apiGroups: [ "" ]
-    resources: [ "jobs", "cronjobs", "poddisruptionbudgets", "ingresses", "horizontalpodautoscalers" ]
-    verbs: [ "get", "list", "create", "delete" ]
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+  - nonResourceURLs: ["*"]
+    verbs: ["*"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: jenkins-role-binding
-  namespace: jk
 subjects:
   - kind: ServiceAccount
     name: jenkins-sa
     namespace: jk
 roleRef:
-  kind: Role
-  name: jenkins-role
+  kind: ClusterRole
+  name: jenkins-role  # 使用自定义的 jenkins-role，而不是 cluster-admin
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: v1
@@ -74,6 +68,7 @@ spec:
       labels:
         app: jenkins
     spec:
+      serviceAccountName: jenkins-sa
       tolerations:
         - key: "node-role.kubernetes.io/control-plane"
           operator: "Exists"
@@ -87,11 +82,25 @@ spec:
           ports:
             - containerPort: 8080
             - containerPort: 50000
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - sh
+                  - -c
+                  - |
+                    tar -xzvf /var/jenkins_home/tools/nerdctl-2.0.3-linux-amd64.tar.gz -C /usr/local/bin/
           securityContext:
             runAsUser: 0  # 运行容器时使用 root 用户
             runAsGroup: 0 # 运行容器时使用 root 用户组
             allowPrivilegeEscalation: true  # 允许特权提升，给容器更多权限
           volumeMounts:
+            - mountPath: /usr/local/bin/kubectl  # 容器内的路径
+              name: kubectl-volume
+            - mountPath: /usr/local/bin/buildctl
+              name: buildctl-volume
+            - mountPath: /var/run/buildkit/buildkitd.sock
+              name: buildkitd-sock
             - mountPath: /var/run/containerd/containerd.sock
               name: containerd-sock
             - mountPath: /var/jenkins_home
@@ -99,6 +108,16 @@ spec:
             - mountPath: /certs/client  # 挂载 /certs/client
               name: jenkins-certs  # 挂载的 volume 名称
       volumes:
+        - name: kubectl-volume
+          hostPath:
+            path: /usr/bin/kubectl
+        - name: buildctl-volume
+          hostPath:
+            path: /usr/local/bin/buildctl
+        - name: buildkitd-sock
+          hostPath:
+            path: /var/run/buildkit/buildkitd.sock
+            type: Socket
         - name: containerd-sock
           hostPath:
             path: /var/run/containerd/containerd.sock

@@ -50,39 +50,50 @@ pipeline {
                     def imageName = "${mirror_name}:${tag}"
                     def pushImage = "${ali_url}/${ali_project_name}/${imageName}"
 
+                    echo "处理image:${imageName}"
+                    echo "push 路径检查:${pushImage}"
+
                     sh """
-                        # 删除旧镜像（如果存在）
-                        crictl rmi ${imageName} || true
+                        echo "图像开始构建"
                         # 构建新镜像
-                        crictl build --no-cache -t ${imageName} -f ${servicePath}/Dockerfile ${servicePath}
+                        nerdctl --namespace=k8s.io build --no-cache -t ${imageName} -f ${servicePath}/Dockerfile ${servicePath}
+                         echo "图像构建完成。"
                     """
 
-                    sh "crictl tag ${imageName} ${pushImage}"
+                    // 打标签
+                    sh "echo '标记图像： ${imageName} with ${pushImage}'"
+                    sh "nerdctl --namespace=k8s.io tag ${imageName} ${pushImage}"
+                    echo "标记完成： ${imageName} -> ${pushImage}"
 
-                    // 登录到阿里云 Docker Registry
+                    // 登录到阿里云 Registry
                     withCredentials([usernamePassword(credentialsId: ali_credentialsId, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                         sh '''
-                            echo "$DOCKER_PASSWORD" | crictl login --username="$DOCKER_USERNAME" --password-stdin ${ali_url}
+                            echo "$DOCKER_PASSWORD" | nerdctl login -u=$DOCKER_USERNAME --password-stdin registry.cn-shenzhen.aliyuncs.com
                         '''
                     }
 
+                    echo "Login to Aliyun registry successful."
+
                     // 推送镜像
-                    sh "crictl push ${pushImage}"
+                    echo "推送镜像: ${pushImage}"
+                    sh "nerdctl --namespace=k8s.io push ${pushImage}"
+                    echo "推送完成: ${pushImage}"
+
 
                     // 删除本地镜像
-                    def imageId = sh(script: "crictl images -q ${imageName}", returnStdout: true).trim()
-                    if (imageId) {
-                        sh "crictl rmi ${imageId}"
-                    }
+                    sh "echo '删除本地镜像: ${imageName} and ${pushImage}'"
+                    sh "nerdctl --namespace=k8s.io rmi -f ${imageName} ${pushImage}"
+                    sh "echo '删除本地镜像完成'"
 
-                  sh """
-                      sed -i 's#\${IMAGE_TAG}#${tag}#' '${servicePath}/deploy.yml'
-                  """
 
-                  kubernetesDeploy(
-                      configs: "${servicePath}/deploy.yml",
-                      kubeconfigId: "${k8s_auth}"
-                  )
+                    sh """
+                        echo "使用新的图像标签更新 deploy.yml: ${tag}"
+                        sed -i 's#\${IMAGE_TAG}#${tag}#' '${servicePath}/deploy.yml'
+                        echo "deploy.yml 使用新标签更新: ${tag}"
+                    """
+
+                    sh "kubectl apply -f ${servicePath}/deploy.yaml"
+
 
                 }
             }

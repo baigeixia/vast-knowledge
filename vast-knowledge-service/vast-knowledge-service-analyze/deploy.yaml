@@ -1,42 +1,42 @@
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: search
+  name: analyze
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: search-svc
-  namespace: search
+  name: analyze-svc
+  namespace: analyze
 spec:
   ports:
-    - port: 19009
+    - port: 19006
   selector:
-    app: search
+    app: analyze
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: search
-  namespace: search
+  name: analyze
+  namespace: analyze
 spec:
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
-      app: search
+      app: analyze
   template:
     metadata:
       labels:
-        app: search
+        app: analyze
     spec:
       containers:
-        - name: search
-          image: registry.cn-shenzhen.aliyuncs.com/vk-25/search:${IMAGE_TAG}  # 使用适合的版本
+        - name: analyze
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/analyze:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
-            - containerPort: 19009
+            - containerPort: 19006

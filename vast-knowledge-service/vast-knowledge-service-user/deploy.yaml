@@ -1,42 +1,42 @@
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: behaviour
+  name: media
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: behaviour-svc
-  namespace: behaviour
+  name: media-svc
+  namespace: media
 spec:
   ports:
-    - port: 19007
+    - port: 19005
   selector:
-    app: behaviour
+    app: media
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: behaviour
-  namespace: behaviour
+  name: media
+  namespace: media
 spec:
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
-      app: behaviour
+      app: media
   template:
     metadata:
       labels:
-        app: behaviour
+        app: media
     spec:
       containers:
-        - name: behaviour
-          image: registry.cn-shenzhen.aliyuncs.com/vk-25/behaviour:${IMAGE_TAG}  # 使用适合的版本
+        - name: media
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/wemedia:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
-            - containerPort: 19007
+            - containerPort: 19005

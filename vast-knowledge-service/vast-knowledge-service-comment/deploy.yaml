@@ -1,42 +1,42 @@
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: analyze
+  name: comment
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: analyze-svc
-  namespace: analyze
+  name: comment-svc
+  namespace: comment
 spec:
   ports:
-    - port: 19006
+    - port: 19008
   selector:
-    app: analyze
+    app: comment
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: analyze
-  namespace: analyze
+  name: comment
+  namespace: comment
 spec:
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
-      app: analyze
+      app: comment
   template:
     metadata:
       labels:
-        app: analyze
+        app: comment
     spec:
       containers:
-        - name: analyze
-          image: registry.cn-shenzhen.aliyuncs.com/vk-25/analyze:${IMAGE_TAG}  # 使用适合的版本
+        - name: comment
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/comment:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
-            - containerPort: 19006
+            - containerPort: 19008

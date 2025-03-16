@@ -1,5 +1,5 @@
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:

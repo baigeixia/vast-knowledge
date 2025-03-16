@@ -1,42 +1,42 @@
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: gateway
+  name: search
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: gateway-svc
-  namespace: gateway
+  name: search-svc
+  namespace: search
 spec:
   ports:
-    - port: 16001
+    - port: 19009
   selector:
-    app: gateway
+    app: search
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gateway
-  namespace: gateway
+  name: search
+  namespace: search
 spec:
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
-      app: gateway
+      app: search
   template:
     metadata:
       labels:
-        app: gateway
+        app: search
     spec:
       containers:
-        - name: gateway
-          image: registry.cn-shenzhen.aliyuncs.com/vk-25/gateway:${IMAGE_TAG}  # 使用适合的版本
+        - name: search
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/search:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
-            - containerPort: 16001
+            - containerPort: 19009

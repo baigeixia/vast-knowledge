@@ -21,7 +21,7 @@ spec:
               values:
                 - node2
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:

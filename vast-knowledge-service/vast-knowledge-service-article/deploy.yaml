@@ -1,42 +1,42 @@
 ---
-#Namespace dev
+
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: system
+  name: article
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: system-svc
-  namespace: system
+  name: article-svc
+  namespace: article
 spec:
   ports:
-    - port: 19002
+    - port: 19004
   selector:
-    app: system
+    app: article
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: system
-  namespace: system
+  name: article
+  namespace: article
 spec:
   replicas: 1  # 副本数，根据需要调整
   selector:
     matchLabels:
-      app: system
+      app: article
   template:
     metadata:
       labels:
-        app: system
+        app: article
     spec:
       containers:
-        - name: system
-          image: registry.cn-shenzhen.aliyuncs.com/vk-25/system:${IMAGE_TAG}  # 使用适合的版本
+        - name: article
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/article:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
-            - containerPort: 19002
+            - containerPort: 19004
