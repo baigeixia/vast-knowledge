@@ -88,7 +88,7 @@ pipeline {
 
                     sh """
                         echo "使用新的图像标签更新 deploy.yml: ${tag}"
-                        sed -i 's#\${IMAGE_TAG}#${tag}#' '${servicePath}/deploy.yml'
+                        sed -i 's#\${IMAGE_TAG}#${tag}#' '${servicePath}/deploy.yaml'
                         echo "deploy.yml 使用新标签更新: ${tag}"
                     """
 
