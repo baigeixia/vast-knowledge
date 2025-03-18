@@ -37,7 +37,6 @@ pipeline {
                     }
 
                     def service = server_name
-                    def service_port = parts[1]
 
                     def servicePath = server_name != 'gateway' ?
                         "vast-knowledge-service/vast-knowledge-${service}" :
