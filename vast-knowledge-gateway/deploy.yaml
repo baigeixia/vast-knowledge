@@ -47,10 +47,10 @@ metadata:
   name: gateway-ingress
   namespace: gateway
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"  # 强制使用 HTTPS
     nginx.ingress.kubernetes.io/rewrite-target: "/"
 spec:
+  ingressClassName: nginx
   rules:
     - host: "api.aidighub.com"  # 设置外部域名
       http:
