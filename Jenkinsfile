@@ -21,32 +21,38 @@ pipeline {
             }
         }
 
-        stage('代码编译') {
+        stage('编译公共模块') {
             steps {
-                sh 'mvn clean package -Dmaven.test.skip=true'
+                sh 'mvn clean install -U'
             }
         }
-
 
         stage('构建并部署服务') {
             steps {
                 script {
+                    sh "java -version"
+
 					// 服务名称 common
                     if (!server_name || server_name.trim().isEmpty()) {
                         error "server_name 不能为空"
                     }
 
                     def service = server_name
+                    echo "server_name 参数: ${server_name}"
 
                     def servicePath = server_name != 'gateway' ?
                         "vast-knowledge-service/vast-knowledge-${service}" :
-                        'vast-knowledge-${service}'
+                        "vast-knowledge-${service}"
+
+                    echo "servicePath 参数: ${servicePath}"
 
                     // Maven打包
-                    sh "mvn -f ${servicePath} clean package -Dfile.encoding=UTF-8 -Dmaven.test.skip=true"
+
+                    sh "mvn -f ${servicePath} clean package -DskipTests=true "
+
 
                     def tag = env.BUILD_NUMBER
-                    def imageName = "${mirror_name}:${tag}"
+                    def imageName = "${service}:${tag}"
                     def pushImage = "${ali_url}/${ali_project_name}/${imageName}"
 
                     echo "处理image:${imageName}"
@@ -100,20 +106,13 @@ pipeline {
     }
 
     post {
-        always {
-            // 清理 containerd 镜像
-            sh '''
-                # 获取所有镜像ID并逐一删除
-                crictl images -q | xargs -I {} crictl rmi {}
-            '''
-        }
 
         success {
-            slackSend color: 'good', message: "部署成功: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+            echo "部署成功: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
         }
 
         failure {
-            slackSend color: 'danger', message: "部署失败: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+            echo "部署失败: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
         }
     }
 }
