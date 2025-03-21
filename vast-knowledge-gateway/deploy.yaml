@@ -61,7 +61,7 @@ spec:
               service:
                 name: gateway-svc
                 port:
-                  number: 80
+                  number: 16001
   tls:
     - hosts:
         - "api.aidighub.com"  # 设置 TLS 证书的域名

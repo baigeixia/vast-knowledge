@@ -12,7 +12,7 @@ metadata:
   namespace: behaviour
 spec:
   ports:
-    - name: TCP
+    - name: tcp
       port: 19007
       targetPort: 19007
     - name: socket
