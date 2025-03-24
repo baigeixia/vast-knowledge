@@ -20,6 +20,7 @@ ENV SERVER_PORT=19006 \
     NACOS_NAMESPACE=549a7c16-6c77-48a3-8925-5a880f59da6f \
     NACOS_HOST=nc-svc.nc.svc.cluster.local \
     NACOS_PORT=8848 \
+    MYSQL_URL=jdbc:mysql://mysql-svc.mysql.svc.cluster.local:3306/learned_asked_analyze?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai \
     ACTIVE=prod
 
 # 暴露端口
@@ -33,4 +34,5 @@ ENTRYPOINT exec java -Djava.security.egd=file:/dev/./urandom \
                                  -Dnacos.namespace=$NACOS_NAMESPACE \
                                  -Dnacos.discovery.server-addr=$NACOS_HOST:$NACOS_PORT \
                                  -Dspring.profiles.active=$ACTIVE \
+                                 -Dspring.datasource.url=$MYSQL_URL \
                                  $JAVA_OPTS -jar app.jar

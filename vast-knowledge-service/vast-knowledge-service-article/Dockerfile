@@ -19,6 +19,8 @@ ENV SERVER_PORT=19004 \
     NACOS_NAMESPACE=549a7c16-6c77-48a3-8925-5a880f59da6f \
     NACOS_HOST=nc-svc.nc.svc.cluster.local \
     NACOS_PORT=8848 \
+    MYSQL_HOST=mysql-svc.mysql.svc.cluster.local \
+    MYSQL_PORT=3306 \
     ACTIVE=prod
 
 # 暴露端口

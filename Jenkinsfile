@@ -41,13 +41,12 @@ pipeline {
                     echo "server_name 参数: ${server_name}"
 
                     def servicePath = server_name != 'gateway' ?
-                        "vast-knowledge-service/vast-knowledge-${service}" :
+                        "vast-knowledge-service/vast-knowledge-service-${service}" :
                         "vast-knowledge-${service}"
 
                     echo "servicePath 参数: ${servicePath}"
 
                     // Maven打包
-
                     sh "mvn -f ${servicePath} clean package -DskipTests=true "
 
 
