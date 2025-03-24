@@ -46,6 +46,15 @@ spec:
           ports:
             - containerPort: 19007
             - containerPort: 19090
+          volumeMounts:
+            - mountPath: /vk/prod/logs
+              name: log-volume
+      volumes:
+        - name: log-volume
+          hostPath:
+            path: /mnt/data/logs/behaviour
+            type: DirectoryOrCreate
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

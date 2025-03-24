@@ -6,8 +6,7 @@ FROM dragonwell-registry.cn-hangzhou.cr.aliyuncs.com/dragonwell/dragonwell:21
 LABEL maintainer="zhang san"
 
 # 创建日志目录
-RUN mkdir -p /vk/dev/logs
-
+RUN mkdir -p /vk/prod/logs && chmod -R 777 /vk/prod/logs
 # 设置工作目录
 WORKDIR /vk/gen
 

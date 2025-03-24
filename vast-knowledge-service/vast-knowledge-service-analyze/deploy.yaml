@@ -1,5 +1,4 @@
 ---
-
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -40,3 +39,11 @@ spec:
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
             - containerPort: 19006
+          volumeMounts:
+            - mountPath: /vk/prod/logs
+              name: log-volume
+      volumes:
+        - name: log-volume
+          hostPath:
+            path: /mnt/data/logs/analyze
+            type: DirectoryOrCreate

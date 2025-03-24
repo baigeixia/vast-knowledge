@@ -40,6 +40,15 @@ spec:
               value: "Asia/Shanghai"  # 设置时区为上海
           ports:
             - containerPort: 16001
+          volumeMounts:
+            - mountPath: /vk/prod/logs
+              name: log-volume
+      volumes:
+        - name: log-volume
+          hostPath:
+            path: /mnt/data/logs/gateway
+            type: DirectoryOrCreate
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
