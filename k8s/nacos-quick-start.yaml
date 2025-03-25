@@ -149,10 +149,8 @@ spec:
                 configMapKeyRef:
                   name: nacos-cm
                   key: auth.token
-            - name: PREFER_HOST_MODE
-              value: "hostname"
-            - name: NACOS_SERVERS
-              value: "nacos-svc.nacos.nc.svc.cluster.local:8848"
+            - name: MODE
+              value: "standalone"
   selector:
     matchLabels:
       app: nacos

@@ -1,5 +1,5 @@
 ---
-
+#Namespace dev
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -55,7 +55,7 @@ spec:
             - name: ELASTICSEARCH_USERNAME
               value: 'kibana_system'
             - name: ELASTICSEARCH_PASSWORD
-              value: 'LLB37kNRP8zpqe_4UERT'
+              value: 'vH2mazr6lemIo4gEkqbf'
             - name: i18n.locale
               value: 'zh-CN'
           ports:
