@@ -88,7 +88,7 @@ spring:
         - id: vk-service-behaviour
           uri: lb://vk-service-behaviour
           predicates:
-            - Path=/batch/**
+            - Path=/behaviour/**
           filters:
             - StripPrefix=1
         #统计信息
