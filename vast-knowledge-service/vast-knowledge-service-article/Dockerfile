@@ -19,6 +19,7 @@ ENV SERVER_PORT=19004 \
     NACOS_NAMESPACE=549a7c16-6c77-48a3-8925-5a880f59da6f \
     NACOS_HOST=nc-svc.nc.svc.cluster.local \
     NACOS_PORT=8848 \
+    LOG_PATH=/vk/prod/logs \
     MYSQL_HOST=mysql-svc.mysql.svc.cluster.local \
     MYSQL_PORT=3306 \
     ACTIVE=prod
@@ -34,4 +35,5 @@ ENTRYPOINT exec java -Djava.security.egd=file:/dev/./urandom \
                                  -Dnacos.namespace=$NACOS_NAMESPACE \
                                  -Dnacos.discovery.server-addr=$NACOS_HOST:$NACOS_PORT \
                                  -Dspring.profiles.active=$ACTIVE \
+                                 -Dlog.home=$LOG_PATH \
                                  $JAVA_OPTS -jar app.jar

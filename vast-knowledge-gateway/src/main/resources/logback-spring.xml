@@ -8,8 +8,8 @@
     <contextName>logback</contextName>
     <!-- name的值是变量的名称，value的值时变量定义的值。通过定义的值会被插入到logger上下文中。定义后，可以使“${}”来使用变量。 -->
     <!--可通过-Dlog.home设置值来获取-->
-    <property name="log.path" value="${log.home:-logs}"/>
-
+    <property name="log.path" value="${log.home:-logs/gateway}"/>
+    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
     <springProperty scope="context" name="logName" source="spring.application.name" defaultValue="localhost.log" />
     <!--0. 日志格式和颜色渲染 -->
     <!-- 彩色日志依赖的渲染类 -->
@@ -43,7 +43,7 @@
         <file>${log.path}/${logName}_web_debug.log</file>
         <!--日志文档输出格式    [${PID:- }] 标识进程ID -->
         <encoder>
-            <pattern>${log.pattern}</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [${PID:- }] [%thread] %-5level %logger{50} - %msg%n</pattern>
             <charset>UTF-8</charset> <!-- 设置字符集 -->
         </encoder>
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
@@ -177,10 +177,10 @@
         <logger name="com.vk" level="debug"/>
         <root level="info">
             <appender-ref ref="CONSOLE"/>
-            <!--<appender-ref ref="DEBUG_FILE"/>
-            <appender-ref ref="INFO_FILE"/>
-            <appender-ref ref="WARN_FILE"/>
-            <appender-ref ref="ERROR_FILE"/>-->
+<!--            <appender-ref ref="DEBUG_FILE"/>-->
+<!--            <appender-ref ref="INFO_FILE"/>-->
+<!--            <appender-ref ref="WARN_FILE"/>-->
+<!--            <appender-ref ref="ERROR_FILE"/>-->
         </root>
     </springProfile>
 
@@ -194,7 +194,7 @@
      </root>-->
 
     <!-- 4.2 生产环境:输出到文档-->
-    <springProfile name="pro">
+    <springProfile name="prod">
         <root level="info">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="DEBUG_FILE"/>
