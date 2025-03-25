@@ -69,7 +69,7 @@ public class GlobalCorsFilter implements WebFilter, Ordered {
 
             String origin = request.getHeaders().getOrigin();
             // 允许的域名列表
-            List<String> allowedOrigins = List.of("http://localhost:8080", "http://localhost:8081","http://localhost:8082","https://aidighub.com");
+            List<String> allowedOrigins = List.of("http://localhost:8080", "http://localhost:8081","http://localhost:8082","https://aidighub.com","https://console.aidighub.com","https://creator.aidighub.com");
 
             // 如果 Origin 在允许的域名列表中，则设置 Access-Control-Allow-Origin
             if (origin != null && allowedOrigins.contains(origin)) {

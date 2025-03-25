@@ -41,6 +41,9 @@ public class SocketConfig {
     @Value("${socketio.context}")
     private String context;
 
+    @Value("${socketio.origin}")
+    private String origin;
+
     @Value("${socketio.nameSpaces}")
     private String[] nameSpaces;
 
@@ -76,6 +79,7 @@ public class SocketConfig {
         // 设置最大每帧处理数据的长度，防止他人利用大数据来攻击服务器
         config.setMaxFramePayloadLength(maxFramePayloadLength);
         config.setContext(context);
+        config.setOrigin(origin);
 
         final SocketIOServer server = new SocketIOServer(config);
         Optional.ofNullable(nameSpaces).ifPresent(nss ->
