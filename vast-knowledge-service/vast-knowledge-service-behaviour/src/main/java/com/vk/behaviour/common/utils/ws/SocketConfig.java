@@ -48,6 +48,14 @@ public class SocketConfig {
     private String[] nameSpaces;
 
     /**
+     * 这里为支持的请求头，如果有自定义的header字段请自己添加
+     */
+    private static final String ALLOWED_HEADERS =
+            "X-Requested-With, Content-Language, Content-Type,content-type,Authorization, clientid, credential, X-XSRF-TOKEN, " +
+                    "isToken,isToken, token, Admin-Token, App-Token, Encrypt-Key, isEncrypt,from," +
+                    ",uuid-token,longin-code,repeatsubmit,refresh_token";
+
+    /**
      * SocketIOServer配置
      *
      * @param
@@ -79,7 +87,9 @@ public class SocketConfig {
         // 设置最大每帧处理数据的长度，防止他人利用大数据来攻击服务器
         config.setMaxFramePayloadLength(maxFramePayloadLength);
         config.setContext(context);
+
         config.setOrigin(origin);
+        config.setAllowHeaders(ALLOWED_HEADERS);
 
         final SocketIOServer server = new SocketIOServer(config);
         Optional.ofNullable(nameSpaces).ifPresent(nss ->
