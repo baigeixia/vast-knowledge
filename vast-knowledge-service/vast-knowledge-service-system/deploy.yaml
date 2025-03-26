@@ -46,5 +46,5 @@ spec:
       volumes:
         - name: log-volume
           hostPath:
-            path: /mnt/data/logs/article
+            path: /mnt/data/logs/system
             type: DirectoryOrCreate
