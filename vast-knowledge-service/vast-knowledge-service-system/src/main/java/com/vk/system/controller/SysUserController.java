@@ -1,6 +1,7 @@
 package com.vk.system.controller;
 
 import com.vk.common.core.domain.R;
+import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.AdminCheck;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.controller.BaseController;
@@ -142,17 +143,22 @@ public class SysUserController extends BaseController
     @GetMapping("/getInfo")
     public AjaxResult getInfo()
     {
-        SysUser user = userService.selectUserById(SecurityUtils.getUserId());
-        user.setPassword(null);
-        // 角色集合
-        Set<String> roles = permissionService.getRolePermission(user);
-        // 权限集合
-        Set<String> permissions = permissionService.getMenuPermission(user);
-        AjaxResult ajax = AjaxResult.success();
-        ajax.put("user", user);
-        ajax.put("roles", roles);
-        ajax.put("permissions", permissions);
-        return ajax;
+        Long userId = SecurityUtils.getUserId();
+        SysUser user = userService.selectUserById(userId);
+        if (null==user){
+            throw new LeadNewsException(401,"用户未登录");
+        }
+            user.setPassword(null);
+            // 角色集合
+            Set<String> roles = permissionService.getRolePermission(user);
+            // 权限集合
+            Set<String> permissions = permissionService.getMenuPermission(user);
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("user", user);
+            ajax.put("roles", roles);
+            ajax.put("permissions", permissions);
+            return ajax;
+
     }
 
     /**

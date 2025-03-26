@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -276,7 +275,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         {
             child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
         }
-        if (children.size() > 0)
+        if (!children.isEmpty())
         {
             deptMapper.updateDeptChildren(children);
         }
@@ -317,12 +316,8 @@ public class SysDeptServiceImpl implements ISysDeptService
     private List<SysDept> getChildList(List<SysDept> list, SysDept t)
     {
         List<SysDept> tlist = new ArrayList<SysDept>();
-        Iterator<SysDept> it = list.iterator();
-        while (it.hasNext())
-        {
-            SysDept n = (SysDept) it.next();
-            if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue())
-            {
+        for (SysDept n : list) {
+            if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue()) {
                 tlist.add(n);
             }
         }
@@ -334,6 +329,6 @@ public class SysDeptServiceImpl implements ISysDeptService
      */
     private boolean hasChild(List<SysDept> list, SysDept t)
     {
-        return getChildList(list, t).size() > 0 ? true : false;
+        return !getChildList(list, t).isEmpty();
     }
 }

@@ -1,11 +1,11 @@
 package com.vk.system.service.system;
 
 import com.vk.common.core.constant.Constants;
-import com.vk.common.core.constant.SecurityConstants;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.utils.ip.IpUtils;
 import com.vk.system.domain.SysLogininfor;
 import com.vk.system.feign.RemoteLogService;
+import com.vk.system.service.ISysLogininforService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +20,8 @@ public class SysRecordLogService
     @Autowired
     private RemoteLogService remoteLogService;
 
+    @Autowired
+    private ISysLogininforService iSysLogininforService;
     /**
      * 记录登录信息
      * 
@@ -43,6 +45,7 @@ public class SysRecordLogService
         {
             logininfor.setStatus(Constants.LOGIN_FAIL_STATUS);
         }
-        remoteLogService.saveLogininfor(logininfor, SecurityConstants.INNER);
+        iSysLogininforService.insertLogininfor(logininfor);
+//        remoteLogService.saveLogininfor(logininfor, SecurityConstants.INNER);
     }
 }
