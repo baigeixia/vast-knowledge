@@ -12,6 +12,7 @@ spring:
       discovery:
         # 服务注册地址
         server-addr: ${NACOS_HOST:101.126.43.197}:${NACOS_PORT:31080}
+        namespace: ${GROUP_NAMESPACE:549a7c16-6c77-48a3-8925-5a880f59da6f}
       config:
         server-addr: ${NACOS_HOST:101.126.43.197}:${NACOS_PORT:31080}
         namespace: ${NACOS_NAMESPACE:}
