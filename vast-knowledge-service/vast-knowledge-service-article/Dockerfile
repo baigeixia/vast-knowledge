@@ -7,6 +7,7 @@ LABEL maintainer="zhang san"
 
 # 创建日志目录
 RUN mkdir -p /vk/prod/logs && chmod -R 777 /vk/prod/logs
+RUN mkdir -p /vk/prod/xxl-job && chmod -R 777 /vk/prod/xxl-job
 
 # 设置工作目录
 WORKDIR /vk/gen
@@ -20,8 +21,6 @@ ENV SERVER_PORT=19004 \
     NACOS_HOST=nc-svc.nc.svc.cluster.local \
     NACOS_PORT=8848 \
     LOG_PATH=/vk/prod/logs \
-    MYSQL_HOST=mysql-svc.mysql.svc.cluster.local \
-    MYSQL_PORT=3306 \
     ACTIVE=prod
 
 # 暴露端口

@@ -9,3 +9,12 @@ spring:
     username: root
     password: mysql_root_123@112..
 
+xxl:
+  job:
+    admin:
+      accessToken: default_token
+      addresses: http://xxl-svc.xxl.svc.cluster.local:8080/xxl-job-admin/
+    executor:
+      appname: job-executor-analyze-01
+      logpath: /vk/prod/xxl-job
+      logretentiondays: 15

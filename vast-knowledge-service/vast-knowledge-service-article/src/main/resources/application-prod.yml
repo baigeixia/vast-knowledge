@@ -1,0 +1,29 @@
+# Tomcat
+server:
+  port: 19006
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql-svc.mysql.svc.cluster.local:3306/learned_asked_article?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai
+    username: root
+    password: mysql_root_123@112..
+  data:
+    mongodb:
+      host: mongo.mongo.svc.cluster.local
+      port: 27017
+      username: adminRoot
+      password: mymongoroot_1234@
+      database: article
+      authentication-database: admin
+#      uri: mongodb://adminRoot:mymongoroot_1234%40@101.126.43.197:32407/article
+
+xxl:
+  job:
+    admin:
+      accessToken: default_token
+      addresses: http://xxl-svc.xxl.svc.cluster.local:8080/xxl-job-admin/
+    executor:
+      appname: job-executor-article-01
+      logpath: /vk/prod/xxl-job
+      logretentiondays: 15

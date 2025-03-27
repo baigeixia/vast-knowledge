@@ -5,7 +5,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOST:101.126.43.197}:${MYSQL_PORT:31193}/learned_asked_article?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://101.126.43.197:31193/learned_asked_article?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai
     username: root
     password: mysql_root_123@112..
   data:
@@ -17,6 +17,13 @@ spring:
       database: article
       authentication-database: admin
 #      uri: mongodb://adminRoot:mymongoroot_1234%40@101.126.43.197:32407/article
-logging:
-  level:
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
+xxl:
+  job:
+    admin:
+      accessToken: default_token
+      addresses: http://101.126.43.197:30243/xxl-job-admin/
+    executor:
+      appname: job-executor-article-01
+      logpath: /vk/prod/xxl-job
+      logretentiondays: 15

@@ -1,0 +1,11 @@
+# Tomcat
+server:
+  port: 19007
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql-svc.mysql.svc.cluster.local:3306/learned_asked_comment?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai
+    username: root
+    password: mysql_root_123@112..
+

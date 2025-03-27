@@ -1,3 +1,5 @@
+server:
+  port: 19011
 spring:
   profiles:
     active: dev

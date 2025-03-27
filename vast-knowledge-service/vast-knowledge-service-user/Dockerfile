@@ -7,6 +7,7 @@ LABEL maintainer="zhang san"
 
 # 创建日志目录
 RUN mkdir -p /vk/prod/logs && chmod -R 777 /vk/prod/logs
+RUN mkdir -p /vk/prod/xxl-job && chmod -R 777 /vk/prod/xxl-job
 # 设置工作目录
 WORKDIR /vk/gen
 

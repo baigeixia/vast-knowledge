@@ -43,8 +43,14 @@ spec:
           volumeMounts:
             - mountPath: /vk/prod/logs
               name: log-volume
+            - mountPath: /vk/prod/xxl-job
+              name: job-log
       volumes:
         - name: log-volume
           hostPath:
             path: /mnt/data/logs/user
+            type: DirectoryOrCreate
+        - name: job-log
+          hostPath:
+            path: /mnt/data/logs/user/job
             type: DirectoryOrCreate
