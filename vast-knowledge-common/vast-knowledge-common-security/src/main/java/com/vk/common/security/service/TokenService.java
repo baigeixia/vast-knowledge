@@ -11,6 +11,7 @@ import com.vk.common.core.utils.TokenUtils;
 import com.vk.common.core.utils.ip.IpUtils;
 import com.vk.common.core.utils.uuid.IdUtils;
 import com.vk.common.redis.service.RedisService;
+import com.vk.common.security.utils.AppSystemSettingsUtils;
 import com.vk.common.security.utils.SecurityUtils;
 import com.vk.system.model.LoginUser;
 import io.jsonwebtoken.Claims;
@@ -39,7 +40,8 @@ public class TokenService {
     @Autowired
     private RedisService redisService;
 
-
+    @Autowired
+    private AppSystemSettingsUtils systemSettingsUtils;
     protected static final long MILLIS_SECOND = 1000;
 
     protected static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
@@ -110,13 +112,26 @@ public class TokenService {
         claims.put(type, key);
         String refreshToken = TokenUtils.createRefreshToken(claims);
 
+        Cookie refreshTokenCookie = getCookie(refreshToken);
+
+        response.addCookie(refreshTokenCookie); // 添加 Cookie 到响应中
+    }
+
+    private Cookie getCookie(String refreshToken) {
         Cookie refreshTokenCookie = new Cookie(TokenConstants.REFRESH_TOKEN, refreshToken);
         refreshTokenCookie.setHttpOnly(true); // 设置 HttpOnly，防止 JavaScript 访问
         refreshTokenCookie.setSecure(true); // 设置 Secure，表示只有 HTTPS 请求才可以传输
         refreshTokenCookie.setAttribute("SameSite", "None"); // 设置 SameSite 属性为 None，允许跨站请求
         refreshTokenCookie.setPath("/");// 设置 Cookie 对应的路径
         refreshTokenCookie.setMaxAge((int) (TokenConstants.REFRESH_TIME/1000)); // 设置过期时间为 2 天
-        response.addCookie(refreshTokenCookie); // 添加 Cookie 到响应中
+
+        String env = systemSettingsUtils.getCurrentEnv();
+
+        if ("prod".equals(env)) {
+            // 生产环境，设置为 .aidighub.com，允许所有子域共享
+            refreshTokenCookie.setDomain(".aidighub.com");
+        }
+        return refreshTokenCookie;
     }
 
 
