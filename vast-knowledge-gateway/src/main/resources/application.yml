@@ -1,5 +1,3 @@
-server:
-  port: 16001
 spring:
   cloud:
     gateway:
@@ -103,5 +101,12 @@ spring:
           uri: lb://vk-service-dfs
           predicates:
             - Path=/dfs/**
+          filters:
+            - StripPrefix=1
+        #ai
+        - id: vk-service-ai
+          uri: lb://vk-service-ai
+          predicates:
+            - Path=/ai/**
           filters:
             - StripPrefix=1

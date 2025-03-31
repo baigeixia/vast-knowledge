@@ -1,11 +1,11 @@
 # Tomcat
 server:
-  port: 19009
+  port: 19010
 spring:
   profiles:
     active: dev
   application:
-    name: vk-service-search
+    name: vk-service-ai
   cloud:
     nacos:
       username: nacos
@@ -22,3 +22,5 @@ spring:
         # 共享配置
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+ark:
+  apikey: 50448dfc-b8e4-4715-99d5-f936a34b0fb2

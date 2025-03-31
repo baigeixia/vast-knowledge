@@ -1,3 +1,6 @@
+# Tomcat
+server:
+  port: 19006
 spring:
   profiles:
     active: dev

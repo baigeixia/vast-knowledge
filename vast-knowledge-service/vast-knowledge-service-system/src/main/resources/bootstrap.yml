@@ -1,3 +1,6 @@
+# Tomcat
+server:
+  port: 19002
 # Spring
 spring: 
   application:

@@ -22,6 +22,7 @@
         <module>vast-knowledge-service-search</module>
         <module>vast-knowledge-service-wemedia</module>
         <module>vast-knowledge-service-dfs</module>
+        <module>vast-knowledge-service-ai</module>
     </modules>
 
     <properties>

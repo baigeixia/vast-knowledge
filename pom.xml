@@ -46,7 +46,7 @@
         <tx.cos.version>5.6.237</tx.cos.version>
         <tx.sts.cos.version>3.1.0</tx.sts.cos.version>
         <ip2region.version>2.7.0</ip2region.version>
-        <dockerfile-maven-version>1.4.13</dockerfile-maven-version>
+        <volcengine.version>0.2.1</volcengine.version>
 
     </properties>
 
@@ -346,11 +346,13 @@
                 <version>${ip2region.version}</version>
             </dependency>
 
-<!--            <dependency>-->
-<!--                <groupId>com.spotify</groupId>-->
-<!--                <artifactId>dockerfile-maven-plugin</artifactId>-->
-<!--                <version>${dockerfile-maven-version}</version>-->
-<!--            </dependency>-->
+            <!-- https://mvnrepository.com/artifact/com.volcengine/volcengine-java-sdk-ark-runtime -->
+            <dependency>
+                <groupId>com.volcengine</groupId>
+                <artifactId>volcengine-java-sdk-ark-runtime</artifactId>
+                <version>${volcengine.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
