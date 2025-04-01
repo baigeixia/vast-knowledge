@@ -28,22 +28,12 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/chat")
 public class ChatAiController {
 
-    private final ArkConfig arkConfig;
     private final ArkService service;
 
     @Autowired
-    public ChatAiController(ArkConfig arkConfig) {
-        this.arkConfig = arkConfig;
-
+    public ChatAiController(ArkService service) {
         // 在构造函数中初始化 ArkService
-        this.service = ArkService.builder()
-                .timeout(Duration.ofSeconds(1800))
-                .connectTimeout(Duration.ofSeconds(20))
-                .dispatcher(new Dispatcher())
-                .connectionPool(new ConnectionPool(5, 1, TimeUnit.SECONDS))
-                .baseUrl("https://ark.cn-beijing.volces.com/api/v3")
-                .apiKey(arkConfig.getApiKey())
-                .build();
+        this.service = service;
     }
 
     @PostMapping("/stream")
@@ -114,40 +104,47 @@ public class ChatAiController {
         ChatCompletionRequest streamChatCompletionRequest = ChatCompletionRequest.builder()
                 .model( "deepseek-r1-250120" )
                 .messages(streamMessages)
+                .stream(true)
+                .streamOptions(ChatCompletionRequest.ChatCompletionRequestStreamOptions.of(true))
                 .build();
 
         // 使用异步操作避免阻塞
         // 确保流完成时关闭连接
-        service.streamChatCompletion(streamChatCompletionRequest)
-                .doOnError(Throwable::printStackTrace)
-                .flatMap(delta -> {
-                    if (!delta.getChoices().isEmpty()) {
-                        String reasoningContent = delta.getChoices().get(0).getMessage().getReasoningContent();
-                        String content = StringUtils.isNotEmpty(reasoningContent) ? reasoningContent : (String) delta.getChoices().get(0).getMessage().getContent();
+        try {
+            service.streamChatCompletion(streamChatCompletionRequest)
+                    .doOnError(Throwable::printStackTrace)
+                    .flatMap(delta -> {
+                        if (!delta.getChoices().isEmpty()) {
+                            String reasoningContent = delta.getChoices().get(0).getMessage().getReasoningContent();
+                            String content = StringUtils.isNotEmpty(reasoningContent) ? reasoningContent : (String) delta.getChoices().get(0).getMessage().getContent();
 
-                        return Mono.just(content); // 包装内容为Mono
-                    }
-                    return Mono.empty(); // 没有内容时返回空
-                })
-                .doOnNext(content -> {
-                    try {
-                        emitter.send(content, MediaType.TEXT_PLAIN); // 发送流数据
-                    } catch (IOException e) {
-                        emitter.completeWithError(e); // 如果发生错误，完成事件
-                    }
-                })
-                .doOnTerminate(emitter::complete)
-                .subscribe(); // 异步执行流操作
+                            return Mono.just(content); // 包装内容为Mono
+                        }
+                        return Mono.empty(); // 没有内容时返回空
+                    })
+                    .doOnNext(content -> {
+                        try {
+                            emitter.send(content, MediaType.TEXT_PLAIN); // 发送流数据
+                        } catch (IOException e) {
+                            emitter.completeWithError(e); // 如果发生错误，完成事件
+                        }
+                    })
+                    .doOnTerminate(emitter::complete)
+                    .subscribe(); // 异步执行流操作
 
-        // 处理完毕后返回
-        emitter.onCompletion(() -> {
-            System.out.println("SSE流已完成");
-        });
+            // 处理完毕后返回
+            emitter.onCompletion(() -> {
+                System.out.println("SSE流已完成");
+            });
 
-        emitter.onError(e -> {
-            System.out.println("SSE流发生错误：" + e.getMessage());
-            emitter.completeWithError(e); // 错误发生时关闭连接
-        });
+            emitter.onError(e -> {
+                System.out.println("SSE流发生错误：" + e.getMessage());
+                emitter.completeWithError(e); // 错误发生时关闭连接
+            });
+        } catch (Exception e) {
+            // throw new RuntimeException(e);
+            System.out.println("终止或网络异常"+ e.getMessage());
+        }
 
         return emitter;
     }
