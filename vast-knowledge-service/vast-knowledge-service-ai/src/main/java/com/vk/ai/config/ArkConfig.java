@@ -12,4 +12,16 @@ public class ArkConfig {
     @Value("${ark.apikey}")
     private String apiKey;
 
+    @Value("${ark.baseUrl}")
+    private String baseUrl;
+
+    @Value("${ark.timeout}")
+    private Integer timeout;
+
+    @Value("${ark.connectTimeout}")
+    private Integer connectTimeout;
+
+    @Value("${ark.retryTimes}")
+    private Integer retryTimes;
+
 }
