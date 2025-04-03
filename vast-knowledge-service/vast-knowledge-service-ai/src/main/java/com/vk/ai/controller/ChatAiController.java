@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/chat")
+@CrossOrigin
 public class ChatAiController {
 
     private final ArkService service;
