@@ -17,7 +17,7 @@ import java.time.Duration;
 /**
  * @version 1.0
  * @description 说明
- * @package com.itheima.article.stream
+ * @package com.vk.article.stream
  */
 @Configuration
 public class HotArticleStreamHandler {

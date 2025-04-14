@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 /**
  * @version 1.0
  * @description 说明
- * @package com.itheima.search.document
+ * @package com.vk.search.document
  */
 @Data
 // es中的索引名称

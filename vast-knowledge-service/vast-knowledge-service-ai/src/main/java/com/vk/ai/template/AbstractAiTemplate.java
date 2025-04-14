@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 /**
  * @version 1.0
  * @description 说明
- * @package com.itheima.dfs.template
+ * @package com.vk.ai.template
  */
 public abstract class AbstractAiTemplate<M extends BaseMapper<T>, T> implements AiTemplate, InitializingBean {
 

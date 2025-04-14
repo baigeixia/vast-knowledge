@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 /**
  * @version 1.0
  * @description 说明
- * @package com.itheima.dfs.template
+ * @package com.vk.dfs.template
  */
 public abstract class AbstractDfsTemplate implements DfsTemplate, InitializingBean {
 

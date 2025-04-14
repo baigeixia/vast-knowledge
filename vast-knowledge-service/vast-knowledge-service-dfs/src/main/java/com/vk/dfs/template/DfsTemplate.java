@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @version 1.0
  * @description 说明
- * @package com.itheima.dfs.service
+ * @package com.vk.dfs.service
  */
 public interface DfsTemplate {
 

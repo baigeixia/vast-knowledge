@@ -7,7 +7,7 @@ import org.springframework.util.DigestUtils;
 /**
  * @version 1.0
  * @description 说明
- * @package com.itheima.dfs.pojo
+ * @package com.vk.dfs.pojo
  */
 @Data
 @NoArgsConstructor
