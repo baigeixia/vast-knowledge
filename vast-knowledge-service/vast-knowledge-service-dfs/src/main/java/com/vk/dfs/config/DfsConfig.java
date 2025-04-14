@@ -1,4 +1,4 @@
-package com.vk.config;
+package com.vk.dfs.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

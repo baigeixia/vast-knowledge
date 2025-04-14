@@ -1,4 +1,4 @@
-package com.vk.domain;
+package com.vk.dfs.domain;
 
 import com.tencent.cloud.Credentials;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.vk.config;
+package com.vk.dfs.config;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
@@ -11,12 +11,10 @@ import com.tencent.cloud.Credentials;
 import com.tencent.cloud.Response;
 import com.tencent.cloud.Scope;
 import com.vk.common.redis.service.RedisService;
-import com.vk.domain.TxCredentials;
+import com.vk.dfs.domain.TxCredentials;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;

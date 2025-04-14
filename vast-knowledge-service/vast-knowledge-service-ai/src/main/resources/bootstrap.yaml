@@ -27,6 +27,7 @@ ark:
   apikey: 50448dfc-b8e4-4715-99d5-f936a34b0fb2
 #  推理接入点/应用资源所在区域对应的访问域名   beijing  现在只有默认 详情查看 https://www.volcengine.com/docs/82379/1302013
   baseUrl: "https://ark.cn-beijing.volces.com/api/v3"
+#  baseUrl: "https://ark-project.tos-cn-beijing.ivolces.com/images/view.jpeg"
 #  超时 单位 秒
   timeout: 120
 #  连接超时 单位 秒

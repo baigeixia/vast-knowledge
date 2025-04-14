@@ -1,4 +1,4 @@
-package com.vk.config;
+package com.vk.dfs.config;
 
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.transfer.TransferManager;

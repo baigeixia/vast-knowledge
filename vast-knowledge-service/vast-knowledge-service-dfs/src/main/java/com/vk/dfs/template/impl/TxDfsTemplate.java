@@ -13,7 +13,7 @@ import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
-import com.vk.config.TxDfsConfig;
+import com.vk.dfs.config.TxDfsConfig;
 import com.vk.dfs.enums.DFSType;
 import com.vk.dfs.enums.FilePosition;
 import com.vk.dfs.model.BaseFileModel;

@@ -1,23 +1,17 @@
-package com.vk.controller;
+package com.vk.dfs.controller;
 
 
-import com.alibaba.nacos.common.utils.UuidUtils;
-import com.vk.common.core.domain.R;
-import com.vk.common.core.domain.ValidationUtils;
 import com.vk.common.core.exception.LeadNewsException;
 import com.vk.common.core.utils.RequestContextUtil;
-import com.vk.common.core.utils.threads.TaskVirtualExecutorUtil;
 import com.vk.common.core.utils.uuid.UUID;
 import com.vk.common.core.web.domain.AjaxResult;
-import com.vk.config.DfsConfig;
-import com.vk.config.TxDfsConfig;
+import com.vk.dfs.config.DfsConfig;
+import com.vk.dfs.config.TxDfsConfig;
 import com.vk.dfs.enums.DFSType;
 import com.vk.dfs.enums.FilePosition;
 import com.vk.dfs.model.BaseFileModel;
 import com.vk.dfs.strategy.DfsTemplateStrategyContext;
 import com.vk.dfs.template.DfsTemplate;
-import com.vk.wemedia.domain.WmMaterialFeign;
-import com.vk.wemedia.feign.RemoteClientWemediaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
@@ -26,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 
