@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class AiTemplateStrategyContext implements ApplicationContextAware {
 
     //key  就是某一个类型 value 就是接口对应的具体子类对象
-    private final Map<AiType, AiTemplate> dsfTemplates = new EnumMap<>(AiType.class);
+    private final Map<AiType, AiTemplate> aiTemplates = new EnumMap<>(AiType.class);
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -31,7 +31,7 @@ public class AiTemplateStrategyContext implements ApplicationContextAware {
         Map<AiType, AbstractAiTemplate> map = types.values().stream()
             .collect(Collectors.toMap(AbstractAiTemplate::support, Function.identity()));
         //循环抽象类的子类
-        dsfTemplates.putAll(map);
+        aiTemplates.putAll(map);
     }
 
     /**
@@ -40,7 +40,7 @@ public class AiTemplateStrategyContext implements ApplicationContextAware {
      * @return
      */
     public AiTemplate getTemplate(AiType aiType) {
-        return dsfTemplates.get(aiType);
+        return aiTemplates.get(aiType);
     }
 
 }

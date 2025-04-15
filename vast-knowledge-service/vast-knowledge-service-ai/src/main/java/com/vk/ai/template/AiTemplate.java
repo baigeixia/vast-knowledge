@@ -1,11 +1,9 @@
 package com.vk.ai.template;
 
 
-import com.vk.ai.domain.GeneralMessage;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import com.vk.ai.domain.ModelList;
+import com.vk.ai.domain.dto.GeneralMessageDto;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * @version 1.0
@@ -18,9 +16,9 @@ public interface AiTemplate {
      * 发送消息
      *
      * @param message
-     * @return 文件的路径信息
+     * @return
      */
-    String chatMessage(GeneralMessage message);
+    SseEmitter chatMessage(GeneralMessageDto message, ModelList modelList);
 
 
 }

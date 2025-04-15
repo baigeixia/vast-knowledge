@@ -12,7 +12,7 @@ import java.util.function.Predicate;
  * @description 说明
  * @package com.vk.ai.template
  */
-public abstract class AbstractAiTemplate<M extends BaseMapper<T>, T> implements AiTemplate, InitializingBean {
+public abstract class AbstractAiTemplate implements AiTemplate, InitializingBean {
 
     /**
      * 定义支持的类型 必须设置值

@@ -47,6 +47,9 @@
         <tx.sts.cos.version>3.1.0</tx.sts.cos.version>
         <ip2region.version>2.7.0</ip2region.version>
         <volcengine.version>0.2.1</volcengine.version>
+        <dashscope.version>2.19.1</dashscope.version>
+        <hunyuan.version>3.1.1229</hunyuan.version>
+        <qianfan.version>0.1.6</qianfan.version>
 
     </properties>
 
@@ -351,6 +354,27 @@
                 <groupId>com.volcengine</groupId>
                 <artifactId>volcengine-java-sdk-ark-runtime</artifactId>
                 <version>${volcengine.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dashscope-sdk-java</artifactId>
+                <version>${dashscope.version}</version>
+            </dependency>
+            <!--版本在maven生效需要时间，如获取不到对应的版本，可以调低版本号-->
+            <!-- https://mvnrepository.com/artifact/com.tencentcloudapi/tencentcloud-sdk-java-hunyuan -->
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java-hunyuan</artifactId>
+                <version>${hunyuan.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.baidubce/qianfan -->
+            <dependency>
+                <groupId>com.baidubce</groupId>
+                <artifactId>qianfan</artifactId>
+                <version>${qianfan.version}</version>
             </dependency>
 
         </dependencies>

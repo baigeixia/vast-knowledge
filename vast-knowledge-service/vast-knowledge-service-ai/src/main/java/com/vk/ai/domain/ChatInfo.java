@@ -13,57 +13,40 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- *  实体类。
+ * 消息详情 实体类。
  *
  * @author 张三
- * @since 2025-03-31
+ * @since 2025-04-15
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(value = "model_list")
-public class ModelList implements Serializable {
+@Table(value = "chat_info")
+public class ChatInfo implements Serializable {
 
     @Id(keyType=KeyType.Generator, value= KeyGenerators.flexId)
     private String id;
 
     /**
-     * 模型名称
+     * 标题
      */
-    private String modelName;
+    private String title;
 
     /**
-     * 模型id
+     * 使用用户
      */
-    private String modelId;
-
+    private Integer userId;
 
     /**
-     * 模型归属
+     * 序列号
      */
-    private String pertain;
-
-
-    /**
-     * token 最大限制
-     */
-    private Integer tokenLimit;
+    private String seqId;
 
     /**
-     * 是否可思考
+     * 当前最大 消息 ID
      */
-    private Boolean isThink;
-
-    /**
-     * 是否可联网
-     */
-    private Boolean isSearch;
-
-    /**
-     * 是否启用
-     */
-    private Boolean state;
+    private Integer currentMessageId;
 
     /**
      * 创造时间
