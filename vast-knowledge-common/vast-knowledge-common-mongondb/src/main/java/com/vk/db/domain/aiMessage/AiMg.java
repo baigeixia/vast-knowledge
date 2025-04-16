@@ -1,40 +1,27 @@
-package com.vk.ai.domain;
+package com.vk.db.domain.aiMessage;
 
-import com.mybatisflex.annotation.Id;
-import com.mybatisflex.annotation.KeyType;
-import com.mybatisflex.annotation.Table;
-import com.mybatisflex.core.keygen.KeyGenerators;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * 对话详情 实体类。
- *
- * @author 张三
- * @since 2025-04-15
- */
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(value = "chat_message")
-public class ChatMessage implements Serializable {
+@Document
+public class AiMg {
 
-    @Id(keyType=KeyType.Generator, value= KeyGenerators.flexId)
+    @Id
     private String id;
 
     /**
      * 消息详情
      */
+    @Indexed
     private String infoId;
 
     /**
-     * 本次 消息id
+     * 本次 消息id 1是顶级
      */
     private Integer messageId;
 
@@ -46,6 +33,7 @@ public class ChatMessage implements Serializable {
     /**
      * 使用模型id
      */
+    @Indexed
     private String modelId;
 
     /**
@@ -127,5 +115,4 @@ public class ChatMessage implements Serializable {
      * 是否删除
      */
     private Boolean del;
-
 }

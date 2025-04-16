@@ -5,4 +5,11 @@ spring:
     url: jdbc:mysql://mysql-svc.mysql.svc.cluster.local:3306/learned_asked_ai?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai
     username: root
     password: mysql_root_123@112..
-
+  data:
+    mongodb:
+      host: mongo.mongo.svc.cluster.local
+      port: 27017
+      username: adminRoot
+      password: mymongoroot_1234@
+      database: aiMessage
+      authentication-database: admin

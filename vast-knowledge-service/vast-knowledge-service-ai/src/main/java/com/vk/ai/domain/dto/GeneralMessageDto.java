@@ -18,7 +18,7 @@ public class GeneralMessageDto {
     /**
      * 消息 父级 id
      */
-    private String parentMessageId;
+    private Integer parentMessageId;
 
     /**
      *  模型 id

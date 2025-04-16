@@ -2,6 +2,8 @@ package com.vk.ai.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import com.vk.ai.domain.ChatInfo;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 消息详情 映射层。
@@ -11,4 +13,6 @@ import com.vk.ai.domain.ChatInfo;
  */
 public interface ChatInfoMapper extends BaseMapper<ChatInfo> {
 
+    @Select("UPDATE chat_info SET current_message_id = current_message_id + 1 WHERE id = #{id};")
+    void updateMessageIdAuto(@Param("id") String id);
 }

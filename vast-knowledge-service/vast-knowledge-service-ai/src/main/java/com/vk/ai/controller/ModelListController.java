@@ -1,8 +1,11 @@
 package com.vk.ai.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.vk.ai.domain.ModelList;
+import com.vk.ai.domain.vo.GetModelListVo;
 import com.vk.ai.service.ModelListService;
+import com.vk.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,8 +13,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.vk.ai.domain.table.ModelListTableDef.MODEL_LIST;
+
 /**
- *  控制层。
+ * 控制层。
  *
  * @author 张三
  * @since 2025-04-15
@@ -26,7 +31,7 @@ public class ModelListController {
     /**
      * 添加。
      *
-     * @param modelList 
+     * @param modelList
      * @return {@code true} 添加成功，{@code false} 添加失败
      */
     @PostMapping("save")
@@ -51,7 +56,7 @@ public class ModelListController {
     /**
      * 根据主键更新。
      *
-     * @param modelList 
+     * @param modelList
      * @return {@code true} 更新成功，{@code false} 更新失败
      */
     @PutMapping("update")
@@ -65,8 +70,9 @@ public class ModelListController {
      * @return 所有数据
      */
     @GetMapping("list")
-    public List<ModelList> list() {
-        return modelListService.list();
+    public AjaxResult list() {
+        List<GetModelListVo> getModelListVos = modelListService.listAs(QueryWrapper.create().where(MODEL_LIST.STATE.eq(true).and(MODEL_LIST.DEL.eq(false)).and(MODEL_LIST.TOKEN_LIMIT.ne(0))), GetModelListVo.class);
+        return AjaxResult.success(getModelListVos);
     }
 
     /**

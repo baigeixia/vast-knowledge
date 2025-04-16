@@ -19,6 +19,12 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.vk</groupId>
+            <artifactId>vast-knowledge-common-mongondb</artifactId>
+        </dependency>
+
         <!--百度千帆-->
         <dependency>
             <groupId>com.baidubce</groupId>

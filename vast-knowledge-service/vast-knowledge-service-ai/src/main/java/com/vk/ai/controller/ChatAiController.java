@@ -4,11 +4,15 @@ package com.vk.ai.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.vk.ai.domain.ChatInfo;
 import com.vk.ai.domain.ModelList;
 import com.vk.ai.domain.dto.CreateMessageDto;
 import com.vk.ai.domain.dto.GeneralMessageDto;
+import com.vk.ai.domain.dto.createChatDto;
 import com.vk.ai.domain.table.ModelListTableDef;
 import com.vk.ai.enums.AiType;
+import com.vk.ai.mapper.ChatInfoMapper;
+import com.vk.ai.mapper.ChatMessageMapper;
 import com.vk.ai.service.ModelListService;
 import com.vk.ai.strategy.AiTemplateStrategyContext;
 import com.vk.ai.template.AbstractAiTemplate;
@@ -27,6 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,11 +50,22 @@ public class ChatAiController {
     @Autowired
     private ModelListService modelListService;
 
+    @Autowired
+    private ChatMessageMapper chatMessageMapper;
+
+    @Autowired
+    private ChatInfoMapper chatInfoMapper;
+
     @PostMapping(value = "/stream-chat")
     public SseEmitter streamChat(
             @RequestBody GeneralMessageDto messageDto
     ) {
         String modelId = messageDto.getModelId();
+        String sessionId = messageDto.getChatSessionId();
+
+        if (null==modelId || modelId.isEmpty())  throw new LeadNewsException("模型id不能为空");
+        if (null==sessionId ||sessionId.isEmpty())  throw new LeadNewsException("消息错误");
+
         Boolean thinkingEnabled = messageDto.getThinkingEnabled();
         Boolean searchEnabled = messageDto.getSearchEnabled();
 
@@ -86,11 +102,24 @@ public class ChatAiController {
 
     @PostMapping(value = "/create")
     public AjaxResult create(
-            @RequestBody CreateMessageDto dto
+            @RequestBody createChatDto dto
     ) {
+        String sessionId = dto.getChatSessionId();
+        if (!sessionId.isEmpty()){
+            chatInfoMapper.selectOneById(sessionId);
+        }
+        LocalDateTime dateTime = LocalDateTime.now();
 
+        ChatInfo chatInfo = new ChatInfo();
+        //默认1
+        chatInfo.setCurrentMessageId(0);
+        chatInfo.setCreatingTime(dateTime);
+        chatInfo.setUpdateTime(dateTime);
+        chatInfo.setDel(false);
 
-        return AjaxResult.success();
+        chatInfoMapper.insert(chatInfo);
+
+        return AjaxResult.success(chatInfo);
     }
 
     // 通用校验方法 思考和搜索 是否开启

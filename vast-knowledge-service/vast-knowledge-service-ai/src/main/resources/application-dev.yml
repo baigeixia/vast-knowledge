@@ -5,4 +5,11 @@ spring:
     url: jdbc:mysql://101.126.43.197:31193/learned_asked_ai?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=&serverTimezone=Asia/Shanghai
     username: root
     password: mysql_root_123@112..
-
+  data:
+    mongodb:
+      host: 101.126.43.197
+      port: 32407
+      username: adminRoot
+      password: mymongoroot_1234@
+      database: aiMessage
+      authentication-database: admin
