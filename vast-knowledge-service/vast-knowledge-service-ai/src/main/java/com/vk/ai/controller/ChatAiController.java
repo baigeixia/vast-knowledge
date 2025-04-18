@@ -9,6 +9,7 @@ import com.vk.ai.domain.ModelList;
 import com.vk.ai.domain.dto.CreateMessageDto;
 import com.vk.ai.domain.dto.GeneralMessageDto;
 import com.vk.ai.domain.dto.createChatDto;
+import com.vk.ai.domain.table.ChatInfoTableDef;
 import com.vk.ai.domain.table.ModelListTableDef;
 import com.vk.ai.enums.AiType;
 import com.vk.ai.mapper.ChatInfoMapper;
@@ -37,6 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static com.vk.ai.domain.table.ChatInfoTableDef.CHAT_INFO;
 import static com.vk.ai.domain.table.ModelListTableDef.MODEL_LIST;
 
 @RestController
@@ -100,19 +102,24 @@ public class ChatAiController {
         return template.chatMessage(messageDto,modelList);
     }
 
+
+
     @PostMapping(value = "/create")
     public AjaxResult create(
             @RequestBody createChatDto dto
     ) {
         String sessionId = dto.getChatSessionId();
-        if (!sessionId.isEmpty()){
-            chatInfoMapper.selectOneById(sessionId);
+        if (!StringUtils.isEmpty(sessionId)){
+            QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(sessionId).and(CHAT_INFO.DEL.eq(false)));
+            ChatInfo chatInfo = chatInfoMapper.selectOneByQuery(where);
+            return AjaxResult.success(chatInfo);
         }
+
         LocalDateTime dateTime = LocalDateTime.now();
 
         ChatInfo chatInfo = new ChatInfo();
         //默认1
-        chatInfo.setCurrentMessageId(0);
+        chatInfo.setCurrentMessageId(1);
         chatInfo.setCreatingTime(dateTime);
         chatInfo.setUpdateTime(dateTime);
         chatInfo.setDel(false);
