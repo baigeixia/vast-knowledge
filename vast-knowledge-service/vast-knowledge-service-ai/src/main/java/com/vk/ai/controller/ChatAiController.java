@@ -73,7 +73,7 @@ public class ChatAiController {
 
         ModelList modelList = modelListService.getOne(QueryWrapper.create().where(
                 MODEL_LIST.ID.eq(modelId)
-        ).and(MODEL_LIST.STATE.eq(true)));
+        ).and(MODEL_LIST.STATE.eq(true)).and(MODEL_LIST.DEL.eq(false)));
 
         if (null==modelList){
             throw new LeadNewsException("错误的模型");

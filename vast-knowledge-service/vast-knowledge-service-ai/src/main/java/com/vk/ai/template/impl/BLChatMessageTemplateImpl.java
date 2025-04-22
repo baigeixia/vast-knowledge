@@ -6,6 +6,7 @@ import com.alibaba.dashscope.common.Role;
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vk.ai.config.TxConfig;
 import com.vk.ai.domain.ChatMessage;
 import com.vk.ai.domain.ModelList;
 import com.vk.ai.domain.dto.GeneralMessageDto;
@@ -55,6 +56,8 @@ public class BLChatMessageTemplateImpl extends AbstractAiTemplate {
     @Autowired
     private MessageTemplate messageTemplate;
 
+    @Autowired
+    private TxConfig txConfig;
 
     /**
      * @param dto       消息
@@ -104,7 +107,7 @@ public class BLChatMessageTemplateImpl extends AbstractAiTemplate {
 
         GenerationParam build = GenerationParam.builder()
                 // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
-                .apiKey("sk-aff40a9d4b8a414ea461237d1fb6adc8")
+                .apiKey(txConfig.getKey())
                 // 此处以 qwq-plus 为例，可按需更换模型名称
                 .model(modelId)
                 .messages(messageList)
@@ -154,17 +157,7 @@ public class BLChatMessageTemplateImpl extends AbstractAiTemplate {
         try {
             resultFlowable = gen.streamCall(build);
         } catch (Exception e) {
-            // AiMg aiMg = AiMgBuilder.builder()
-            //         .fromModel(modelList)
-            //         .fromDto(dto)
-            //         .withRole(Role.ASSISTANT.getValue())
-            //         .withContent(dbContent.toString())
-            //         .withReasoningContent( dbReasoningContent.toString())
-            //         .withSearchContent(search.toString())
-            //         .withStatus( MessageStatus.FAILED)
-            //         .build();
             messageTemplate.saveMessage(Role.ASSISTANT.getValue(), modelList, dto, search.toString(), dbReasoningContent.toString(), dbContent.toString(), MessageStatus.FAILED);
-            // serveDBMessage(Role.ASSISTANT.getValue(), modelList, dto, search.toString(), dbReasoningContent.toString(), dbContent.toString(), MessageStatus.FAILED);
             log.error("调用api失败 uuid:{} error:{}", uuid, e.getMessage());
             throw new LeadNewsException("服务器繁忙，请稍后再试。");
         }

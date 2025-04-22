@@ -4,24 +4,26 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 @Configuration
 @Data
+@ConfigurationProperties(prefix = "aihub.ark")
 public class ArkConfig {
 
-    @Value("${ark.apikey}")
+    @Value("${apikey}")
     private String apiKey;
 
-    @Value("${ark.baseUrl}")
+    @Value("${baseUrl}")
     private String baseUrl;
 
-    @Value("${ark.timeout}")
+    @Value("${timeout}")
     private Integer timeout;
 
-    @Value("${ark.connectTimeout}")
+    @Value("${connectTimeout}")
     private Integer connectTimeout;
 
-    @Value("${ark.retryTimes}")
+    @Value("${retryTimes}")
     private Integer retryTimes;
 
 }

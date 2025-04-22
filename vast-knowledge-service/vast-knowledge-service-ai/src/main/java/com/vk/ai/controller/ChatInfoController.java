@@ -41,7 +41,8 @@ public class ChatInfoController {
             @RequestParam(name = "offset",defaultValue = "1") Integer offset,
             @RequestParam(name = "limit",defaultValue = "5") Integer limit
     ) {
-        Page<ChatInfoVo> vo= chatInfoService.getUserList(offset,limit);
+        int start = (offset - 1) * limit;
+        Page<ChatInfoVo> vo= chatInfoService.getUserList(start,limit);
         return AjaxResult.success(vo);
     }
 
@@ -56,7 +57,8 @@ public class ChatInfoController {
             @RequestParam(name = "offset",defaultValue = "1") Integer offset,
             @RequestParam(name = "limit",defaultValue = "5") Integer limit
     ) {
-        PageVo<AiMgListVo> conversation = chatInfoService.conversation(id, offset, limit);
+        int start = (offset - 1) * limit;
+        PageVo<AiMgListVo> conversation = chatInfoService.conversation(id, start, limit);
         return AjaxResult.success(conversation);
     }
 
