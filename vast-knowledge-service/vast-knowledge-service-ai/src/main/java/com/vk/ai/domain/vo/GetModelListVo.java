@@ -13,6 +13,12 @@ public class GetModelListVo {
     private String modelName;
 
     /**
+     * 模型id
+     */
+    private String modelId;
+
+
+    /**
      * 模型归属
      */
     private String pertain;

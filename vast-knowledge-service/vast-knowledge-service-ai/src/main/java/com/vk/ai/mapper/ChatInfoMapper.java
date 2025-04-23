@@ -19,4 +19,7 @@ public interface ChatInfoMapper extends BaseMapper<ChatInfo> {
 
     @Update("UPDATE chat_info SET title = #{title} WHERE id = #{id};")
     void updateMessageTitle(@Param("id")String sessionId, @Param("title")String title);
+
+    @Update("UPDATE chat_info SET used_token = used_token + #{usedTokens} WHERE id = #{id};")
+    void updateTokenAuto(@Param("id")String infoId, @Param("usedTokens")Integer tokenNumber);
 }

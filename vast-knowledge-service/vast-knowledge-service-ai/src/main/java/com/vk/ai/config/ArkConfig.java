@@ -11,19 +11,14 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "aihub.ark")
 public class ArkConfig {
 
-    @Value("${apikey}")
     private String apiKey;
 
-    @Value("${baseUrl}")
     private String baseUrl;
 
-    @Value("${timeout}")
     private Integer timeout;
 
-    @Value("${connectTimeout}")
     private Integer connectTimeout;
 
-    @Value("${retryTimes}")
     private Integer retryTimes;
 
 }

@@ -41,7 +41,7 @@ public class ChatInfo implements Serializable {
     /**
      * 序列号
      */
-    private String seqId;
+    private Integer usedToken;
 
     /**
      * 当前最大 消息 ID

@@ -1,5 +1,6 @@
 package com.vk.ai.template.impl;
 
+import com.mybatisflex.core.row.Db;
 import com.vk.ai.domain.ModelList;
 import com.vk.ai.domain.dto.GeneralMessageDto;
 import com.vk.ai.enums.MessageStatus;
@@ -33,13 +34,20 @@ public class MessageTemplate {
     }
 
     public void saveMessage(String role, ModelList modelList, GeneralMessageDto dto,
+                            Integer tokenNumber,
                             String searchContent, String reasoningContent,
                             String content, MessageStatus status) {
         TaskVirtualExecutorUtil.executeWith(() -> {
-                    AiMg aiMg = buildMessage(role, modelList, dto, searchContent, reasoningContent, content, status);
+                    AiMg aiMg = buildMessage(role, modelList, dto, tokenNumber,searchContent, reasoningContent, content, status);
                     try {
                         aiMgRepository.save(aiMg);
-                        chatInfoMapper.updateMessageIdAuto(aiMg.getInfoId());
+                        Db.tx(()->{
+                            chatInfoMapper.updateMessageIdAuto(aiMg.getInfoId());
+                            if(null!=tokenNumber){
+                                chatInfoMapper.updateTokenAuto(aiMg.getInfoId(),tokenNumber);
+                            }
+                            return true;
+                        });
                         log.debug("保存消息成功: {}", aiMg);
                     } catch (Exception e) {
                         log.error("保存消息失败: {}", aiMg, e);
@@ -50,6 +58,7 @@ public class MessageTemplate {
     }
 
     private AiMg buildMessage(String role, ModelList modelList, GeneralMessageDto dto,
+                              Integer token,
                               String searchContent, String reasoningContent,
                               String content, MessageStatus messageStatus) {
 
@@ -80,6 +89,7 @@ public class MessageTemplate {
         aiMg.setMessageId(messageId);
         // 父级id
         aiMg.setParentId(firstMessageId);
+        aiMg.setUsingTokens(token);
         aiMg.setModelId(modelList.getModelId());
         aiMg.setModelName(modelList.getModelName());
         aiMg.setRole(role);

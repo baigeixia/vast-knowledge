@@ -9,6 +9,5 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @ConfigurationProperties(prefix = "aihub.tx")
 public class TxConfig {
-    @Value("${key}")
     private String key;
 }
