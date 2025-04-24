@@ -175,10 +175,12 @@ public class ModelListController {
             @RequestParam(name = "limit", defaultValue = "10") Integer limit
     ) {
 
+        //不查询删除的
         QueryWrapper wrapper = QueryWrapper.create();
         wrapper.where(MODEL_LIST.STATE.eq(status,null!=status))
-                .and(MODEL_LIST.DEL.eq(del,null!=del))
-                .and(MODEL_LIST.MODEL_NAME.eq(name,StringUtils.isNotEmpty(name)));
+                // .and(MODEL_LIST.DEL.eq(del,null!=del))
+                .and(MODEL_LIST.DEL.eq(false))
+                .and(MODEL_LIST.MODEL_NAME.like(name,StringUtils.isNotEmpty(name)));
 
         Page<ModelList> page = modelListService.page(Page.of(offset, limit), wrapper);
 

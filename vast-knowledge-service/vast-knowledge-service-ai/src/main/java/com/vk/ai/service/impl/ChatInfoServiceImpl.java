@@ -10,6 +10,7 @@ import com.vk.ai.domain.vo.PageVo;
 import com.vk.ai.mapper.ChatInfoMapper;
 import com.vk.ai.service.ChatInfoService;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.domain.BaseEntity;
 import com.vk.db.domain.aiMessage.AiMg;
@@ -43,8 +44,10 @@ public class ChatInfoServiceImpl extends ServiceImpl<ChatInfoMapper, ChatInfo> i
 
     @Override
     public Page<ChatInfoVo> getUserList(Integer offset, Integer limit) {
+        Long userId = RequestContextUtil.getUserId();
+
         QueryWrapper wrapper = QueryWrapper.create();
-        wrapper.where(CHAT_INFO.DEL.eq(false)).orderBy(CHAT_INFO.UPDATE_TIME,false);
+        wrapper.where(CHAT_INFO.DEL.eq(false).and(CHAT_INFO.USER_ID.eq(userId))).orderBy(CHAT_INFO.UPDATE_TIME,false);
         return mapper.paginateAs(Page.of(offset, limit), wrapper, ChatInfoVo.class);
     }
 
@@ -54,7 +57,10 @@ public class ChatInfoServiceImpl extends ServiceImpl<ChatInfoMapper, ChatInfo> i
             throw  new LeadNewsException("错误的id");
         }
 
-        QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(id).and(CHAT_INFO.DEL.eq(false)));
+        Long userId = RequestContextUtil.getUserId();
+
+
+        QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(id).and(CHAT_INFO.USER_ID.eq(userId)).and(CHAT_INFO.DEL.eq(false)));
         ChatInfoVo chatInfoVo = mapper.selectOneByQueryAs(where, ChatInfoVo.class);
         if (null==chatInfoVo){
             throw  new LeadNewsException("对话不存在");

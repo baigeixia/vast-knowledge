@@ -19,6 +19,7 @@ import com.vk.ai.strategy.AiTemplateStrategyContext;
 import com.vk.ai.template.AbstractAiTemplate;
 import com.vk.ai.template.AiTemplate;
 import com.vk.common.core.exception.LeadNewsException;
+import com.vk.common.core.utils.RequestContextUtil;
 import com.vk.common.core.utils.StringUtils;
 import com.vk.common.core.web.domain.AjaxResult;
 import com.volcengine.ark.runtime.model.completion.chat.ChatCompletionRequest;
@@ -64,7 +65,9 @@ public class ChatAiController {
         String sessionId = messageDto.getChatSessionId();
         if (null==sessionId ||sessionId.isEmpty())  throw new LeadNewsException("消息错误");
 
-        QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(sessionId).and(CHAT_INFO.DEL.eq(false)));
+        Long userId = RequestContextUtil.getUserId();
+
+        QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(sessionId).and(CHAT_INFO.DEL.eq(false).and(CHAT_INFO.USER_ID.eq(userId))));
         ChatInfo chatInfo = chatInfoMapper.selectOneByQuery(where);
         if (null==chatInfo)throw new LeadNewsException("消息列表错误");
 
@@ -119,8 +122,11 @@ public class ChatAiController {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
+        Long userId = RequestContextUtil.getUserId();
+
         ChatInfo chatInfo = new ChatInfo();
         //默认1
+        chatInfo.setUserId(userId);
         chatInfo.setUsedToken(0);
         chatInfo.setCurrentMessageId(1);
         chatInfo.setCreatingTime(dateTime);

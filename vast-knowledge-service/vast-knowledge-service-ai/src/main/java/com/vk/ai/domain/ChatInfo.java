@@ -36,7 +36,7 @@ public class ChatInfo implements Serializable {
     /**
      * 使用用户
      */
-    private Integer userId;
+    private Long userId;
 
     /**
      * 序列号
