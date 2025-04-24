@@ -47,6 +47,7 @@ pipeline {
                     echo "servicePath 参数: ${servicePath}"
 
                     // Maven打包
+
                     sh "mvn -f ${servicePath} clean package -DskipTests=true "
 
 
