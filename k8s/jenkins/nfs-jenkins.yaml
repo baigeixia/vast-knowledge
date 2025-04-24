@@ -69,6 +69,15 @@ spec:
         app: jenkins
     spec:
       serviceAccountName: jenkins-sa
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - master
       tolerations:
         - key: "node-role.kubernetes.io/control-plane"
           operator: "Exists"
