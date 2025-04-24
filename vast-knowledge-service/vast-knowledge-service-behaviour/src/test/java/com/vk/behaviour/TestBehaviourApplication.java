@@ -19,7 +19,8 @@ import org.springframework.data.elasticsearch.core.query.highlight.HighlightPara
 
 import java.util.List;
 
-@SpringBootTest(classes = {TestBehaviourApplication.class})
+//@SpringBootTest(classes = {TestBehaviourApplication.class})
+@SpringBootTest
 public class TestBehaviourApplication {
 
 
