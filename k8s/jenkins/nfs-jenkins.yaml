@@ -98,7 +98,11 @@ spec:
                   - sh
                   - -c
                   - |
-                    tar -xzvf /var/jenkins_home/tools/nerdctl-2.0.3-linux-amd64.tar.gz -C /usr/local/bin/
+                    if [ -f /var/jenkins_home/tools/nerdctl-2.0.3-linux-amd64.tar.gz ]; then
+                      tar -xzvf /var/jenkins_home/tools/nerdctl-2.0.3-linux-amd64.tar.gz -C /usr/local/bin/ || true
+                    else
+                      echo "nerdctl archive not found, skipping"
+                    fi
           securityContext:
             runAsUser: 0  # 运行容器时使用 root 用户
             runAsGroup: 0 # 运行容器时使用 root 用户组

@@ -50,7 +50,7 @@ spec:
           hostPath:
             path: /mnt/data/logs/article
             type: DirectoryOrCreate
-        - name: log-volume
+        - name: job-log
           hostPath:
             path: /mnt/data/logs/article/job
             type: DirectoryOrCreate

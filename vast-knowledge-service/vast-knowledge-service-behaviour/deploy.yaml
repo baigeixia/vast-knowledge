@@ -56,34 +56,34 @@ spec:
           hostPath:
             path: /mnt/data/logs/behaviour
             type: DirectoryOrCreate
-        - name: log-volume
+        - name: job-log
           hostPath:
             path: /mnt/data/logs/behaviour/job
             type: DirectoryOrCreate
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: behaviour-ingress
-  namespace: behaviour
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"  # 强制使用 HTTPS
-    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: "api.aidighub.com"  # 设置外部域名
-      http:
-        paths:
-          - path: /batch(/|$)(.*)  # 匹配路径 /batch 及其后续部分
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: behaviour-svc
-                port:
-                  number: 9090
-  tls:
-    - hosts:
-        - "api.aidighub.com"  # 设置 TLS 证书的域名
-      secretName: behaviour-tls-secret  # 这里是你的 TLS 证书的 Secret 名称
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: behaviour-ingress
+#  namespace: behaviour
+#  annotations:
+#    nginx.ingress.kubernetes.io/ssl-redirect: "true"  # 强制使用 HTTPS
+#    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+#spec:
+#  ingressClassName: nginx
+#  rules:
+#    - host: "api.aidighub.com"  # 设置外部域名
+#      http:
+#        paths:
+#          - path: /batch(/|$)(.*)  # 匹配路径 /batch 及其后续部分
+#            pathType: ImplementationSpecific
+#            backend:
+#              service:
+#                name: behaviour-svc
+#                port:
+#                  number: 9090
+#  tls:
+#    - hosts:
+#        - "api.aidighub.com"  # 设置 TLS 证书的域名
+#      secretName: behaviour-tls-secret  # 这里是你的 TLS 证书的 Secret 名称
