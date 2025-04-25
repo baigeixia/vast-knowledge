@@ -128,8 +128,8 @@ public class TokenService {
         String env = systemSettingsUtils.getCurrentEnv();
 
         if ("prod".equals(env)) {
-            // 生产环境，设置为 .aidighub.com，允许所有子域共享
-            refreshTokenCookie.setDomain(".aidighub.com");
+            // 生产环境，设置为 aidighub.com，允许所有子域共享
+            refreshTokenCookie.setDomain("aidighub.com");
         }
         return refreshTokenCookie;
     }
