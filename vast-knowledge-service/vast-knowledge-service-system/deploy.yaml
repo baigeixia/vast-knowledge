@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
         - name: system
-          image: 10.1.182.202:443/vk-25/system:${IMAGE_TAG}  # 使用适合的版本
+          image: registry.cn-shenzhen.aliyuncs.com/vk-25/system:${IMAGE_TAG}  # 使用适合的版本
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
