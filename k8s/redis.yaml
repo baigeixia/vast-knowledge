@@ -21,7 +21,7 @@ spec:
               values:
                 - node2
 ---
-
+#Namespace dev
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -30,7 +30,7 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis
+  name: redis-svc
   namespace: redis
 spec:
   ports:
@@ -73,8 +73,8 @@ data:
     logfile ""
     
     # 设置客户端连接
-    timeout 300
-    maxclients 10000
+    timeout 30
+    maxclients 1000
     
     # 禁止危险命令
     rename-command CONFIG ""
@@ -89,7 +89,7 @@ metadata:
   name: redis
   namespace: redis
 spec:
-  serviceName: "redis"
+  serviceName: "redis-svc"
   replicas: 1
   selector:
     matchLabels:
@@ -99,11 +99,11 @@ spec:
       labels:
         app: redis
     spec:
-#      部署 master 节点需要
-#      tolerations:
-#        - key: "node-role.kubernetes.io/control-plane"
-#          operator: "Exists"
-#          effect: "NoSchedule"  # 容忍控制平面节点的 taint
+      #      部署 master 节点需要
+      #      tolerations:
+      #        - key: "node-role.kubernetes.io/control-plane"
+      #          operator: "Exists"
+      #          effect: "NoSchedule"  # 容忍控制平面节点的 taint
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

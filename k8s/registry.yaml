@@ -10,13 +10,13 @@ metadata:
   name: registry-svc
   namespace: registry
 spec:
+  type: ClusterIP
   selector:
     app: registry
   ports:
     - protocol: TCP
-      port: 5000
-      targetPort: 5000
-  type: NodePort
+      port: 443
+      targetPort: 443
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -26,7 +26,7 @@ metadata:
   labels:
     app: registry
 spec:
-  serviceName: "registry"
+  serviceName: "registry-svc"
   replicas: 1
   selector:
     matchLabels:
@@ -51,13 +51,26 @@ spec:
             privileged: true
           image: registry:3
           ports:
-            - containerPort: 5000
+            - containerPort: 443
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
+            - name: REGISTRY_HTTP_ADDR
+              value: "0.0.0.0:443"
+            - name: OTEL_TRACES_EXPORTER
+              value: "none"
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+            - name: REGISTRY_HTTP_TLS_CERTIFICATE
+              value: "/certs/api.aidighub.com.pem"
+            - name: REGISTRY_HTTP_TLS_KEY
+              value: "/certs/api.aidighub.com.key"
           volumeMounts:
             - name: registry-storage
               mountPath: /var/lib/registry
+            - name: tls-secret
+              mountPath: /certs
+              readOnly: true
           resources:
             limits:
               cpu: "500m"
@@ -65,20 +78,12 @@ spec:
             requests:
               cpu: "100m"
               memory: "128Mi"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 5000
-            initialDelaySeconds: 5
-            periodSeconds: 5
       volumes:
         - name: registry-storage
           hostPath:
             path: /mnt/data/registry
+            type: DirectoryOrCreate
+        - name: tls-secret
+          hostPath:
+            path: /mnt/data/registry/secret
             type: DirectoryOrCreate

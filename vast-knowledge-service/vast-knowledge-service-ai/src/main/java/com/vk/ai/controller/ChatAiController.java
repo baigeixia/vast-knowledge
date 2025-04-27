@@ -28,6 +28,7 @@ import com.volcengine.ark.runtime.model.completion.chat.ChatMessageRole;
 import com.volcengine.ark.runtime.service.ArkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Mono;
@@ -114,15 +115,15 @@ public class ChatAiController {
             @RequestBody createChatDto dto
     ) {
         String sessionId = dto.getChatSessionId();
+        Long userId = RequestContextUtil.getUserId();
         if (!StringUtils.isEmpty(sessionId)){
-            QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(sessionId).and(CHAT_INFO.DEL.eq(false)));
+            QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(sessionId).and(CHAT_INFO.USER_ID.eq(userId)).and(CHAT_INFO.DEL.eq(false)));
             ChatInfo chatInfo = chatInfoMapper.selectOneByQuery(where);
             return AjaxResult.success(chatInfo);
         }
 
         LocalDateTime dateTime = LocalDateTime.now();
 
-        Long userId = RequestContextUtil.getUserId();
 
         ChatInfo chatInfo = new ChatInfo();
         //默认1
@@ -143,6 +144,61 @@ public class ChatAiController {
         if (Boolean.TRUE.equals(featureEnabled) && !Boolean.TRUE.equals(modelSupports)) {
             throw new RuntimeException(errorMsg);
         }
+    }
+
+    @GetMapping(value = "/upTitle/{id}")
+    public AjaxResult upTitle(
+            @PathVariable(name="id") String id,
+            @RequestParam(name="title") String title
+    ) {
+        if (StringUtils.isEmpty(id)|| StringUtils.isEmpty(title))
+            throw new LeadNewsException("错误的参数");
+
+        Long userId = RequestContextUtil.getUserId();
+
+        QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(id).and(CHAT_INFO.USER_ID.eq(userId)).and(CHAT_INFO.DEL.eq(false)));
+        ChatInfo chatInfo = chatInfoMapper.selectOneByQuery(where);
+        if (ObjectUtils.isEmpty(chatInfo))
+            throw new LeadNewsException("错误的消息");
+
+        ChatInfo info = new ChatInfo();
+        info.setUpdateTime(LocalDateTime.now());
+        info.setId(id);
+        info.setTitle(title);
+
+        chatInfoMapper.update(info);
+
+        return AjaxResult.success();
+    }
+
+
+    @DeleteMapping(value = "/deChat/{id}")
+    public AjaxResult deChat(
+            @PathVariable(name="id") String id
+    ) {
+        if (StringUtils.isEmpty(id))
+            throw new LeadNewsException("错误的参数");
+
+        Long userId = RequestContextUtil.getUserId();
+
+        QueryWrapper where = QueryWrapper.create().where(CHAT_INFO.ID.eq(id).and(CHAT_INFO.USER_ID.eq(userId)));
+        ChatInfo chatInfo = chatInfoMapper.selectOneByQuery(where);
+
+        if (ObjectUtils.isEmpty(chatInfo))
+            throw new LeadNewsException("错误的消息");
+
+        Boolean del = chatInfo.getDel();
+        if (del)
+            throw new LeadNewsException("已经被移除的消息");
+
+        ChatInfo info = new ChatInfo();
+        info.setUpdateTime(LocalDateTime.now());
+        info.setId(id);
+        info.setDel(true);
+
+        chatInfoMapper.update(info);
+
+        return AjaxResult.success();
     }
 
 }
