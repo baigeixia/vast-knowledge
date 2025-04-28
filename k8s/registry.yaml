@@ -15,8 +15,34 @@ spec:
     app: registry
   ports:
     - protocol: TCP
-      port: 443
-      targetPort: 443
+      port: 5000
+      targetPort: 5000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry-ingress
+  namespace: registry
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: ""
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "api.aidighub.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: registry-svc
+                port:
+                  number: 5000
+  tls:
+    - hosts:
+        - "api.aidighub.com"
+      secretName: registry-tls-secret
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -55,20 +81,20 @@ spec:
             privileged: true
           image: registry:3
           ports:
-            - containerPort: 443
+            - containerPort: 5000
           env:
             - name: TZ
               value: "Asia/Shanghai"  # 设置时区为上海
-            - name: REGISTRY_HTTP_ADDR
-              value: "0.0.0.0:443"
+#            - name: REGISTRY_HTTP_ADDR
+#              value: "0.0.0.0:443"
             - name: OTEL_TRACES_EXPORTER
               value: "none"
             - name: REGISTRY_STORAGE_DELETE_ENABLED
               value: "true"
-            - name: REGISTRY_HTTP_TLS_CERTIFICATE
-              value: "/certs/api.aidighub.com.pem"
-            - name: REGISTRY_HTTP_TLS_KEY
-              value: "/certs/api.aidighub.com.key"
+#            - name: REGISTRY_HTTP_TLS_CERTIFICATE
+#              value: "/certs/api.aidighub.com.pem"
+#            - name: REGISTRY_HTTP_TLS_KEY
+#              value: "/certs/api.aidighub.com.key"
           volumeMounts:
             - name: registry-storage
               mountPath: /var/lib/registry
