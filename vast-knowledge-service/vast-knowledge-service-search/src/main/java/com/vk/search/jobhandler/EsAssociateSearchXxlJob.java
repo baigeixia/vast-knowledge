@@ -8,6 +8,7 @@ import com.vk.common.redis.service.RedisService;
 import com.vk.search.mapper.ApAssociateWordsMapper;
 import com.vk.search.util.SyncUtil;
 import com.xxl.job.core.context.XxlJobHelper;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ public class EsAssociateSearchXxlJob {
     /**
      * 1、简单任务示例（Bean模式）
      */
-    // @XxlJob("esAssociateSearchSync")
+    @XxlJob("esAssociateSearchSync")
     public void esAssociateSearchSync() {
         String recordTime = redisService.getCacheObject("associateTime");
         if (StringUtils.isEmpty(recordTime)) {
@@ -52,8 +53,8 @@ public class EsAssociateSearchXxlJob {
         redisService.setCacheObject("associateTime", now.format(SyncUtil.FORMATTER_YMDHMS));
         LocalDateTime redisTime = LocalDateTime.parse(recordTime, SyncUtil.FORMATTER_YMDHMS);
         List<AssociateWordsDocument> apSearch = apAssociateWordsMapper.selectForCondition(redisTime,now);
-        log.info("执行定时任务esAssociateSearchSync:: 需要同步的文章size={}, from={},to={}", apSearch == null ? 0 : apSearch.size(), redisTime, now);
-        XxlJobHelper.log("执行定时任务esAssociateSearchSync:: 需要同步的文章size={}, from={},to={}", apSearch == null ? 0 : apSearch.size(), redisTime, now);
+        log.info("执行定时任务esAssociateSearchSync:: 需要同步的联想词size={}, from={},to={}", apSearch == null ? 0 : apSearch.size(), redisTime, now);
+        XxlJobHelper.log("执行定时任务esAssociateSearchSync:: 需要同步的联想词size={}, from={},to={}", apSearch == null ? 0 : apSearch.size(), redisTime, now);
         if (apSearch != null && !apSearch.isEmpty()) {
             associateWordsDocumentRepository.saveAll(apSearch);
         }

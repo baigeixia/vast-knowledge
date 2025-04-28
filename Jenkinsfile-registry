@@ -1,8 +1,7 @@
 pipeline {
     agent any
     environment {
-
-        ali_url = "10.1.182.202:443"
+        ali_url = "registry-svc.registry"
         ali_project_name = "vk-25"
         ali_credentialsId = "2bbf117e-0bfd-406d-95e1-9d9d593474c7"
         git_auth_id = "2b317317-386b-4924-90e3-b3c78eb83c4d"
@@ -14,7 +13,6 @@ pipeline {
     }
 
     stages {
-
         stage('克隆代码') {
             steps {
                 git credentialsId: git_auth_id, url: 'https://gitee.com/tsitsiharry/vast-knowledge.git'

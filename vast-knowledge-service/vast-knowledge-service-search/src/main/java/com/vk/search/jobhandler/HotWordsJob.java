@@ -5,6 +5,7 @@ import com.vk.common.redis.service.RedisService;
 import com.vk.search.domain.HotWordsTop;
 import com.vk.search.mapper.ApHotWordsMapper;
 import com.vk.search.service.ApHotWordsService;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ public class HotWordsJob {
     private static final ReentrantLock lock = new ReentrantLock();
 
 
-    // @XxlJob("hotWordsSyncRedis")
+    @XxlJob("hotWordsSyncRedis")
     public void hotWordsSyncRedis() {
         if (lock.tryLock()) {
             try {

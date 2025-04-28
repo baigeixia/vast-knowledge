@@ -9,13 +9,15 @@ import com.vk.common.es.domain.UserReadDocument;
 import com.vk.common.es.repository.UserReadDocumentRepository;
 import com.vk.common.redis.service.RedisService;
 import com.xxl.job.core.context.XxlJobHelper;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-// @Component
+@Component
 @Slf4j(topic = "EsBehaviourSynChXxlJob")
 public class EsBehaviourSynChXxlJob {
 
@@ -29,7 +31,7 @@ public class EsBehaviourSynChXxlJob {
     /**
      * 1、简单任务示例（Bean模式）
      */
-    // @XxlJob("esUserReadSync")
+    @XxlJob("esUserReadSync")
     public void esUserReadSync() {
         String recordTime = redisService.getCacheObject("recordUserReadTime");
         if (StringUtils.isEmpty(recordTime)) {

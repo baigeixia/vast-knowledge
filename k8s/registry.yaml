@@ -44,7 +44,11 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: In
                     values:
-                      - node4
+                      - master
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"  # 容忍控制平面节点的 taint
       containers:
         - name: registry
           securityContext:
@@ -85,5 +89,5 @@ spec:
             type: DirectoryOrCreate
         - name: tls-secret
           hostPath:
-            path: /mnt/data/registry/secret
+            path: /root/nginxKey/api
             type: DirectoryOrCreate

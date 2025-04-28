@@ -8,13 +8,15 @@ import com.vk.common.redis.service.RedisService;
 import com.vk.user.mapper.ApUserInfoMapper;
 import com.vk.user.util.SyncUtil;
 import com.xxl.job.core.context.XxlJobHelper;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-// @Component
+@Component
 @Slf4j(topic="EsUserInfoSynChXxlJob")
 public class EsArticleSynChXxlJob {
 
@@ -29,7 +31,7 @@ public class EsArticleSynChXxlJob {
     /**
      * 1、简单任务示例（Bean模式）
      */
-    // @XxlJob("esUserInfoSync")
+    @XxlJob("esUserInfoSync")
     public void esUserInfoSync() {
         String recordTime = redisService.getCacheObject("recordTime");
         if (StringUtils.isEmpty(recordTime)) {
