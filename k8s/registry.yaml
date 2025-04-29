@@ -10,13 +10,14 @@ metadata:
   name: registry-svc
   namespace: registry
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: registry
   ports:
     - protocol: TCP
       port: 5000
       targetPort: 5000
+      nodePort: 30355
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -26,6 +27,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: ""
+    nginx.ingress.kubernetes.io/proxy-body-size: "1G"
 spec:
   ingressClassName: nginx
   rules:
@@ -98,9 +100,9 @@ spec:
           volumeMounts:
             - name: registry-storage
               mountPath: /var/lib/registry
-            - name: tls-secret
-              mountPath: /certs
-              readOnly: true
+#            - name: tls-secret
+#              mountPath: /certs
+#              readOnly: true
           resources:
             limits:
               cpu: "500m"
@@ -113,7 +115,7 @@ spec:
           hostPath:
             path: /mnt/data/registry
             type: DirectoryOrCreate
-        - name: tls-secret
-          hostPath:
-            path: /root/nginxKey/api
-            type: DirectoryOrCreate
+#        - name: tls-secret
+#          hostPath:
+#            path: /root/nginxKey/api
+#            type: DirectoryOrCreate
