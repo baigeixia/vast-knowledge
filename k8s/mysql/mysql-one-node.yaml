@@ -49,12 +49,14 @@ spec: #必选，Pod中容器的详细定义
         app: mysql
     spec:
       affinity:
-        podAntiAffinity:
+        nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app: mysql
-              topologyKey: kubernetes.io/hostname
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - node1
       containers:
         - name: mysql
           image: mysql:8.4.4  #必选，容器的镜像名称
@@ -68,10 +70,6 @@ spec: #必选，Pod中容器的详细定义
                 secretKeyRef:
                   name: mysql-pass
                   key: password # root 用户密码
-          resources:
-            limits:
-              cpu: "500m" #Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
-              memory: "1Gi"  #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
           livenessProbe: #对Pod内各容器健康检查的设置，当探测无响应几次后将自动重启该容器
             tcpSocket: #对Pod内个容器健康检查方式设置为tcpSocket方式
               port: 3306
